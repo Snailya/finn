@@ -1,0 +1,55 @@
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+  frontend:
+    build: 
+      context: ./finn.ui
+      dockerfile: Dockerfile
+    image: snailya2005/finn_frontend
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost
+    depends_on:
+      - api
+    command: npm run start
+
+    ports:
+      - "3000:3000"
+  api:
+    build: 
+      dockerfile: ./FINN.API/Dockerfile
+    image: snailya2005/finn_api
+    depends_on:
+      - rabbitmq
+    environment:
+      - RabbitMQ__Uri=amqp://rabbitmq:5672
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - storage:/tmp/
+  reader:
+    build: 
+      dockerfile: ./FINN.READER/Dockerfile
+    image: snailya2005/finn_reader
+    depends_on:
+      - rabbitmq
+    environment:
+      - RabbitMQ__Uri=amqp://rabbitmq:5672
+    volumes:
+      - storage:/tmp/
+  drafter:
+    build: 
+      dockerfile: ./FINN.DRAFTER/Dockerfile
+    image: snailya2005/finn_drafter
+    depends_on:
+      - rabbitmq
+    environment:
+      - RabbitMQ__Uri=amqp://rabbitmq:5672
+    volumes:
+      - storage:/tmp/
+
+volumes:
+  storage:

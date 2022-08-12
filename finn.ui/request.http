@@ -1,0 +1,4 @@
+GET https://localhost:7282/file/check?jobId=1
+
+###
+GET http://localhost:5140/file/check?jobId=1

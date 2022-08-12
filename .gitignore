@@ -1,0 +1,12 @@
+﻿#.NET build
+/*/obj/
+/*/bin/
+
+# vscode config
+.vscode/
+
+# Nodejs modules
+*/node_modules/
+
+# Rider config
+.idea/
