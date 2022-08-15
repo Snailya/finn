@@ -1,4 +1,6 @@
-﻿using FINN.DRAFTER.Utils;
+﻿using FINN.DRAFTER.Extensions;
+using FINN.DRAFTER.Utils;
+using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
@@ -9,15 +11,27 @@ namespace FINN.DRAFTER.Model;
 
 public class Grid : DxfWrapper
 {
+    private readonly Block _axios = new("_Axios",
+        new[] { EntityUtil.CreateCircle(LayerUtil.GetAxis(), Vector2d.Zero, 1) },
+        new[]
+        {
+            new AttributeDefinition("A", 1,
+                new TextStyle("COMPLEX", "complex.shx"))
+            {
+                Alignment = TextAlignment.MiddleCenter, Layer = LayerUtil.GetAxisText(), Value = "X",
+                IsVisible = true, Position = Vector3.Zero
+            }
+        });
+
     public Grid(Vector2d location, double[] xCoordinates, double[] yCoordinates, double columnXLength,
         double columnYLength) : base(Layer.Default, location)
     {
-        var (xLines, yLines) = PrepareGridLine(xCoordinates, yCoordinates);
-        PrepareGridIndex(xLines);
-        PrepareGridIndex(yLines);
-        PrepareContinuesDimensions(xLines);
-        PrepareContinuesDimensions(yLines);
-        PrepareColumns(xCoordinates, yCoordinates, columnXLength, columnYLength);
+        var xLength = xCoordinates.Max();
+        var yLength = yCoordinates.Max();
+
+        PopulateLinesWidthLabelAndDims(xCoordinates, yLength, PopulateDirection.Horizontal);
+        PopulateLinesWidthLabelAndDims(yCoordinates, xLength, PopulateDirection.Vertical);
+        PopulateColumns(xCoordinates, yCoordinates, columnXLength, columnYLength);
     }
 
     public Grid(double[] xCoordinates, double[] yCoordinates, double columnXLength,
@@ -26,58 +40,44 @@ public class Grid : DxfWrapper
     {
     }
 
-    private void PrepareGridIndex(IEnumerable<Line> lines)
+    private void PopulateLinesWidthLabelAndDims(double[] coordinates, double length, PopulateDirection direction)
     {
-        var block = new Block("_Axios", new[] { EntityUtil.CreateCircle(LayerUtil.GetAxis(), Vector2d.Zero, 1) },
-            new[]
-            {
-                new AttributeDefinition("A", 1,
-                    new TextStyle("COMPLEX", "complex.shx"))
+        var lines = coordinates.Select(x =>
+        {
+            var line = direction == PopulateDirection.Horizontal
+                ? EntityUtil.CreateLine(new Vector2d(x, 0), new Vector2d(x, length))
+                : EntityUtil.CreateLine(new Vector2d(length, x), new Vector2d(0, x));
+            line.TransformBy(new Scale(((line.StartPoint + line.EndPoint) / 2).ToVector2d(), 1.2), Location);
+            AddEntity(line);
+
+            var label1 =
+                new Insert(_axios, line.StartPoint - Vector3.Normalize(line.Direction) * 1600)
+                    { Scale = new Vector3(1600, 1600, 1600) };
+            var label2 = new Insert(_axios, line.EndPoint + Vector3.Normalize(line.Direction) * 1600)
+                { Scale = new Vector3(1600, 1600, 1600) };
+            AddEntity(label1);
+            AddEntity(label2);
+
+            return (Line: line, Labels: new[] { label1, label2 });
+        }).ToList();
+
+        var dims = lines.Take(lines.Count - 1)
+            .Zip(lines.Skip(1),
+                (l1, l2) =>
                 {
-                    Alignment = TextAlignment.MiddleCenter, Layer = LayerUtil.GetAxisText(), Value = "X",
-                    IsVisible = true, Position = Vector3.Zero
-                }
-            });
-        foreach (var line in lines)
-        {
-            var ins1 = new Insert(block, line.StartPoint, 1600);
-            var ins2 = new Insert(block, line.EndPoint, 1600);
-
-            AddEntity(ins1);
-            AddEntity(ins2);
-        }
+                    return new[]
+                    {
+                        new Line(l1.Line.StartPoint, l2.Line.StartPoint), new Line(l2.Line.EndPoint, l1.Line.EndPoint)
+                    };
+                }).SelectMany(x => x).Select(x =>
+            {
+                var dim = DimUtil.CreateAlignedDim(x, 200);
+                AddEntity(dim);
+                return dim;
+            }).ToList();
     }
 
-    private (IEnumerable<Line>, IEnumerable<Line>) PrepareGridLine(double[] xCoordinates, double[] yCoordinates)
-    {
-        var xLines = new List<Line>();
-        var yLines = new List<Line>();
-
-        var xLength = xCoordinates.Max();
-        var yLength = yCoordinates.Max();
-
-        foreach (var coordinate in xCoordinates)
-        {
-            var line = EntityUtil.CreateLine(new Vector2d(coordinate, 0), new Vector2d(coordinate, yLength));
-            line.TransformBy(new Scale(((line.StartPoint + line.EndPoint) / 2).ToVector2d(), 1.2), Location);
-            AddEntity(line);
-
-            xLines.Add(line);
-        }
-
-        foreach (var coordinate in yCoordinates)
-        {
-            var line = EntityUtil.CreateLine(new Vector2d(0, coordinate), new Vector2d(xLength, coordinate));
-            line.TransformBy(new Scale(((line.StartPoint + line.EndPoint) / 2).ToVector2d(), 1.2), Location);
-            AddEntity(line);
-
-            yLines.Add(line);
-        }
-
-        return (xLines, yLines);
-    }
-
-    private void PrepareColumns(IEnumerable<double> xCoordinates, IEnumerable<double> yCoordinates,
+    private void PopulateColumns(IEnumerable<double> xCoordinates, IEnumerable<double> yCoordinates,
         double columnXLength,
         double columnYLength)
     {
@@ -95,26 +95,16 @@ public class Grid : DxfWrapper
         }
     }
 
-    private void PrepareContinuesDimensions(IEnumerable<Line> lines)
+    public static Grid FromDto(GridDto dto)
     {
-        var enumerable = lines.ToList();
-        // start point
-        enumerable.Skip(1)
-            .Zip(enumerable.Take(enumerable.Count - 1), (l1, l2) => (p1: l1.StartPoint, p2: l2.StartPoint)).ToList()
-            .ForEach(
-                i =>
-                {
-                    var dim = DimUtil.CreateAlignedDim(i.p1.ToVector2d(), i.p2.ToVector2d(), 200);
-                    AddEntity(dim, false);
-                });
-        // end point
-        enumerable.Skip(1)
-            .Zip(enumerable.Take(enumerable.Count - 1), (l1, l2) => (p1: l1.EndPoint, p2: l2.EndPoint)).ToList()
-            .ForEach(
-                i =>
-                {
-                    var dim = DimUtil.CreateAlignedDim(i.p1.ToVector2d(), i.p2.ToVector2d(), 200);
-                    AddEntity(dim, false);
-                });
+        return new Grid(dto.XCoordinates, dto.YCoordinates,
+            dto.ColumnXLength,
+            dto.ColumnYLength);
+    }
+
+    private enum PopulateDirection
+    {
+        Horizontal,
+        Vertical
     }
 }

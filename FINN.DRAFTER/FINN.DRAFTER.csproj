@@ -13,7 +13,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="netDxf.netstandard" Version="2.4.0"/>
+        <None Remove="Template.las"/>
+        <Content Include="Template.las">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="netDxf">
+            <HintPath>..\3rd\netDxf.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

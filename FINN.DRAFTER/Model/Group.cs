@@ -3,12 +3,12 @@ using netDxf.Tables;
 
 namespace FINN.DRAFTER.Model;
 
-public class Group<T> : DxfWrapper where T : DxfWrapper
+public class Group : DxfWrapper
 {
     private readonly GroupAlignment _alignment;
-    private readonly double _gutter;
     private readonly GroupDirection _direction;
-    private readonly List<T> _items = new();
+    private readonly double _gutter;
+    private readonly List<DxfWrapper> _items = new();
 
     public Group(Vector2d location, GroupDirection direction, GroupAlignment alignment, double gutter) : base(
         Layer.Default,
@@ -19,7 +19,7 @@ public class Group<T> : DxfWrapper where T : DxfWrapper
         _gutter = gutter;
     }
 
-    public virtual void Add(T item)
+    public void Add(DxfWrapper item)
     {
         item.Location = _alignment switch
         {
@@ -66,6 +66,21 @@ public class Group<T> : DxfWrapper where T : DxfWrapper
 
         // track in group wrapper
         item.Entities.ToList().ForEach(x => AddEntity(x));
+    }
+}
+
+public sealed class Group<T> : Group where T : DxfWrapper
+{
+    private readonly List<T> _items = new();
+
+    public Group(Vector2d location, GroupDirection direction, GroupAlignment alignment, double gutter) : base(location,
+        direction, alignment, gutter)
+    {
+    }
+
+    public void Add(T item)
+    {
+        base.Add(item);
     }
 }
 

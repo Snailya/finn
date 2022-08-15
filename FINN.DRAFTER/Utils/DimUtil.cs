@@ -1,4 +1,6 @@
-﻿using FINN.SHAREDKERNEL.Models;
+﻿using FINN.DRAFTER.Extensions;
+using FINN.SHAREDKERNEL.Models;
+using netDxf;
 using netDxf.Entities;
 using netDxf.Tables;
 
@@ -6,11 +8,23 @@ namespace FINN.DRAFTER.Utils;
 
 public static class DimUtil
 {
+    public enum TextDirection
+    {
+        Increase,
+        Decrease
+    }
+
     private static readonly Dictionary<string, DimensionStyle> DimStyles = new();
 
     public static AlignedDimension CreateAlignedDim(Vector2d point1, Vector2d point2, double scaleFactor)
     {
         return new AlignedDimension(point1.ToVector2(), point2.ToVector2(), 800, GetDimStyle(scaleFactor))
+            { Layer = LayerUtil.GetDim() };
+    }
+
+    public static AlignedDimension CreateAlignedDim(Line line, double scaleFactor)
+    {
+        return new AlignedDimension(line, 800d, GetDimStyle(scaleFactor))
             { Layer = LayerUtil.GetDim() };
     }
 
@@ -29,5 +43,12 @@ public static class DimUtil
         };
         DimStyles.Add(name, dimStyle);
         return dimStyle;
+    }
+
+    public static void Initialize(DxfDocument dxf)
+    {
+        DimStyles.Clear();
+
+        dxf.DimensionStyles.Items.ToList().ForEach(x => DimStyles.Add(x.Name, x));
     }
 }

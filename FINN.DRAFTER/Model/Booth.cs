@@ -1,4 +1,6 @@
-﻿using FINN.DRAFTER.Utils;
+﻿using FINN.DRAFTER.Extensions;
+using FINN.DRAFTER.Utils;
+using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Models;
 using netDxf.Entities;
 using netDxf.Tables;
@@ -42,10 +44,7 @@ public class Booth : DxfWrapper
     {
     }
 
-    /// <summary>
-    ///     Indicate whether the booth is a abstract booth that has no shape.
-    /// </summary>
-    public bool UnSized => _xLength == 0 || _yLength == 0;
+    private bool UnSized => _xLength == 0 || _yLength == 0;
 
     private void PrepareCentralLine()
     {
@@ -95,5 +94,18 @@ public class Booth : DxfWrapper
         AddEntity(hatch);
 
         AddEntity(wall);
+    }
+
+    public static Booth FromDto(ProcessDto dto, Vector2d location)
+    {
+        return dto.XLength == 0 || dto.YLength == 0
+            ? new Booth(LayerUtil.GetLayerByName(dto.Layer), location, dto.Name)
+            : new Booth(LayerUtil.GetLayerByName(dto.Layer), location, dto.XLength, dto.YLength,
+                dto.Line1, dto.Line2);
+    }
+
+    public static Booth FromDto(ProcessDto dto)
+    {
+        return FromDto(dto, Vector2d.Zero);
     }
 }

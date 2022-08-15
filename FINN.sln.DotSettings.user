@@ -1,4 +1,5 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005Csnailya_005CRiderProjects_005CFINN_005C3rd_005CnetDxf_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=702442f8_002Da025_002D453b_002Da118_002Ddc70aedc9d8f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="JsonSerializeTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.TransformExtensionLogicCorrectly&lt;/TestId&gt;&#xD;

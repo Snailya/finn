@@ -1,11 +1,13 @@
 ﻿using System.Text;
 using System.Text.Json;
+using FINN.DRAFTER.Extensions;
 using FINN.DRAFTER.Model;
 using FINN.DRAFTER.Utils;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
+using netDxf.Entities;
 
 namespace FINN.DRAFTER;
 
@@ -50,20 +52,11 @@ public class HostedService : BackgroundService
         try
         {
             // do business
-            var dxf = new DxfDocument();
+            var dxf = DocUtil.CreateDoc();
 
             // draw grids
             var location = Vector2d.Zero;
-            var gridGroup = new Group<Grid>(location, GroupDirection.BottomToTop, GroupAlignment.Start, Gutter * 4);
-            foreach (var gridDto in drafterDto.Grids)
-            {
-                var grid = new Grid(gridDto.XCoordinates, gridDto.YCoordinates,
-                    gridDto.ColumnXLength,
-                    gridDto.ColumnYLength);
-
-                gridGroup.Add(grid);
-            }
-
+            var gridGroup = drafterDto.Grids.ToGridGroup(location);
             dxf.Add(gridGroup);
 
             // draw layout items
@@ -76,11 +69,7 @@ public class HostedService : BackgroundService
                 location -= new Vector2d(0, yStep);
 
                 // draw primary
-                var primary = processDto.XLength == 0 || processDto.YLength == 0
-                    ? new Booth(LayerUtil.GetLayerByName(processDto.Layer), location, processDto.Name)
-                    : new Booth(LayerUtil.GetLayerByName(processDto.Layer), location, processDto.XLength,
-                        processDto.YLength,
-                        processDto.Line1, processDto.Line2);
+                var primary = Booth.FromDto(processDto, location);
                 dxf.Add(primary);
 
                 // step half of process's x length
@@ -89,18 +78,7 @@ public class HostedService : BackgroundService
                 // draw sub process
                 if (sub.Count > 0)
                 {
-                    var boothGroup =
-                        new Group<Booth>(subLocation, GroupDirection.LeftToRight, GroupAlignment.Middle, 0);
-                    foreach (var subDto in processDto.SubProcess)
-                    {
-                        var booth = subDto.XLength == 0 || subDto.YLength == 0
-                            ? new Booth(LayerUtil.GetLayerByName(subDto.Layer), subDto.Name)
-                            : new Booth(LayerUtil.GetLayerByName(subDto.Layer), subDto.XLength, subDto.YLength,
-                                subDto.Line1, subDto.Line2);
-
-                        boothGroup.Add(booth);
-                    }
-
+                    var boothGroup = processDto.SubProcess.ToBoothGroup(subLocation);
                     dxf.Add(boothGroup);
                 }
 

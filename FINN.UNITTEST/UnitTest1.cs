@@ -1,5 +1,5 @@
 using System.Text.Json;
-using FINN.DRAFTER;
+using FINN.DRAFTER.Extensions;
 using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;

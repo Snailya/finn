@@ -1,4 +1,5 @@
-﻿using FINN.SHAREDKERNEL.Models;
+﻿using FINN.DRAFTER.Extensions;
+using FINN.SHAREDKERNEL.Models;
 using netDxf.Entities;
 using netDxf.Tables;
 

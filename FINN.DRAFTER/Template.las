@@ -1,0 +1,1414 @@
+  0
+LAYERSTATEDICTIONARY
+  0
+LAYERSTATE
+  1
+Template
+ 91
+2047
+301
+
+290
+0
+302
+2
+  8
+22
+ 90
+8
+ 62
+8
+370
+-3
+  6
+S
+  2
+Color_8
+440
+0
+  8
+21
+ 90
+8
+ 62
+1
+370
+-3
+  6
+Z
+  2
+Color_1
+440
+0
+  8
+44
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+jh
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+34
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PTEC-TUN-SUS
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-SymbolText
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+P-Symbol
+ 90
+8
+ 62
+2
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_2
+440
+0
+  8
+P-PR-Text
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+P-PR-N
+ 90
+8
+ 62
+2
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_2
+440
+0
+  8
+P-PR-Dim
+ 90
+8
+ 62
+2
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_2
+440
+0
+  8
+P-PR-44
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PR-34
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PR-24
+ 90
+8
+ 62
+2
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_2
+440
+0
+  8
+P-PR-23
+ 90
+8
+ 62
+8
+370
+-3
+  6
+X
+  2
+Color_8
+440
+0
+  8
+P-PR-22
+ 90
+8
+ 62
+2
+370
+-3
+  6
+S
+  2
+Color_2
+440
+0
+  8
+P-PR-21
+ 90
+8
+ 62
+1
+370
+-3
+  6
+Z
+  2
+Color_1
+440
+0
+  8
+P-OV-Z
+ 90
+8
+ 62
+1
+370
+-3
+  6
+Z
+  2
+Color_1
+440
+0
+  8
+P-OV-X
+ 90
+8
+ 62
+8
+370
+-3
+  6
+X
+  2
+Color_8
+440
+0
+  8
+P-OV-PLAT
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-OV-S
+ 90
+8
+ 62
+15
+370
+-3
+  6
+S
+  2
+Color_15
+440
+0
+  8
+P-OV-P
+ 90
+8
+ 62
+6
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_6
+440
+0
+  8
+P-OV-OD
+ 90
+8
+ 62
+5
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_5
+440
+0
+  8
+P-OV-ID
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-OV-HU
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-OV-H
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-OV-BS
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-SP-X
+ 90
+8
+ 62
+6
+370
+-3
+  6
+X
+  2
+Color_6
+440
+0
+  8
+P-SP-Z
+ 90
+8
+ 62
+1
+370
+-3
+  6
+Z
+  2
+Color_1
+440
+0
+  8
+P-SP-S
+ 90
+8
+ 62
+9
+370
+-3
+  6
+S
+  2
+Color_9
+440
+0
+  8
+P-N
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-Hatch
+ 90
+8
+ 62
+8
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_8
+440
+0
+  8
+P-CV-X
+ 90
+8
+ 62
+8
+370
+-3
+  6
+X
+  2
+Color_8
+440
+0
+  8
+P-CV-Z
+ 90
+8
+ 62
+1
+370
+-3
+  6
+Z
+  2
+Color_1
+440
+0
+  8
+P-CV-S
+ 90
+8
+ 62
+15
+370
+-3
+  6
+S
+  2
+Color_15
+440
+0
+  8
+P-PTEC-TUN-Q235
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-TUN-PIPE
+ 90
+8
+ 62
+1
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_1
+440
+0
+  8
+P-PTEC-TUN-LAMP
+ 90
+8
+ 62
+5
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_5
+440
+0
+  8
+P-PTEC-TUN-DOOR
+ 90
+8
+ 62
+5
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_5
+440
+0
+  8
+P-PTEC-STEEL
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-HR
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-PLAT
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PTEC-PIPE-TEXT
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+P-PTEC-PIPE-SUS-VALVE
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PTEC-PIPE-SUS
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PTEC-PIPE-RO
+ 90
+8
+ 62
+5
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_5
+440
+0
+  8
+P-PTEC-PIPE-Q235-VALVE
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-PIPE-Q235
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-PIPE-PUMP
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-PIPE-FILTER
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-PIPE-ELSE
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PTEC-PIPE-DI
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-PIPE-CW
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PTEC-PIPE-CA
+ 90
+8
+ 62
+5
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_5
+440
+0
+  8
+P-Sheet
+ 90
+8
+ 62
+35
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_35
+440
+0
+  8
+P-PTEC-Z
+ 90
+8
+ 62
+1
+370
+-3
+  6
+Z
+  2
+Color_1
+440
+0
+  8
+P-PTEC-X
+ 90
+8
+ 62
+2
+370
+-3
+  6
+X
+  2
+Color_2
+440
+0
+  8
+P-PTEC-FAN-SUS
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PTEC-S
+ 90
+8
+ 62
+2
+370
+-3
+  6
+S
+  2
+Color_2
+440
+0
+  8
+P-PTEC-FAN-Q235
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-TANK-PIPE
+ 90
+0
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-PTEC-TANK
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PTEC-BS-STEEL
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-PTEC-BS-LINE
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-TEXT
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+P-SP-WB
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-SP-UT
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-SP-SP
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-SP-RS
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+P-SP-Pump
+ 90
+8
+ 62
+6
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_6
+440
+0
+  8
+P-SP-PLAT
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-SP-PS
+ 90
+8
+ 62
+5
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_5
+440
+0
+  8
+P-SP-Fan
+ 90
+8
+ 62
+6
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_6
+440
+0
+  8
+P-SP-EM
+ 90
+8
+ 62
+6
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_6
+440
+0
+  8
+P-SP-TANK
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-SP-BS
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-SP-AS
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-SP-AD
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+P-Rd
+ 90
+8
+ 62
+13
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_13
+440
+0
+  8
+P-Lgn
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+P-Dim
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+Defpoints
+ 90
+0
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+P-CV-DS
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+P-CV-HR
+ 90
+8
+ 62
+30
+370
+-3
+  6
+HANDRAIL
+  2
+Color_30
+440
+0
+  8
+P-CV-FN
+ 90
+8
+ 62
+220
+370
+-3
+  6
+Fence
+  2
+Color_220
+440
+0
+  8
+P-CV-PLAT
+ 90
+8
+ 62
+195
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_195
+440
+0
+  8
+P-CV-UT
+ 90
+8
+ 62
+152
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_152
+440
+0
+  8
+P-CV-BS
+ 90
+8
+ 62
+253
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_253
+440
+0
+  8
+P-CV-FL
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+P-CV-EM
+ 90
+8
+ 62
+4
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_4
+440
+0
+  8
+P-CV-OH
+ 90
+8
+ 62
+5
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_5
+440
+0
+  8
+P-CV-SK
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
+  8
+tk
+ 90
+8
+ 62
+13
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_13
+440
+0
+  8
+6
+ 90
+8
+ 62
+6
+370
+-3
+  6
+X
+  2
+Color_6
+440
+0
+  8
+4
+ 90
+8
+ 62
+4
+370
+-3
+  6
+S
+  2
+Color_4
+440
+0
+  8
+3
+ 90
+8
+ 62
+3
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_3
+440
+0
+  8
+2
+ 90
+8
+ 62
+2
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_2
+440
+0
+  8
+1
+ 90
+8
+ 62
+1
+370
+-3
+  6
+Z
+  2
+Color_1
+440
+0
+  8
+24
+ 90
+8
+ 62
+2
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_2
+440
+0
+  8
+0
+ 90
+8
+ 62
+7
+370
+-3
+  6
+CONTINUOUS
+  2
+Color_7
+440
+0
