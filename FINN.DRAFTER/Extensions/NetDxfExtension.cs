@@ -1,6 +1,7 @@
 ﻿using FINN.DRAFTER.Model;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
+using netDxf.Blocks;
 using netDxf.Entities;
 
 namespace FINN.DRAFTER.Extensions;
@@ -29,8 +30,8 @@ public static class NetDxfExtension
 
     public static void TransformBy(this EntityObject entity, Scale scale, Vector2d translate)
     {
-        entity.TransformBy(Matrix3.Scale(scale.Factor),
-            (scale.BasePoint * (1 - scale.Factor) + translate).ToVector3());
+        entity.TransformBy(Matrix3.Scale(scale.Factor.X, scale.Factor.Y, 1),
+            (scale.BasePoint * (new Vector2d(1, 1) - scale.Factor) + translate).ToVector3());
     }
 
     public static BoundingBox GetBoundingBox(this MText mText)
@@ -86,12 +87,31 @@ public static class NetDxfExtension
                 box.AddBox(mText.GetBoundingBox());
                 break;
             case Insert insert:
-                // currently ignore
+                box.AddBox(insert.GetBoundingBox());
                 break;
             case Hatch hatch:
                 hatch.BoundaryPaths.SelectMany(x => x.Entities).ToList().ForEach(box.AddEntity);
                 break;
         }
+    }
+
+    private static BoundingBox GetBoundingBox(this Block block)
+    {
+        var box = new BoundingBox();
+        foreach (var entity in block.Entities)
+        {
+            box.AddEntity(entity);
+        }
+
+        return box;
+    }
+
+    private static BoundingBox GetBoundingBox(this Insert insert)
+    {
+        var box = insert.Block.GetBoundingBox();
+        box.TransformBy(new Scale(insert.Block.Origin.ToVector2d(), insert.Scale.X, insert.Scale.Y),
+            insert.Position.ToVector2d());
+        return box;
     }
 
     public static void Add(this DxfDocument doc, DxfWrapper wrapper)

@@ -6,8 +6,6 @@ using FINN.DRAFTER.Utils;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Models;
-using netDxf;
-using netDxf.Entities;
 
 namespace FINN.DRAFTER;
 
@@ -54,37 +52,26 @@ public class HostedService : BackgroundService
             // do business
             var dxf = DocUtil.CreateDoc();
 
-            // draw grids
-            var location = Vector2d.Zero;
-            var gridGroup = drafterDto.Grids.ToGridGroup(location);
-            dxf.Add(gridGroup);
+            var canvas = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, Gutter);
 
-            // draw layout items
-            location = gridGroup.Box.Min;
-            foreach (var processDto in drafterDto.Process)
+            var grids = drafterDto.Grids.ToGridGroup(Vector2d.Zero);
+            canvas.Add(grids);
+
+            var layouts = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, Gutter);
+            drafterDto.Process.ToList().ForEach(x =>
             {
-                // step half of process' y length
-                var sub = processDto.SubProcess.ToList();
-                var yStep = sub.Select(x => x.YLength).Append(processDto.YLength).Append(Gutter).Max() / 2;
-                location -= new Vector2d(0, yStep);
+                var layoutItem = new Group(Vector2d.Zero, GroupDirection.LeftToRight, GroupAlignment.Middle, Gutter);
+                layoutItem.Add(Booth.FromDto(x));
+                var sub = x.SubProcess.ToList();
+                if (sub.Count <= 0) return;
+                var boothGroup = x.SubProcess.ToBoothGroup(Vector2d.Zero);
+                layoutItem.Add(boothGroup);
 
-                // draw primary
-                var primary = Booth.FromDto(processDto, location);
-                dxf.Add(primary);
+                layouts.Add(layoutItem);
+            });
+            canvas.Add(layouts);
 
-                // step half of process's x length
-                var subLocation = new Vector2d(primary.Box.Max.X + Gutter, location.Y);
-
-                // draw sub process
-                if (sub.Count > 0)
-                {
-                    var boothGroup = processDto.SubProcess.ToBoothGroup(subLocation);
-                    dxf.Add(boothGroup);
-                }
-
-                // step half of process' y length
-                location -= new Vector2d(0, yStep + Gutter);
-            }
+            dxf.Add(canvas);
 
             var output = Path.GetTempFileName().Replace(".tmp", ".dxf");
             dxf.Save(output);

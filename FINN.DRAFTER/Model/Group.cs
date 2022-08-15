@@ -71,8 +71,6 @@ public class Group : DxfWrapper
 
 public sealed class Group<T> : Group where T : DxfWrapper
 {
-    private readonly List<T> _items = new();
-
     public Group(Vector2d location, GroupDirection direction, GroupAlignment alignment, double gutter) : base(location,
         direction, alignment, gutter)
     {

@@ -23,6 +23,11 @@ public class Vector2d
         return new Vector2d(v.X * scalar, v.Y * scalar);
     }
 
+    public static Vector2d operator *(Vector2d v1, Vector2d v2)
+    {
+        return new Vector2d(v1.X * v2.X, v1.Y * v2.Y);
+    }
+
     public static Vector2d operator +(Vector2d v1, Vector2d v2)
     {
         return new Vector2d(v1.X + v2.X, v1.Y + v2.Y);
@@ -39,8 +44,8 @@ public class Vector2d
     /// <param name="translation">平移</param>
     public void TransformBy(Scale scale, Vector2d translation)
     {
-        X = (X - scale.BasePoint.X) * scale.Factor + scale.BasePoint.X + translation.X;
-        Y = (Y - scale.BasePoint.Y) * scale.Factor + scale.BasePoint.Y + translation.Y;
+        X = (X - scale.BasePoint.X) * scale.Factor.X + scale.BasePoint.X + translation.X;
+        Y = (Y - scale.BasePoint.Y) * scale.Factor.Y + scale.BasePoint.Y + translation.Y;
     }
 
     public override bool Equals(object? obj)
