@@ -64,9 +64,8 @@ public class ExcelReader : IReader
     public IEnumerable<ProcessDto> ReadAsProcessList(DataTable dataTable)
     {
         // find the terminate row
-        var end =
-            dataTable.AsEnumerable().Where(x => x[0] is string str && str == "#")
-                .Select(x => dataTable.Rows.IndexOf(x))?.Max() ?? dataTable.Rows.Count;
+        var endRow = dataTable.AsEnumerable().FirstOrDefault(x => x[0] is "#");
+        var endRowIndex = endRow == null ? dataTable.Rows.Count - 1 : dataTable.Rows.IndexOf(endRow);
 
         // read the units;
         var timeUint = Time.ParseUnit(Convert.ToString(dataTable.Rows[6][5]) ?? string.Empty);
@@ -75,7 +74,7 @@ public class ExcelReader : IReader
         // data range is from the 11th row.
         // detect the segment from column A, each segment is recognized by where the first row's text is not empty and the next row of the last row is not empty
         var list = new List<Process>();
-        for (var line = 10; line < end; line++)
+        for (var line = 10; line < endRowIndex; line++)
         {
             // treat as empty row if name is empty, and skip it
             if (Convert.ToString(dataTable.Rows[line][2]) == null) continue;
