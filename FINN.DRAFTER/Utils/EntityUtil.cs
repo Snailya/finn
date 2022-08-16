@@ -7,23 +7,6 @@ namespace FINN.DRAFTER.Utils;
 
 public static class EntityUtil
 {
-    public static Text CreateText(string text, Vector2d position, double scaleFactor)
-    {
-        return new Text(text, position.ToVector2(), 3 * scaleFactor) { Layer = LayerUtil.GetText() };
-    }
-
-    public static EntityObject CreateMText(string text, Vector2d position, double scaleFactor)
-    {
-        return CreateMText(text, position, MTextAttachmentPoint.MiddleCenter, scaleFactor);
-    }
-
-    public static EntityObject CreateMText(string text, Vector2d position, MTextAttachmentPoint attachment
-        , double scaleFactor)
-    {
-        return new MText(text, position.ToVector2(), 2.5 * scaleFactor)
-            { Layer = LayerUtil.GetText(), AttachmentPoint = attachment };
-    }
-
     public static Line CreateLine(Vector2d startPoint, Vector2d endPoint)
     {
         return CreateLine(Layer.Default, startPoint, endPoint);

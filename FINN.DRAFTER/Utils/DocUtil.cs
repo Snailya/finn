@@ -10,6 +10,7 @@ public static class DocUtil
 
         LayerUtil.Initialize(dxf);
         DimUtil.Initialize(dxf);
+        TextUtil.Initialize(dxf);
 
         return dxf;
     }

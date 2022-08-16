@@ -24,7 +24,7 @@ public class Grid : DxfWrapper
         });
 
     public Grid(Vector2d location, double[] xCoordinates, double[] yCoordinates, double columnXLength,
-        double columnYLength) : base(Layer.Default, location)
+        double columnYLength, string level) : base(Layer.Default, location)
     {
         var xLength = xCoordinates.Max();
         var yLength = yCoordinates.Max();
@@ -32,12 +32,19 @@ public class Grid : DxfWrapper
         PopulateLinesWidthLabelAndDims(xCoordinates, yLength, PopulateDirection.Horizontal);
         PopulateLinesWidthLabelAndDims(yCoordinates, xLength, PopulateDirection.Vertical);
         PopulateColumns(xCoordinates, yCoordinates, columnXLength, columnYLength);
+        PopulateLevel(level);
     }
 
     public Grid(double[] xCoordinates, double[] yCoordinates, double columnXLength,
-        double columnYLength) : this(Vector2d.Zero, xCoordinates, yCoordinates,
-        columnXLength, columnYLength)
+        double columnYLength, string level) : this(Vector2d.Zero, xCoordinates, yCoordinates,
+        columnXLength, columnYLength, level)
     {
+    }
+
+    private void PopulateLevel(string level)
+    {
+        var levelLabel = TextUtil.CreateText(level, Box.TopLeft + new Vector2d(0, 1600), 500);
+        AddEntity(levelLabel);
     }
 
     private void PopulateLinesWidthLabelAndDims(double[] coordinates, double length, PopulateDirection direction)
@@ -45,9 +52,12 @@ public class Grid : DxfWrapper
         var lines = coordinates.Select(x =>
         {
             var line = direction == PopulateDirection.Horizontal
-                ? EntityUtil.CreateLine(new Vector2d(x, 0), new Vector2d(x, length))
-                : EntityUtil.CreateLine(new Vector2d(length, x), new Vector2d(0, x));
-            line.TransformBy(new Scale(((line.StartPoint + line.EndPoint) / 2).ToVector2d(), 1.2), Location);
+                ? EntityUtil.CreateLine(new Vector2d(x, 0) - new Vector2d(0, 6400),
+                    new Vector2d(x, length) + new Vector2d(0, 6400))
+                : EntityUtil.CreateLine(new Vector2d(length, x) + new Vector2d(6400, 0),
+                    new Vector2d(0, x) - new Vector2d(6400, 0));
+            line.TransformBy(Scale.Identity, Location);
+            // line.TransformBy(new Scale(((line.StartPoint + line.EndPoint) / 2).ToVector2d(), 1.2), Location);
             AddEntity(line);
 
             var label1 =
@@ -99,7 +109,7 @@ public class Grid : DxfWrapper
     {
         return new Grid(dto.XCoordinates, dto.YCoordinates,
             dto.ColumnXLength,
-            dto.ColumnYLength);
+            dto.ColumnYLength, dto.Label);
     }
 
     private enum PopulateDirection

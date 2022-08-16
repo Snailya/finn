@@ -62,9 +62,9 @@ public class Booth : DxfWrapper
         for (var i = 0; i < texts.Length; i++)
         {
             if (string.IsNullOrEmpty(texts[i])) continue;
-            var label = EntityUtil.CreateMText(texts[i], Location + new Vector2d(_xLength / 2,
+            var label = TextUtil.CreateMText(texts[i], Location + new Vector2d(_xLength / 2,
                 (Enumerable.Range(1, texts.Length).Average() - (i + 1)) * interval), 200);
-            AddEntity(label);
+            AddEntity(label, false);
         }
     }
 
@@ -72,7 +72,7 @@ public class Booth : DxfWrapper
     {
         if (UnSized)
         {
-            var placeHolder = EntityUtil.CreateMText(_name, Location, MTextAttachmentPoint.MiddleLeft, 200);
+            var placeHolder = TextUtil.CreateMText(_name, Location, MTextAttachmentPoint.MiddleLeft, 200);
             AddEntity(placeHolder);
             return;
         }

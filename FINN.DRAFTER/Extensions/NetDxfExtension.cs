@@ -34,38 +34,88 @@ public static class NetDxfExtension
             (scale.BasePoint * (new Vector2d(1, 1) - scale.Factor) + translate).ToVector3());
     }
 
-    public static BoundingBox GetBoundingBox(this MText mText)
+    public static BoundingBox GetBoundingBox(this MText text)
     {
-        return mText.AttachmentPoint switch
+        return text.AttachmentPoint switch
         {
             MTextAttachmentPoint.TopLeft => new BoundingBox(
-                new Vector2d(mText.Position.X, mText.Position.Y - mText.Height),
-                new Vector2d(mText.Position.X + mText.RectangleWidth, mText.Position.Y)),
+                new Vector2d(text.Position.X, text.Position.Y - text.Height),
+                new Vector2d(text.Position.X + text.RectangleWidth, text.Position.Y)),
             MTextAttachmentPoint.TopCenter => new BoundingBox(
-                new Vector2d(mText.Position.X - mText.RectangleWidth / 2, mText.Position.Y - mText.Height),
-                new Vector2d(mText.Position.X + mText.RectangleWidth / 2, mText.Position.Y)),
+                new Vector2d(text.Position.X - text.RectangleWidth / 2, text.Position.Y - text.Height),
+                new Vector2d(text.Position.X + text.RectangleWidth / 2, text.Position.Y)),
             MTextAttachmentPoint.TopRight => new BoundingBox(
-                new Vector2d(mText.Position.X - mText.RectangleWidth, mText.Position.Y - mText.Height),
-                mText.Position.ToVector2d()),
+                new Vector2d(text.Position.X - text.RectangleWidth, text.Position.Y - text.Height),
+                text.Position.ToVector2d()),
             MTextAttachmentPoint.MiddleLeft => new BoundingBox(
-                new Vector2d(mText.Position.X, mText.Position.Y - mText.Height / 2),
-                new Vector2d(mText.Position.X + mText.RectangleWidth, mText.Position.Y + mText.Height / 2)),
+                new Vector2d(text.Position.X, text.Position.Y - text.Height / 2),
+                new Vector2d(text.Position.X + text.RectangleWidth, text.Position.Y + text.Height / 2)),
             MTextAttachmentPoint.MiddleCenter => new BoundingBox(
-                new Vector2d(mText.Position.X - mText.RectangleWidth / 2, mText.Position.Y - mText.Height / 2),
-                new Vector2d(mText.Position.X + mText.RectangleWidth / 2, mText.Position.Y + mText.Height / 2)),
+                new Vector2d(text.Position.X - text.RectangleWidth / 2, text.Position.Y - text.Height / 2),
+                new Vector2d(text.Position.X + text.RectangleWidth / 2, text.Position.Y + text.Height / 2)),
             MTextAttachmentPoint.MiddleRight => new BoundingBox(
-                new Vector2d(mText.Position.X - mText.RectangleWidth, mText.Position.Y - mText.Height / 2),
-                new Vector2d(mText.Position.X, mText.Position.Y + mText.Height / 2)),
-            MTextAttachmentPoint.BottomLeft => new BoundingBox(mText.Position.ToVector2d(),
-                new Vector2d(mText.Position.X + mText.RectangleWidth, mText.Position.Y + mText.Height)),
+                new Vector2d(text.Position.X - text.RectangleWidth, text.Position.Y - text.Height / 2),
+                new Vector2d(text.Position.X, text.Position.Y + text.Height / 2)),
+            MTextAttachmentPoint.BottomLeft => new BoundingBox(text.Position.ToVector2d(),
+                new Vector2d(text.Position.X + text.RectangleWidth, text.Position.Y + text.Height)),
             MTextAttachmentPoint.BottomCenter => new BoundingBox(
-                new Vector2d(mText.Position.X - mText.RectangleWidth / 2, mText.Position.Y),
-                new Vector2d(mText.Position.X + mText.RectangleWidth / 2, mText.Position.Y + mText.Height)),
+                new Vector2d(text.Position.X - text.RectangleWidth / 2, text.Position.Y),
+                new Vector2d(text.Position.X + text.RectangleWidth / 2, text.Position.Y + text.Height)),
             MTextAttachmentPoint.BottomRight => new BoundingBox(
-                new Vector2d(mText.Position.X - mText.RectangleWidth, mText.Position.Y),
-                new Vector2d(mText.Position.X, mText.Position.Y + mText.Height)),
+                new Vector2d(text.Position.X - text.RectangleWidth, text.Position.Y),
+                new Vector2d(text.Position.X, text.Position.Y + text.Height)),
             _ => throw new ArgumentOutOfRangeException()
         };
+    }
+
+    public static BoundingBox GetBoundingBox(this Text text)
+    {
+        switch (text.Alignment)
+        {
+            case TextAlignment.TopLeft:
+                return new BoundingBox(
+                    new Vector2d(text.Position.X, text.Position.Y - text.Height),
+                    new Vector2d(text.Position.X + text.Width, text.Position.Y));
+            case TextAlignment.TopCenter:
+                return new BoundingBox(
+                    new Vector2d(text.Position.X - text.Width / 2, text.Position.Y - text.Height),
+                    new Vector2d(text.Position.X + text.Width / 2, text.Position.Y));
+            case TextAlignment.TopRight:
+                return new BoundingBox(
+                    new Vector2d(text.Position.X - text.Width, text.Position.Y - text.Height),
+                    text.Position.ToVector2d());
+            case TextAlignment.MiddleLeft:
+                return new BoundingBox(
+                    new Vector2d(text.Position.X, text.Position.Y - text.Height / 2),
+                    new Vector2d(text.Position.X + text.Width, text.Position.Y + text.Height / 2));
+            case TextAlignment.MiddleCenter:
+                return new BoundingBox(
+                    new Vector2d(text.Position.X - text.Width / 2, text.Position.Y - text.Height / 2),
+                    new Vector2d(text.Position.X + text.Width / 2, text.Position.Y + text.Height / 2));
+            case TextAlignment.MiddleRight:
+                return new BoundingBox(
+                    new Vector2d(text.Position.X - text.Width, text.Position.Y - text.Height / 2),
+                    new Vector2d(text.Position.X, text.Position.Y + text.Height / 2));
+            case TextAlignment.BottomLeft:
+            case TextAlignment.BaselineLeft:
+                return new BoundingBox(text.Position.ToVector2d(),
+                    new Vector2d(text.Position.X + text.Width, text.Position.Y + text.Height));
+            case TextAlignment.BottomCenter:
+            case TextAlignment.BaselineCenter:
+                return new BoundingBox(
+                    new Vector2d(text.Position.X - text.Width / 2, text.Position.Y),
+                    new Vector2d(text.Position.X + text.Width / 2, text.Position.Y + text.Height));
+            case TextAlignment.BottomRight:
+            case TextAlignment.BaselineRight:
+                return new BoundingBox(
+                    new Vector2d(text.Position.X - text.Width, text.Position.Y),
+                    new Vector2d(text.Position.X, text.Position.Y + text.Height));
+            case TextAlignment.Aligned:
+            case TextAlignment.Middle:
+            case TextAlignment.Fit:
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public static void AddEntity(this BoundingBox box, EntityObject entity)
@@ -83,6 +133,9 @@ public static class NetDxfExtension
                 box.AddPoint(new Vector2d(circle.Center.X - circle.Radius, circle.Center.Y - circle.Radius));
                 box.AddPoint(new Vector2d(circle.Center.X + circle.Radius, circle.Center.Y + circle.Radius));
                 break;
+            case Text text:
+                box.AddBox(text.GetBoundingBox());
+                break;
             case MText mText:
                 box.AddBox(mText.GetBoundingBox());
                 break;
@@ -98,10 +151,7 @@ public static class NetDxfExtension
     private static BoundingBox GetBoundingBox(this Block block)
     {
         var box = new BoundingBox();
-        foreach (var entity in block.Entities)
-        {
-            box.AddEntity(entity);
-        }
+        foreach (var entity in block.Entities) box.AddEntity(entity);
 
         return box;
     }

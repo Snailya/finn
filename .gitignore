@@ -10,3 +10,6 @@
 
 # Rider config
 .idea/
+
+# database
+*.sqlite*
