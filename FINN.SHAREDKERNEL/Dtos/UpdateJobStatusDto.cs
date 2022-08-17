@@ -3,7 +3,7 @@ using FINN.SHAREDKERNEL.Models;
 
 namespace FINN.SHAREDKERNEL.Dtos;
 
-public class UpdateJobStatusDto
+public class UpdateJobStatusDto : BaseDto
 {
     public UpdateJobStatusDto()
     {

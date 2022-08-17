@@ -1,4 +1,4 @@
-﻿using FINN.DRAFTER.Model;
+﻿using FINN.DRAFTER.Models;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
@@ -88,6 +88,7 @@ public static class NetDxfExtension
                 return new BoundingBox(
                     new Vector2d(text.Position.X, text.Position.Y - text.Height / 2),
                     new Vector2d(text.Position.X + text.Width, text.Position.Y + text.Height / 2));
+            case TextAlignment.Middle:
             case TextAlignment.MiddleCenter:
                 return new BoundingBox(
                     new Vector2d(text.Position.X - text.Width / 2, text.Position.Y - text.Height / 2),
@@ -111,10 +112,9 @@ public static class NetDxfExtension
                     new Vector2d(text.Position.X - text.Width, text.Position.Y),
                     new Vector2d(text.Position.X, text.Position.Y + text.Height));
             case TextAlignment.Aligned:
-            case TextAlignment.Middle:
             case TextAlignment.Fit:
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(text.Alignment));
         }
     }
 
@@ -158,9 +158,9 @@ public static class NetDxfExtension
 
     private static BoundingBox GetBoundingBox(this Insert insert)
     {
-        var box = insert.Block.GetBoundingBox();
-        box.TransformBy(new Scale(insert.Block.Origin.ToVector2d(), insert.Scale.X, insert.Scale.Y),
-            insert.Position.ToVector2d());
+        var entities = insert.Explode();
+        var box = new BoundingBox();
+        entities.ForEach(x => box.AddEntity(x));
         return box;
     }
 

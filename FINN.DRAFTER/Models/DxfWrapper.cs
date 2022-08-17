@@ -3,7 +3,7 @@ using FINN.SHAREDKERNEL.Models;
 using netDxf.Entities;
 using netDxf.Tables;
 
-namespace FINN.DRAFTER.Model;
+namespace FINN.DRAFTER.Models;
 
 public abstract class DxfWrapper : IEntityWrapper<EntityObject>
 {

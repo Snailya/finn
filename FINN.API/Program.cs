@@ -1,7 +1,7 @@
 using FINN.API;
 using FINN.API.Contexts;
 using FINN.CORE;
-using FINN.SHAREDKERNEL;
+using FINN.SHAREDKERNEL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

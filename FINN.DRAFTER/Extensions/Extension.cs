@@ -1,4 +1,4 @@
-﻿using FINN.DRAFTER.Model;
+﻿using FINN.DRAFTER.Models;
 using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Models;
 

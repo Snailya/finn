@@ -1,31 +1,40 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
+using FINN.DRAFTER.Contexts;
 using FINN.DRAFTER.Extensions;
-using FINN.DRAFTER.Model;
+using FINN.DRAFTER.Models;
 using FINN.DRAFTER.Utils;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Interfaces;
 using FINN.SHAREDKERNEL.Models;
+using Microsoft.EntityFrameworkCore;
+using netDxf;
+using netDxf.Entities;
 
 namespace FINN.DRAFTER;
 
 public class HostedService : BackgroundService
 {
-    private const double Gutter = 1600;
     private readonly IBroker _broker;
+    private readonly IDbContextFactory<BlockContext> _factory;
     private readonly ILogger<HostedService> _logger;
+    private readonly string _blockFolder;
 
-    public HostedService(ILogger<HostedService> logger, IBroker broker)
+    public HostedService(ILogger<HostedService> logger, IConfiguration configuration, IBroker broker,
+        IDbContextFactory<BlockContext> factory)
     {
         _logger = logger;
         _broker = broker;
+        _factory = factory;
+        _blockFolder = configuration["Storage:Blocks"];
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Register handler for {Routing}", RoutingKey.Draw);
 
-        _broker.RegisterHandler("drafter", DrawAndSave);
+        _broker.RegisterHandler(RoutingKey.Draw, (routingKey, correlationId, message) => HandleDraw(message));
+        _broker.RegisterHandler(RoutingKey.InsertBlock, HandleInsertBlock);
 
         // monitor service status
         while (!stoppingToken.IsCancellationRequested)
@@ -39,33 +48,117 @@ public class HostedService : BackgroundService
         _logger.LogInformation("Connection closed");
     }
 
-    private void DrawAndSave(ReadOnlyMemory<byte> memory)
+    #region Handlers
+
+    private void HandleInsertBlock(string routingKey, string correlationId, string message)
     {
-        var drafterDto = JsonSerializer.Deserialize<DrafterDto>(Encoding.UTF8.GetString(memory.ToArray()));
+        Response? response = null;
+
+        try
+        {
+            var dto =
+                JsonSerializer.Deserialize<InsertBlockRequestDto>(message);
+
+            var doc = DxfDocument.Load(dto.Filename);
+
+            var context = _factory.CreateDbContext();
+
+            var names = dto.Names.Any()
+                ? dto.Names.ToList()
+                : doc.Blocks.Items.Where(x =>
+                        !x.Name.StartsWith("*") && !x.Name.StartsWith("_"))
+                    .Select(x => x.Name).ToList();
+
+            foreach (var name in names.Where(name =>
+                         context.BlockDefinitions.SingleOrDefault(x => x.Name == name) != null))
+                throw new ArgumentException(
+                    "Block with the same name already exist. Please check the content and consider using update.",
+                    nameof(name));
+
+            var blocks = names.Select(name =>
+            {
+                // save as individual files
+                var file = new DxfDocument();
+                file.Blocks.Add(doc.Blocks[name]);
+
+                var fileName = Path.Join(_blockFolder,
+                    Path.GetFileName(Path.GetTempFileName()).Replace(".tmp", ".dxf"));
+                file.Save(fileName);
+
+                return new BlockDefinition { Name = name, DxfFileName = fileName };
+            }).ToList();
+            context.BlockDefinitions.AddRange(blocks);
+            context.SaveChanges();
+
+            // Prepare response for successful call
+            response = new Response<InsertBlockResponseDto>("success", 0,
+                new InsertBlockResponseDto
+                    { Blocks = blocks.Select(x => new BlockDefinitionDto() { Id = x.Id, Name = x.Name }) });
+        }
+        catch (Exception ex)
+        {
+            response = new Response(ex.Message, ErrorCode.BlockOfSameNameAlreadyExist);
+        }
+        finally
+        {
+            if (response != null) _broker.Reply(routingKey, correlationId, response.ToJson());
+        }
+    }
+
+    private void HandleDraw(string message)
+    {
+        var drafterDto = JsonSerializer.Deserialize<DrafterDto>(message);
 
         // update status
         _broker.Send(RoutingKey.UpdateJobStatus,
-            Encoding.UTF8.GetBytes(
-                JsonSerializer.Serialize(new UpdateJobStatusDto(drafterDto!.Id, JobStatus.Drawing))));
+            new UpdateJobStatusDto(drafterDto!.Id, JobStatus.Drawing).ToJson());
         try
         {
-            // do business
+            const int gutter = 1600;
+
             var dxf = DocUtil.CreateDoc();
 
-            var canvas = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, Gutter);
+            var canvas = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, gutter);
 
             var grids = drafterDto.Grids.ToGridGroup(Vector2d.Zero);
             canvas.Add(grids);
 
-            var layouts = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, Gutter);
-            drafterDto.Process.ToList().ForEach(x =>
+            var layouts = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, gutter);
+            drafterDto.Process.ToList().ForEach(dto =>
             {
-                var layoutItem = new Group(Vector2d.Zero, GroupDirection.LeftToRight, GroupAlignment.Middle, Gutter);
-                layoutItem.Add(Booth.FromDto(x));
-                var sub = x.SubProcess.ToList();
-                if (sub.Count <= 0) return;
-                var boothGroup = x.SubProcess.ToBoothGroup(Vector2d.Zero);
-                layoutItem.Add(boothGroup);
+                var layoutItem = new Group(Vector2d.Zero, GroupDirection.LeftToRight, GroupAlignment.Middle, gutter);
+                layoutItem.Add(Booth.FromDto(dto));
+
+                // divide into booth and blocks
+                var context = _factory.CreateDbContext();
+                var blocks = dto.SubProcess.Where(x =>
+                    x.XLength == 0 && x.YLength == 0 &&
+                    context.BlockDefinitions.SingleOrDefault(bd => bd.Name == x.Name) != null).ToList();
+                var booths = dto.SubProcess.Except(blocks).ToList();
+
+                // handle booths first
+                if (booths.Count > 0)
+                {
+                    var boothGroup = dto.SubProcess.ToBoothGroup(Vector2d.Zero);
+                    layoutItem.Add(boothGroup);
+                }
+
+                // handle blocks
+                if (blocks.Count > 0)
+                {
+                    var blockGroup = new Group(Vector2d.Zero, GroupDirection.LeftToRight, GroupAlignment.Middle,
+                        gutter);
+                    blocks.ForEach(x =>
+                    {
+                        var bd = context.BlockDefinitions.Single(bd => bd.Name == x.Name);
+                        var doc = DxfDocument.Load(bd.DxfFileName);
+                        var block = doc.Blocks.Items.Single(b => b.Name == bd.Name);
+                        var insert = new Insert(block);
+                        var blockWrapper = new SimpleWrapper(insert);
+                        blockGroup.Add(blockWrapper);
+                    });
+                    layoutItem.Add(blockGroup);
+                }
 
                 layouts.Add(layoutItem);
             });
@@ -78,16 +171,16 @@ public class HostedService : BackgroundService
 
             // update status
             _broker.Send(RoutingKey.UpdateJobStatus,
-                Encoding.UTF8.GetBytes(
-                    JsonSerializer.Serialize(new UpdateJobStatusDto(drafterDto.Id, output))));
+                new UpdateJobStatusDto(drafterDto.Id, output).ToJson());
         }
         catch (Exception e)
         {
             _logger.LogError(e.Message);
 
             _broker.Send(RoutingKey.UpdateJobStatus,
-                Encoding.UTF8.GetBytes(
-                    JsonSerializer.Serialize(new UpdateJobStatusDto(drafterDto.Id, JobStatus.Error))));
+                new UpdateJobStatusDto(drafterDto.Id, JobStatus.Error).ToJson());
         }
     }
+
+    #endregion
 }

@@ -1,7 +1,6 @@
 using System.Text;
 using FINN.CORE;
 using FINN.READER;
-using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Interfaces;
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

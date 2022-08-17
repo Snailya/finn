@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using FINN.SHAREDKERNEL.Models;
 
-namespace FINN.API;
+namespace FINN.API.Models;
 
 public class Job
 {

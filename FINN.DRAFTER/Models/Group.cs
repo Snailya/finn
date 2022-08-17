@@ -1,7 +1,7 @@
 ﻿using FINN.SHAREDKERNEL.Models;
 using netDxf.Tables;
 
-namespace FINN.DRAFTER.Model;
+namespace FINN.DRAFTER.Models;
 
 public class Group : DxfWrapper
 {
@@ -16,6 +16,7 @@ public class Group : DxfWrapper
     {
         _direction = direction;
         _alignment = alignment;
+        
         _gutter = gutter;
     }
 
