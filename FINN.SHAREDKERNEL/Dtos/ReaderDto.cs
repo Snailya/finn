@@ -2,7 +2,7 @@
 
 namespace FINN.SHAREDKERNEL.Dtos;
 
-public class ReaderDto
+public class ReaderDto : BaseDto
 {
     public ReaderDto(int id, string input)
     {

@@ -11,10 +11,7 @@ services:
     image: snailya2005/finn_frontend
     environment:
       - REACT_APP_BACKEND_URL=http://localhost
-    depends_on:
-      - api
     command: npm run start
-
     ports:
       - "3000:3000"
   api:
@@ -25,11 +22,13 @@ services:
       - rabbitmq
     environment:
       - RabbitMQ__Uri=amqp://rabbitmq:5672
+      - ConnectionStrings__JobContextSQLite=Data Source=./sqlite/FINN.sqlite
     ports:
       - "443:443"
       - "80:80"
     volumes:
-      - storage:/tmp/
+      - /app/sqlite
+      - tmp:/tmp
   reader:
     build: 
       dockerfile: ./FINN.READER/Dockerfile
@@ -39,7 +38,7 @@ services:
     environment:
       - RabbitMQ__Uri=amqp://rabbitmq:5672
     volumes:
-      - storage:/tmp/
+      - tmp:/tmp
   drafter:
     build: 
       dockerfile: ./FINN.DRAFTER/Dockerfile
@@ -48,8 +47,11 @@ services:
       - rabbitmq
     environment:
       - RabbitMQ__Uri=amqp://rabbitmq:5672
+      - ConnectionStrings__BlockContextSQLite=Data Source=./sqlite/FINN.sqlite
+      - Storage__Blocks=/app/data
     volumes:
-      - storage:/tmp/
-
+      - /app/data
+      - /app/sqlite
+      - tmp:/tmp
 volumes:
-  storage:
+  tmp:

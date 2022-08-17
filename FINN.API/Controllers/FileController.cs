@@ -1,8 +1,9 @@
-using System.Text;
 using System.Text.Json;
 using FINN.API.Contexts;
+using FINN.API.Models;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Interfaces;
 using FINN.SHAREDKERNEL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ public class FileController : ControllerBase
     }
 
     [HttpPost("upload")]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> Upload(IFormFile file)
     {
         if (file.Length > 0)
@@ -39,7 +41,7 @@ public class FileController : ControllerBase
             await context.SaveChangesAsync();
 
             _broker.Send(RoutingKey.Read,
-                Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new ReaderDto(job.Id, filePath))));
+                JsonSerializer.Serialize(new ReaderDto(job.Id, filePath)));
             return AcceptedAtAction(nameof(CheckStatus), new { jobId = job.Id }, job);
         }
 

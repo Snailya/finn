@@ -60,4 +60,12 @@ public class Tests
             Assert.That(line.EndPoint.ToVector2d(), Is.EqualTo(new Vector2d(2, 1)));
         });
     }
+
+    [Test]
+    public void DeserializeResponseCorrectly()
+    {
+        var str = "{\"msg\":\"success\",\"code\":0,\"data\":{\"Ids\":[4,3]}}";
+        var result = JsonSerializer.Deserialize<Response<InsertBlockResponseDto>>(str);
+        Assert.That(result.Data.Blocks, Is.Not.Null);
+    }
 }

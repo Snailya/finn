@@ -7,7 +7,7 @@ using netDxf.Blocks;
 using netDxf.Entities;
 using netDxf.Tables;
 
-namespace FINN.DRAFTER.Model;
+namespace FINN.DRAFTER.Models;
 
 public class Grid : DxfWrapper
 {

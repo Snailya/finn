@@ -24,15 +24,17 @@ public static class TextUtil
     {
         var style = GetStyleByName("Standard");
 
-        // compute width
-        var graphics = Graphics.FromHwnd(IntPtr.Zero);
-        var stringFont = new Font(style.FontFile, (float)(3 * scaleFactor));
-        var stringSize = graphics.MeasureString(text, stringFont);
+        // bug: unable to compute width in linux, this method need display server which the docker image not have.
+        // var graphics = Graphics.FromHwnd(IntPtr.Zero);
+        // var stringFont = new Font(style.FontFile, (float)(3 * scaleFactor));
+        // var stringSize = graphics.MeasureString(text, stringFont);
+        // var width = style.FontFile.EndsWith("shx") ? stringSize.Width * 1.5 : stringSize.Width
 
-        return new Text(text, position.ToVector2(), 3 * scaleFactor, style)
+        var height = 3 * scaleFactor;
+        return new Text(text, position.ToVector2(), height, style)
         {
             Layer = LayerUtil.GetText(),
-            Width = style.FontFile.EndsWith("shx") ? stringSize.Width * 1.5 : stringSize.Width
+            Width = text.Length * 1.25 * height
         };
     }
 
@@ -46,17 +48,17 @@ public static class TextUtil
     {
         var style = GetStyleByName("Standard");
 
-        // compute width
-        var graphics = Graphics.FromHwnd(IntPtr.Zero);
-        var stringFont =
-            new Font(style.FontFile,
-                (float)(2.5 *
-                        scaleFactor)); // bug: unable to load shx font, which will return the default font of font class Microsoft Sans Serif
-        var stringSize = graphics.MeasureString(text, stringFont);
+        // bug: unable to compute width in linux, this method need display server which the docker image not have.
+        // var graphics = Graphics.FromHwnd(IntPtr.Zero);
+        // var stringFont =
+        //     new Font(style.FontFile,
+        //         (float)(2.5 *
+        //                 scaleFactor)); // bug: unable to load shx font, which will return the default font of font class Microsoft Sans Serif
+        // var stringSize = graphics.MeasureString(text, stringFont);
+        // var width = style.FontFile.EndsWith("shx") ? stringSize.Width * 1.5 : stringSize.Width
 
-        return new MText(text, position.ToVector2(), 2.5 * scaleFactor,
-                style.FontFile.EndsWith("shx") ? stringSize.Width * 1.5 : stringSize.Width,
-                style)
+        var height = 2.5 * scaleFactor;
+        return new MText(text, position.ToVector2(), height, text.Length * 1.25 * height, style)
             { Layer = LayerUtil.GetText(), AttachmentPoint = attachment };
     }
 

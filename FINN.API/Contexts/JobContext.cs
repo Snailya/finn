@@ -1,3 +1,4 @@
+using FINN.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FINN.API.Contexts;

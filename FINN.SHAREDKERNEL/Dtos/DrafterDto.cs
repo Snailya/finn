@@ -2,7 +2,7 @@
 
 namespace FINN.SHAREDKERNEL.Dtos;
 
-public class DrafterDto
+public class DrafterDto : BaseDto
 {
     /// <summary>
     ///     The id of the job, used to update job status.

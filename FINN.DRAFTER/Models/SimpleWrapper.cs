@@ -1,7 +1,7 @@
 ﻿using FINN.SHAREDKERNEL.Models;
 using netDxf.Entities;
 
-namespace FINN.DRAFTER.Model;
+namespace FINN.DRAFTER.Models;
 
 public class SimpleWrapper : DxfWrapper
 {

@@ -1,4 +1,9 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+#RUN sed -i s@/deb.debian.org/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+#    && apt-get update \
+#    && apt-get install -y libx11-dev libgdiplus libc6-dev \
+#    && apt-get clean \
+#    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 # EXPOSE 80
 # EXPOSE 443
