@@ -7,43 +7,77 @@ namespace FINN.DRAFTER.Models;
 
 public abstract class DxfWrapper : IEntityWrapper<EntityObject>
 {
-    private Vector2d _location = Vector2d.Zero;
+    private Vector2d _basePoint;
 
-    protected DxfWrapper(Layer layer, Vector2d location)
+    /// <summary>
+    /// The delegate to call when BasePoint's value change, can be overwrite in group class so that the item inside group could update correctly.
+    /// </summary>
+    protected Action<Vector2d> OnBasePointChanged;
+
+    #region Constructors
+
+    protected DxfWrapper(Layer layer, Vector2d basePoint)
     {
         Layer = layer;
-        Location = location;
+        _basePoint = basePoint;
+
+        OnBasePointChanged = value => { TransformedBy(new Scale(1), value - _basePoint); };
     }
 
+    #endregion
+
+    /// <summary>
+    /// The dxf layer that should place the wrapper on.
+    /// </summary>
     public Layer Layer { get; }
 
-    public Vector2d Location
+    /// <summary>
+    /// The geometric base point of the wrapper.
+    /// </summary>
+    public Vector2d BasePoint
     {
-        get => _location;
+        get => _basePoint;
         set
         {
-            Entities.ToList().ForEach(x => x.TransformBy(Scale.Identity, value - _location));
-            Box.TransformBy(Scale.Identity, value - _location);
-            _location = value;
+            OnBasePointChanged(value);
+            _basePoint = value;
         }
     }
 
-    public IList<EntityObject> Entities { get; } = new List<EntityObject>();
+    public virtual IList<EntityObject> Entities { get; } = new List<EntityObject>();
+
+    /// <summary>
+    /// The valid bounding box of the wrapper.
+    /// </summary>
     public BoundingBox Box { get; } = new();
+
+    /// <summary>
+    /// The actual bounding box of the wrapper.
+    /// </summary>
     public BoundingBox OuterBox { get; } = new();
 
     public void TransformedBy(Scale scale, Vector2d translate)
     {
-        Entities.ToList().ForEach(x =>
-            x.TransformBy(scale, translate));
+        // move entities to right place
+        Entities.ToList().ForEach(x => x.TransformBy(scale, translate));
+
+        // transform inner bounding to match entities
         Box.TransformBy(scale, translate);
+        // transform outer bounding to match entities
+        OuterBox.TransformBy(scale, translate);
+
+        // reset base point
+        _basePoint.TransformBy(scale, translate);
     }
 
     protected void AddEntity(EntityObject entity, bool asInside = true)
     {
         Entities.Add(entity);
+
+        // only add marked entity to valid box
         if (asInside) Box.AddEntity(entity);
 
+        // add all to actual box.
         OuterBox.AddEntity(entity);
     }
 }

@@ -2,6 +2,7 @@ using System.Text.Json;
 using FINN.API.Dtos;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.InsertBlock;
 using FINN.SHAREDKERNEL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

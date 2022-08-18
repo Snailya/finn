@@ -3,6 +3,7 @@ using FINN.API.Contexts;
 using FINN.API.Models;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.Read;
 using FINN.SHAREDKERNEL.Interfaces;
 using FINN.SHAREDKERNEL.Models;
 using Microsoft.AspNetCore.Mvc;

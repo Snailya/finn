@@ -122,6 +122,9 @@ public static class NetDxfExtension
     {
         switch (entity)
         {
+            case Point point:
+                box.AddPoint(point.Position.ToVector2d());
+                break;
             case Line line:
                 box.AddPoint(line.StartPoint.ToVector2d());
                 box.AddPoint(line.EndPoint.ToVector2d());

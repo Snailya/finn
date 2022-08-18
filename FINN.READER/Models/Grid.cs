@@ -1,4 +1,5 @@
 ﻿using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.Draw;
 
 namespace FINN.READER.Models;
 
@@ -27,13 +28,13 @@ internal class Grid
     /// <summary>
     ///     The label of the current grid.
     /// </summary>
-    public string Label { get; set; }
+    public Length Level { get; set; }
 
     public GridDto ToDto()
     {
         return new GridDto
         {
-            Label = Label,
+            Level = Level.ToMillimeter(),
             ColumnXLength = ColumnLength.ToMillimeter(),
             ColumnYLength = ColumnWidth.ToMillimeter(),
             XCoordinates = XCoordinates.Select(x => x.ToMillimeter()).ToArray(),

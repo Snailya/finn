@@ -73,4 +73,14 @@ public static class LayerUtil
         dxf.Layers.StateManager.Import("Template.las", true);
         dxf.Layers.Items.ToList().ForEach(x => Layers.Add(x.Name, x));
     }
+
+    public static Layer GetPlate()
+    {
+        const string name = "P-CV-SS";
+        if (Layers.TryGetValue(name, out var layer)) return layer;
+
+        layer = new Layer(name);
+        Layers.Add(name, layer);
+        return layer;
+    }
 }

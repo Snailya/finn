@@ -1,5 +1,6 @@
 ﻿using FINN.DRAFTER.Models;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.Draw;
 using FINN.SHAREDKERNEL.Models;
 
 namespace FINN.DRAFTER.Extensions;

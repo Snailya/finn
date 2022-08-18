@@ -8,13 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj"/>
-        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj"/>
+        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj" />
+        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="ExcelDataReader" Version="3.6.0"/>
-        <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0"/>
+        <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+        <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     </ItemGroup>
 
 </Project>

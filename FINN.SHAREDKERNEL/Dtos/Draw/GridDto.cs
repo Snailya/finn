@@ -1,4 +1,4 @@
-﻿namespace FINN.SHAREDKERNEL.Dtos;
+﻿namespace FINN.SHAREDKERNEL.Dtos.Draw;
 
 public class GridDto
 {
@@ -15,15 +15,15 @@ public class GridDto
     /// <summary>
     ///     The coordinates of grid line in x direction.
     /// </summary>
-    public double[] XCoordinates { get; set; }
+    public IEnumerable<double> XCoordinates { get; set; } = new List<double>();
 
     /// <summary>
     ///     The coordinates of grid line in y direction.
     /// </summary>
-    public double[] YCoordinates { get; set; }
+    public IEnumerable<double> YCoordinates { get; set; } = new List<double>();
 
     /// <summary>
-    ///     The label of the current grid.
+    ///     The level of the current grid.
     /// </summary>
-    public string Label { get; set; }
+    public double Level { get; set; }
 }

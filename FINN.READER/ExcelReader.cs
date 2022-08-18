@@ -1,13 +1,15 @@
 ﻿using System.Data;
+using System.Text.RegularExpressions;
 using FINN.READER.Models;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.Draw;
 using FINN.SHAREDKERNEL.Interfaces;
 
 namespace FINN.READER;
 
 public class ExcelReader : IReader
 {
-    public IEnumerable<GridDto> ReadAsGrid(DataTable dataTable)
+    public (IEnumerable<GridDto>, IEnumerable<PlateDto>) ReadAsGridSheet(DataTable dataTable)
     {
         // read column geometry
         var columnLength = Convert.ToDouble(dataTable.Rows[0][2]);
@@ -19,30 +21,50 @@ public class ExcelReader : IReader
         var sections = dividers.Take(dividers.Count - 1)
             .Zip(dividers.Skip(1), (l1, l2) => (start: l1 + 1, end: l2 - 1));
 
-        var list = new List<Grid>();
+        var grids = new List<Grid>();
+        var plates = new List<Plate>();
 
         foreach (var (start, end) in sections)
         {
+            var label = Convert.ToString(dataTable.Rows[start][0]) ?? string.Empty;
+            var matches = new Regex(@"(\d+\.\d)").Match(label).Groups;
+
             var grid = new Grid
             {
-                Label = Convert.ToString(dataTable.Rows[start][0]) ?? string.Empty,
+                Level = double.TryParse(matches[0].Value, out var levelInMeter)
+                    ? new Length(levelInMeter, Length.Unit.Meter)
+                    : new Length(0, Length.Unit.Millimeter),
                 ColumnLength = new Length(columnLength, Length.Unit.Millimeter),
                 ColumnWidth = new Length(columnWidth, Length.Unit.Millimeter)
             };
 
             var yDelta = new List<double>();
             var xDelta = new List<double>();
+            var platesLocs = new List<(int, int)>();
             // read in vertical direction
-            for (var i = start + 1; i < end + 1; i++)
-                if (dataTable.Rows[i][0] is double value1)
+            for (var rowIndex = start + 1; rowIndex < end + 1; rowIndex++)
+                if (dataTable.Rows[rowIndex][0] is double value1)
                     yDelta.Add(value1);
                 else
+                {
                     // read in horizontal direction
-                    for (var j = 1; j < dataTable.Columns.Count - 1; j++)
-                        if (dataTable.Rows[i][j] is double value2)
+                    for (var colIndex = 1; colIndex < dataTable.Columns.Count - 1; colIndex++)
+                        if (dataTable.Rows[rowIndex][colIndex] is double value2)
+                        {
                             xDelta.Add(value2);
+
+                            // plate detect
+                            for (var k = rowIndex - 1; k > start; k--)
+                            {
+                                if (dataTable.Rows[k][colIndex] is "钢平台")
+                                {
+                                    platesLocs.Add((colIndex - 1, rowIndex - k - 1));
+                                }
+                            }
+                        }
                         else
                             break;
+                }
 
             yDelta.Reverse();
             grid.YCoordinates = yDelta.Aggregate(new List<double> { 0 }, (dict, next) =>
@@ -55,13 +77,28 @@ public class ExcelReader : IReader
                 dict.Add(dict.LastOrDefault() + next);
                 return dict;
             }).Select(x => new Length(x, Length.Unit.Meter)).ToArray();
-            list.Add(grid);
+            grids.Add(grid);
+
+            var plate = new Plate()
+            {
+                Level = grid.Level,
+                Blocks = platesLocs.Select(location =>
+                    new PlateBlock()
+                    {
+                        XDistance = grid.XCoordinates[location.Item1],
+                        YDistance = grid.YCoordinates[location.Item2],
+                        XLength = grid.XCoordinates[location.Item1 + 1] - grid.XCoordinates[location.Item1],
+                        YLength = grid.YCoordinates[location.Item2 + 1] - grid.YCoordinates[location.Item2],
+                    }
+                ).ToArray()
+            };
+            plates.Add(plate);
         }
 
-        return list.Select(x => x.ToDto());
+        return (grids.Select(x => x.ToDto()), plates.Select(x => x.ToDto()));
     }
 
-    public IEnumerable<ProcessDto> ReadAsProcessList(DataTable dataTable)
+    public IEnumerable<ProcessDto> ReadAsProcessListSheet(DataTable dataTable)
     {
         // find the terminate row
         var endRow = dataTable.AsEnumerable().FirstOrDefault(x => x[0] is "#");

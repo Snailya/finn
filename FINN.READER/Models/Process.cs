@@ -1,4 +1,5 @@
 ﻿using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.Draw;
 
 namespace FINN.READER.Models;
 

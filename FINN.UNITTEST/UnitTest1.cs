@@ -1,9 +1,14 @@
 using System.Text.Json;
 using FINN.DRAFTER.Extensions;
+using FINN.DRAFTER.Models;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.InsertBlock;
+using FINN.SHAREDKERNEL.Dtos.UpdateJobStatus;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Entities;
+using netDxf.Tables;
+using RabbitMQ.Client;
 
 namespace FINN.UNITTEST;
 
@@ -67,5 +72,73 @@ public class Tests
         var str = "{\"msg\":\"success\",\"code\":0,\"data\":{\"Ids\":[4,3]}}";
         var result = JsonSerializer.Deserialize<Response<InsertBlockResponseDto>>(str);
         Assert.That(result.Data.Blocks, Is.Not.Null);
+    }
+
+    [Test]
+    public void GroupLocationChangeWillUpdateItemLocation()
+    {
+        const int gutter = 100;
+
+        var points = new Group(Vector2d.Zero, GroupDirection.LeftToRight, GroupAlignment.Middle, gutter);
+        var point1 = new SimpleWrapper(new Point(Vector2.Zero));
+        var point2 = new SimpleWrapper(new Point(Vector2.Zero));
+
+        points.Add(point1);
+        Assert.Multiple(() =>
+        {
+            Assert.That(point1.BasePoint.X, Is.EqualTo(0));
+            Assert.That(point1.BasePoint.Y, Is.EqualTo(0));
+        });
+        points.Add(point2);
+        Assert.Multiple(() =>
+        {
+            Assert.That(point2.BasePoint.X, Is.EqualTo(100));
+            Assert.That(point2.BasePoint.Y, Is.EqualTo(0));
+        });
+        points.BasePoint = new Vector2d(0, 100);
+        Assert.Multiple(() =>
+        {
+            Assert.That(point1.BasePoint.Y, Is.EqualTo(100));
+            Assert.That(point2.BasePoint.Y, Is.EqualTo(100));
+        });
+
+        var outer = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Middle, gutter);
+        outer.Add(points);
+        Assert.Multiple(() =>
+        {
+            Assert.That(points.BasePoint.X, Is.EqualTo(-50));
+            Assert.That(points.BasePoint.Y, Is.EqualTo(0));
+        });
+        var circle = new SimpleWrapper(new Circle(Vector2.Zero, 50));
+        outer.Add(circle);
+        Assert.Multiple(() =>
+        {
+            Assert.That(circle.BasePoint.X, Is.EqualTo(0));
+            Assert.That(circle.BasePoint.Y, Is.EqualTo(-150));
+        });
+    }
+
+    [Test]
+    public void OuterBoundingBox()
+    {
+        var item1 = new TestWrapper();
+        var item2 = new TestWrapper();
+
+        var group = new Group(Vector2d.Zero, GroupDirection.LeftToRight, GroupAlignment.Middle, 100);
+        group.Add(item1);
+        group.Add(item2);
+
+        Assert.Multiple(() => { Assert.That(item2.BasePoint.X, Is.EqualTo(100)); });
+    }
+
+    public class TestWrapper : DxfWrapper
+    {
+        public TestWrapper() : base(Layer.Default, Vector2d.Zero)
+        {
+            var point = new Point(Vector2.Zero);
+            var line = new Line(new Vector2(-50, 0), new Vector2(50, 0));
+            AddEntity(point);
+            AddEntity(line, false);
+        }
     }
 }

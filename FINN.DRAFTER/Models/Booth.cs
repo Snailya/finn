@@ -1,6 +1,7 @@
 ﻿using FINN.DRAFTER.Extensions;
 using FINN.DRAFTER.Utils;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.Draw;
 using FINN.SHAREDKERNEL.Models;
 using netDxf.Entities;
 using netDxf.Tables;
@@ -13,8 +14,10 @@ public class Booth : DxfWrapper
     private readonly double _xLength;
     private readonly double _yLength;
 
-    public Booth(Layer layer, Vector2d location, double xLength, double yLength, params string[] texts) : base(layer,
-        location)
+    #region Constructors
+
+    public Booth(Layer layer, Vector2d basePoint, double xLength, double yLength, params string[] texts) : base(layer,
+        basePoint)
     {
         if (xLength < 0)
             throw new ArgumentException("value can't be less than 0", nameof(xLength));
@@ -34,7 +37,7 @@ public class Booth : DxfWrapper
     {
     }
 
-    public Booth(Layer layer, Vector2d location, string name) : base(layer, location)
+    public Booth(Layer layer, Vector2d basePoint, string name) : base(layer, basePoint)
     {
         _name = name;
         PrepareWallOrPlaceHolder();
@@ -44,12 +47,14 @@ public class Booth : DxfWrapper
     {
     }
 
-    private bool UnSized => _xLength == 0 || _yLength == 0;
+    #endregion
+
+    private bool IsConceptual => _xLength == 0 || _yLength == 0;
 
     private void PrepareCentralLine()
     {
-        var centralLine = EntityUtil.CreateLine(LayerUtil.GetCentralLine(), new Vector2d(Box.Min.X - 800, Location.Y),
-            new Vector2d(Box.Max.X + 800, Location.Y));
+        var centralLine = EntityUtil.CreateLine(LayerUtil.GetCentralLine(), new Vector2d(Box.Min.X - 800, BasePoint.Y),
+            new Vector2d(Box.Max.X + 800, BasePoint.Y));
         AddEntity(centralLine, false);
     }
 
@@ -62,7 +67,7 @@ public class Booth : DxfWrapper
         for (var i = 0; i < texts.Length; i++)
         {
             if (string.IsNullOrEmpty(texts[i])) continue;
-            var label = TextUtil.CreateMText(texts[i], Location + new Vector2d(_xLength / 2,
+            var label = TextUtil.CreateMText(texts[i], BasePoint + new Vector2d(_xLength / 2,
                 (Enumerable.Range(1, texts.Length).Average() - (i + 1)) * interval), 200);
             AddEntity(label, false);
         }
@@ -70,9 +75,9 @@ public class Booth : DxfWrapper
 
     private void PrepareWallOrPlaceHolder()
     {
-        if (UnSized)
+        if (IsConceptual)
         {
-            var placeHolder = TextUtil.CreateMText(_name, Location, MTextAttachmentPoint.MiddleLeft, 200);
+            var placeHolder = TextUtil.CreateMText(_name, BasePoint, MTextAttachmentPoint.MiddleLeft, 200);
             AddEntity(placeHolder);
             return;
         }
@@ -80,7 +85,7 @@ public class Booth : DxfWrapper
         var wall = EntityUtil.CreatePolyline(Layer, true, new Vector2d(0, -_yLength / 2),
             new Vector2d(_xLength, -_yLength / 2), new Vector2d(_xLength, _yLength / 2),
             new Vector2d(0, _yLength / 2));
-        wall.TransformBy(new Scale(1), Location);
+        wall.TransformBy(new Scale(1), BasePoint);
 
         AddWall(wall);
     }

@@ -1,4 +1,6 @@
 ﻿using FINN.SHAREDKERNEL.Models;
+using netDxf;
+using netDxf.Entities;
 using netDxf.Tables;
 
 namespace FINN.DRAFTER.Models;
@@ -8,71 +10,109 @@ public class Group : DxfWrapper
     private readonly GroupAlignment _alignment;
     private readonly GroupDirection _direction;
     private readonly double _gutter;
-    private readonly List<DxfWrapper> _items = new();
+    protected readonly List<DxfWrapper> Items = new();
 
-    public Group(Vector2d location, GroupDirection direction, GroupAlignment alignment, double gutter) : base(
+    public Group(Vector2d basePoint, GroupDirection direction, GroupAlignment alignment, double gutter) : base(
         Layer.Default,
-        location)
+        basePoint)
     {
         _direction = direction;
         _alignment = alignment;
-        
+
         _gutter = gutter;
+
+        OnBasePointChanged = value =>
+        {
+            Items.ForEach(x => x.BasePoint = x.BasePoint + value - BasePoint);
+            Box.TransformBy(new Scale(1), value - BasePoint);
+            OuterBox.TransformBy(new Scale(1), value - BasePoint);
+        };
     }
+
+    public override IList<EntityObject> Entities => Items.SelectMany(x => x.Entities).ToList();
 
     public void Add(DxfWrapper item)
     {
-        item.Location = _alignment switch
+        var point = _alignment switch
         {
             GroupAlignment.Start => _direction switch
             {
-                GroupDirection.LeftToRight => (_items.Count == 0 ? Location : _items.Last().Box.TopRight) +
-                    item.Location - item.Box.TopLeft + new Vector2d(_gutter, 0),
-                GroupDirection.RightToLeft => (_items.Count == 0 ? Location : _items.Last().Box.TopLeft) +
-                    item.Location - item.Box.TopRight + new Vector2d(-_gutter, 0),
-                GroupDirection.TopToBottom => (_items.Count == 0 ? Location : _items.Last().Box.BottomLeft) +
-                    item.Location - item.Box.TopLeft + new Vector2d(0, -_gutter),
-                GroupDirection.BottomToTop => (_items.Count == 0 ? Location : _items.Last().Box.TopLeft) +
-                    item.Location - item.Box.BottomLeft + new Vector2d(0, _gutter),
+                GroupDirection.LeftToRight => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.TopRight + new Vector2d(_gutter, 0)) +
+                    item.BasePoint - item.Box.TopLeft,
+                GroupDirection.RightToLeft => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.TopLeft + new Vector2d(-_gutter, 0)) +
+                    item.BasePoint - item.Box.TopRight,
+                GroupDirection.TopToBottom => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.BottomLeft + new Vector2d(0, -_gutter)) +
+                    item.BasePoint - item.Box.TopLeft,
+                GroupDirection.BottomToTop => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.TopLeft + new Vector2d(0, _gutter)) +
+                    item.BasePoint - item.Box.BottomLeft,
                 _ => throw new ArgumentOutOfRangeException()
             },
             GroupAlignment.Middle => _direction switch
             {
-                GroupDirection.LeftToRight => (_items.Count == 0 ? Location : _items.Last().Box.MiddleRight) +
-                    item.Location - item.Box.MiddleLeft + new Vector2d(_gutter, 0),
-                GroupDirection.RightToLeft => (_items.Count == 0 ? Location : _items.Last().Box.MiddleLeft) +
-                    item.Location - item.Box.MiddleRight + new Vector2d(-_gutter, 0),
-                GroupDirection.TopToBottom => (_items.Count == 0 ? Location : _items.Last().Box.BottomMiddle) +
-                    item.Location - item.Box.TopMiddle,
-                GroupDirection.BottomToTop => (_items.Count == 0 ? Location : _items.Last().Box.TopMiddle) +
-                    item.Location - item.Box.BottomMiddle + new Vector2d(0, _gutter),
+                GroupDirection.LeftToRight => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.MiddleRight + new Vector2d(_gutter, 0)) +
+                    item.BasePoint - item.Box.MiddleLeft,
+                GroupDirection.RightToLeft => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.MiddleLeft + new Vector2d(-_gutter, 0)) +
+                    item.BasePoint - item.Box.MiddleRight,
+                GroupDirection.TopToBottom => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.BottomMiddle + new Vector2d(0, -_gutter)) +
+                    item.BasePoint - item.Box.TopMiddle,
+                GroupDirection.BottomToTop => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.TopMiddle + new Vector2d(0, _gutter)) +
+                    item.BasePoint - item.Box.BottomMiddle,
                 _ => throw new ArgumentOutOfRangeException()
             },
             GroupAlignment.End => _direction switch
             {
-                GroupDirection.LeftToRight => (_items.Count == 0 ? Location : _items.Last().Box.BottomRight) +
-                    item.Location - item.Box.BottomLeft + new Vector2d(_gutter, 0),
-                GroupDirection.RightToLeft => (_items.Count == 0 ? Location : _items.Last().Box.BottomLeft) +
-                    item.Location - item.Box.BottomRight + new Vector2d(-_gutter, 0),
-                GroupDirection.TopToBottom => (_items.Count == 0 ? Location : _items.Last().Box.TopRight) +
-                    item.Location - item.Box.BottomRight + new Vector2d(0, -_gutter),
-                GroupDirection.BottomToTop => (_items.Count == 0 ? Location : _items.Last().Box.BottomRight) +
-                    item.Location - item.Box.TopRight + new Vector2d(0, _gutter),
+                GroupDirection.LeftToRight => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.BottomRight + new Vector2d(_gutter, 0)) +
+                    item.BasePoint - item.Box.BottomLeft,
+                GroupDirection.RightToLeft => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.BottomLeft + new Vector2d(-_gutter, 0)) +
+                    item.BasePoint - item.Box.BottomRight,
+                GroupDirection.TopToBottom => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.TopRight + new Vector2d(0, -_gutter)) +
+                    item.BasePoint - item.Box.BottomRight,
+                GroupDirection.BottomToTop => (Items.Count == 0
+                        ? BasePoint
+                        : Items.Last().Box.BottomRight + new Vector2d(0, _gutter)) +
+                    item.BasePoint - item.Box.TopRight,
                 _ => throw new ArgumentOutOfRangeException()
             },
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        _items.Add(item);
+        item.BasePoint = point;
+        Items.Add(item);
 
         // track in group wrapper
-        item.Entities.ToList().ForEach(x => AddEntity(x));
+        Box.AddBox(item.Box);
+        OuterBox.AddBox(item.OuterBox);
     }
 }
 
 public sealed class Group<T> : Group where T : DxfWrapper
 {
-    public Group(Vector2d location, GroupDirection direction, GroupAlignment alignment, double gutter) : base(location,
+    public new IEnumerable<T> Items => base.Items.OfType<T>();
+
+    public Group(Vector2d basePoint, GroupDirection direction, GroupAlignment alignment, double gutter) : base(
+        basePoint,
         direction, alignment, gutter)
     {
     }

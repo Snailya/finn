@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FINN.SHAREDKERNEL.Dtos;
+namespace FINN.SHAREDKERNEL.Dtos.Draw;
 
 public class ProcessDto
 {
@@ -8,25 +8,25 @@ public class ProcessDto
     ///     Name of the layer to draw.
     /// </summary>
     [JsonPropertyName("layer")]
-    public string Layer { get; set; }
+    public string Layer { get; set; } = string.Empty;
 
     /// <summary>
     ///     Name of the process, used to find the correspond block in AutoCAD
     /// </summary>
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     ///     The first line to display in the shape, usually of the format name + time.
     /// </summary>
     [JsonPropertyName("line1")]
-    public string Line1 { get; set; }
+    public string Line1 { get; set; } = string.Empty;
 
     /// <summary>
     ///     The second line to display in the shape, usually of the format width x length.
     /// </summary>
     [JsonPropertyName("line2")]
-    public string Line2 { get; set; }
+    public string Line2 { get; set; } = string.Empty;
 
     /// <summary>
     ///     Lenght(mm) (length in x-direction) of room.
@@ -40,5 +40,9 @@ public class ProcessDto
     [JsonPropertyName("yLength")]
     public double YLength { get; set; }
 
-    [JsonPropertyName("subProcess")] public IEnumerable<ProcessDto> SubProcess { get; set; }
+    /// <summary>
+    /// The process items that compose of the process.
+    /// </summary>
+    [JsonPropertyName("subProcess")]
+    public IEnumerable<ProcessDto> SubProcess { get; set; } = new List<ProcessDto>();
 }

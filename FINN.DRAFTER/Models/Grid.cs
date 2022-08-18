@@ -1,6 +1,7 @@
 ﻿using FINN.DRAFTER.Extensions;
 using FINN.DRAFTER.Utils;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.Draw;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
@@ -11,6 +12,16 @@ namespace FINN.DRAFTER.Models;
 
 public class Grid : DxfWrapper
 {
+    /// <summary>
+    /// The origin point of the grid, used to location plates.
+    /// </summary>
+    public Vector2d Origin => BasePoint;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public double Level { get; }
+
     private readonly Block _axios = new("_Axios",
         new[] { EntityUtil.CreateCircle(LayerUtil.GetAxis(), Vector2d.Zero, 1) },
         new[]
@@ -23,31 +34,39 @@ public class Grid : DxfWrapper
             }
         });
 
-    public Grid(Vector2d location, double[] xCoordinates, double[] yCoordinates, double columnXLength,
-        double columnYLength, string level) : base(Layer.Default, location)
+    #region Constructors
+
+    private Grid(Vector2d basePoint, IEnumerable<double> xCoordinates, IEnumerable<double> yCoordinates,
+        double columnXLength,
+        double columnYLength, double level) : base(Layer.Default, basePoint)
     {
+        Level = level;
+
         var xLength = xCoordinates.Max();
         var yLength = yCoordinates.Max();
 
         PopulateLinesWidthLabelAndDims(xCoordinates, yLength, PopulateDirection.Horizontal);
         PopulateLinesWidthLabelAndDims(yCoordinates, xLength, PopulateDirection.Vertical);
         PopulateColumns(xCoordinates, yCoordinates, columnXLength, columnYLength);
-        PopulateLevel(level);
+        PopulateLevelLabel($"+{Level / 1000}m层");
     }
 
-    public Grid(double[] xCoordinates, double[] yCoordinates, double columnXLength,
-        double columnYLength, string level) : this(Vector2d.Zero, xCoordinates, yCoordinates,
+    public Grid(IEnumerable<double> xCoordinates, IEnumerable<double> yCoordinates, double columnXLength,
+        double columnYLength, double level) : this(Vector2d.Zero, xCoordinates, yCoordinates,
         columnXLength, columnYLength, level)
     {
     }
 
-    private void PopulateLevel(string level)
+    #endregion
+
+    private void PopulateLevelLabel(string level)
     {
         var levelLabel = TextUtil.CreateText(level, Box.TopLeft + new Vector2d(0, 1600), 500);
         AddEntity(levelLabel);
     }
 
-    private void PopulateLinesWidthLabelAndDims(double[] coordinates, double length, PopulateDirection direction)
+    private void PopulateLinesWidthLabelAndDims(IEnumerable<double> coordinates, double length,
+        PopulateDirection direction)
     {
         var lines = coordinates.Select(x =>
         {
@@ -56,7 +75,7 @@ public class Grid : DxfWrapper
                     new Vector2d(x, length) + new Vector2d(0, 6400))
                 : EntityUtil.CreateLine(new Vector2d(length, x) + new Vector2d(6400, 0),
                     new Vector2d(0, x) - new Vector2d(6400, 0));
-            line.TransformBy(Scale.Identity, Location);
+            line.TransformBy(Scale.Identity, BasePoint);
             // line.TransformBy(new Scale(((line.StartPoint + line.EndPoint) / 2).ToVector2d(), 1.2), Location);
             AddEntity(line);
 
@@ -100,7 +119,7 @@ public class Grid : DxfWrapper
         foreach (var (x, y) in intersections)
         {
             var column = (Polyline)prototype.Clone();
-            column.TransformBy(new Scale(1), Location + new Vector2d(x, y));
+            column.TransformBy(new Scale(1), BasePoint + new Vector2d(x, y));
             AddEntity(column);
         }
     }
@@ -109,7 +128,7 @@ public class Grid : DxfWrapper
     {
         return new Grid(dto.XCoordinates, dto.YCoordinates,
             dto.ColumnXLength,
-            dto.ColumnYLength, dto.Label);
+            dto.ColumnYLength, dto.Level);
     }
 
     private enum PopulateDirection

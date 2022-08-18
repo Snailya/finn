@@ -5,6 +5,9 @@ using FINN.DRAFTER.Models;
 using FINN.DRAFTER.Utils;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.Draw;
+using FINN.SHAREDKERNEL.Dtos.InsertBlock;
+using FINN.SHAREDKERNEL.Dtos.UpdateJobStatus;
 using FINN.SHAREDKERNEL.Interfaces;
 using FINN.SHAREDKERNEL.Models;
 using Microsoft.EntityFrameworkCore;
@@ -114,12 +117,13 @@ public class HostedService : BackgroundService
             new UpdateJobStatusDto(drafterDto!.Id, JobStatus.Drawing).ToJson());
         try
         {
-            const int gutter = 1600;
+            const int gutter = 3200;
 
             var dxf = DocUtil.CreateDoc();
 
-            var canvas = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, gutter);
+            var canvas = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, gutter * 4);
 
+            // draw grids
             var grids = drafterDto.Grids.ToGridGroup(Vector2d.Zero);
             canvas.Add(grids);
 
@@ -164,6 +168,23 @@ public class HostedService : BackgroundService
             });
             canvas.Add(layouts);
 
+            // draw plates
+            foreach (var grid in grids.Items)
+            {
+                var plate = drafterDto.Plates.SingleOrDefault(x => Math.Abs(x.Level - grid.Level) < double.Epsilon);
+                if (plate != null && plate.Blocks.Any())
+                {
+                    foreach (var blockDto in plate.Blocks)
+                    {
+                        var block = new PlatformBlock(new Vector2d(blockDto.Placement.X, blockDto.Placement.Y),
+                            blockDto.XLength, blockDto.YLength,
+                            plate.Level);
+                        block.BasePoint += grid.Origin;
+                        dxf.Add(block);
+                    }
+                }
+            }
+
             dxf.Add(canvas);
 
             var output = Path.GetTempFileName().Replace(".tmp", ".dxf");
@@ -175,7 +196,7 @@ public class HostedService : BackgroundService
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e.InnerException.StackTrace);
 
             _broker.Send(RoutingKey.UpdateJobStatus,
                 new UpdateJobStatusDto(drafterDto.Id, JobStatus.Error).ToJson());

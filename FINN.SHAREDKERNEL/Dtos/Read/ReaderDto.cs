@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FINN.SHAREDKERNEL.Dtos;
+namespace FINN.SHAREDKERNEL.Dtos.Read;
 
 public class ReaderDto : BaseDto
 {

@@ -2,6 +2,7 @@
 using FINN.API.Contexts;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.UpdateJobStatus;
 using FINN.SHAREDKERNEL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
 using ExcelDataReader;
-using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Dtos.Draw;
+using FINN.SHAREDKERNEL.Dtos.Read;
+using FINN.SHAREDKERNEL.Dtos.UpdateJobStatus;
 using FINN.SHAREDKERNEL.Interfaces;
 using FINN.SHAREDKERNEL.Models;
 
@@ -57,10 +59,11 @@ public class HostedService : BackgroundService
 
             // validate spreadsheet
             var draftDto = new DrafterDto { Id = readerDto.Id };
-            if (spreadSheets.Contains("轴网")) draftDto.Grids = _reader.ReadAsGrid(spreadSheets["轴网"]!);
+            if (spreadSheets.Contains("轴网"))
+                (draftDto.Grids, draftDto.Plates) = _reader.ReadAsGridSheet(spreadSheets["轴网"]!);
 
             if (spreadSheets.Contains("Process list"))
-                draftDto.Process = _reader.ReadAsProcessList(spreadSheets["Process list"]!);
+                draftDto.Process = _reader.ReadAsProcessListSheet(spreadSheets["Process list"]!);
 
             // hand over
             _broker.Send(RoutingKey.Draw, draftDto.ToJson());

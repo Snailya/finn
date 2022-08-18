@@ -2,7 +2,7 @@
 
 public class Vector2d
 {
-    public static readonly Vector2d Zero = new(0, 0);
+    public static Vector2d Zero => new(0, 0);
 
     public Vector2d(double x, double y)
     {
@@ -53,5 +53,10 @@ public class Vector2d
         if (obj is not Vector2d v) return false;
 
         return Math.Abs(v.X - X) < double.Epsilon && Math.Abs(v.Y - Y) < double.Epsilon;
+    }
+
+    public override string ToString()
+    {
+        return $"({X},{Y})";
     }
 }

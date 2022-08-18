@@ -4,6 +4,8 @@ namespace FINN.READER.Models;
 
 public class Length
 {
+    public static Length Zero = new Length(0, Unit.Millimeter);
+
     public enum Unit
     {
         Meter,
@@ -44,29 +46,32 @@ public class Length
 
     public override string ToString()
     {
-        switch (_unit)
+        return _unit switch
         {
-            case Unit.Meter:
-                return $"{Value}m";
-            case Unit.Millimeter:
-                return $"{Value}mm";
-            case Unit.Unknown:
-                return $"{Value}";
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            Unit.Meter => $"{Value}m",
+            Unit.Millimeter => $"{Value}mm",
+            Unit.Unknown => $"{Value}",
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
     public double ToMillimeter()
     {
-        switch (_unit)
+        return _unit switch
         {
-            case Unit.Meter:
-                return Value * 1000;
-            case Unit.Millimeter:
-                return Value;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            Unit.Meter => Value * 1000,
+            Unit.Millimeter => Value,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    public static Length operator +(Length l1, Length l2)
+    {
+        return new Length(l1.ToMillimeter() + l2.ToMillimeter(), Unit.Millimeter);
+    }
+
+    public static Length operator -(Length l1, Length l2)
+    {
+        return new Length(l1.ToMillimeter() - l2.ToMillimeter(), Unit.Millimeter);
     }
 }

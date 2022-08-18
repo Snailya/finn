@@ -1,6 +1,6 @@
-﻿namespace FINN.SHAREDKERNEL;
+﻿namespace FINN.SHAREDKERNEL.Dtos;
 
-public class RoutingKey
+public static class RoutingKey
 {
     public const string UpdateJobStatus = "api.job-status";
     public const string Read = "reader.read";

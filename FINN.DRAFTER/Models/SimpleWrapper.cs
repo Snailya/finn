@@ -1,12 +1,17 @@
 ﻿using FINN.SHAREDKERNEL.Models;
+using netDxf.Collections;
 using netDxf.Entities;
+using netDxf.Tables;
 
 namespace FINN.DRAFTER.Models;
 
 public class SimpleWrapper : DxfWrapper
 {
-    public SimpleWrapper(EntityObject entity) : base(entity.Layer, Vector2d.Zero)
+    public SimpleWrapper(params EntityObject[] entities) : base(Layer.Default, Vector2d.Zero)
     {
-        AddEntity(entity);
+        foreach (var entity in entities)
+        {
+            AddEntity(entity);
+        }
     }
 }

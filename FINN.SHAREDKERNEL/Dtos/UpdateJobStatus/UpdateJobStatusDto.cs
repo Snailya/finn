@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using FINN.SHAREDKERNEL.Models;
 
-namespace FINN.SHAREDKERNEL.Dtos;
+namespace FINN.SHAREDKERNEL.Dtos.UpdateJobStatus;
 
 public class UpdateJobStatusDto : BaseDto
 {
