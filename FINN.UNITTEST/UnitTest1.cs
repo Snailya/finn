@@ -6,6 +6,7 @@ using FINN.SHAREDKERNEL.Dtos.InsertBlock;
 using FINN.SHAREDKERNEL.Dtos.UpdateJobStatus;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
+using netDxf.Blocks;
 using netDxf.Entities;
 using netDxf.Tables;
 using RabbitMQ.Client;
@@ -129,6 +130,19 @@ public class Tests
         group.Add(item2);
 
         Assert.Multiple(() => { Assert.That(item2.BasePoint.X, Is.EqualTo(100)); });
+    }
+
+    [Test]
+    public void InnerBlockCouldExplodedInOneMethodCall()
+    {
+        var inner = new Block("inner", new EntityObject[] { new Circle(Vector2.Zero, 10) });
+        var middle = new Block("middle",
+            new EntityObject[] { new Insert(inner, Vector2.Zero), new Point(new Vector2(10, 10)) });
+        var outer = new Block("outer", new[] { new Insert(middle, Vector2.Zero) });
+
+        var entities = outer.ExplodeIteratively().ToList();
+
+        entities.ForEach(x => Assert.That(x, Is.Not.InstanceOf(typeof(Insert))));
     }
 
     public class TestWrapper : DxfWrapper

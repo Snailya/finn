@@ -171,4 +171,36 @@ public static class NetDxfExtension
     {
         doc.AddEntity(wrapper.Entities);
     }
+
+    public static IEnumerable<EntityObject> ExplodeIteratively(this Insert insert)
+    {
+        var entities = insert.Explode();
+
+        // filter entities that are not insert
+        var noInsert = entities.Where(x => x is not Insert).ToList();
+
+        // explode iteratively for Insert type
+        foreach (var item in entities.Except(noInsert).OfType<Insert>().ToList())
+        {
+            noInsert.AddRange(item.ExplodeIteratively());
+        }
+
+        return noInsert;
+    }
+
+    public static IEnumerable<EntityObject> ExplodeIteratively(this Block block)
+    {
+        var entities = block.Entities;
+
+        // filter entities that are not insert
+        var noInsert = entities.Where(x => x is not Insert).ToList();
+
+        // explode iteratively for Insert type
+        foreach (var item in entities.Except(noInsert).OfType<Insert>().ToList())
+        {
+            noInsert.AddRange(item.ExplodeIteratively());
+        }
+
+        return noInsert;
+    }
 }

@@ -12,6 +12,7 @@ using FINN.SHAREDKERNEL.Interfaces;
 using FINN.SHAREDKERNEL.Models;
 using Microsoft.EntityFrameworkCore;
 using netDxf;
+using netDxf.Blocks;
 using netDxf.Entities;
 
 namespace FINN.DRAFTER;
@@ -80,9 +81,14 @@ public class HostedService : BackgroundService
 
             var blocks = names.Select(name =>
             {
+                // explode
+                var origin = doc.Blocks[name];
+                var entities = origin.ExplodeIteratively();
+                var exploded = new Block(name, entities);
+
                 // save as individual files
                 var file = new DxfDocument();
-                file.Blocks.Add(doc.Blocks[name]);
+                file.Blocks.Add(exploded);
 
                 var fileName = Path.Join(_blockFolder,
                     Path.GetFileName(Path.GetTempFileName()).Replace(".tmp", ".dxf"));
