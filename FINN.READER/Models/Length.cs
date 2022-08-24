@@ -4,8 +4,6 @@ namespace FINN.READER.Models;
 
 public class Length
 {
-    public static Length Zero = new Length(0, Unit.Millimeter);
-
     public enum Unit
     {
         Meter,
@@ -15,17 +13,7 @@ public class Length
 
     private readonly Unit _unit;
 
-    public Length(double value, Unit unit)
-    {
-        Value = value;
-        _unit = unit;
-    }
-
-    public Length(double value, string unitStr)
-    {
-        Value = value;
-        _unit = ParseUnit(unitStr);
-    }
+    public static Length Zero => new(0, Unit.Millimeter);
 
     public double Value { get; set; }
 
@@ -33,15 +21,12 @@ public class Length
     {
         var regex = new Regex(@"(mm|m)");
         var matches = regex.Matches(unitStr);
-        switch (matches[0].Value.ToLower())
+        return matches[0].Value.ToLower() switch
         {
-            case "mm":
-                return Unit.Millimeter;
-            case "m":
-                return Unit.Meter;
-            default:
-                return Unit.Unknown;
-        }
+            "mm" => Unit.Millimeter,
+            "m" => Unit.Meter,
+            _ => Unit.Unknown
+        };
     }
 
     public override string ToString()
@@ -74,4 +59,20 @@ public class Length
     {
         return new Length(l1.ToMillimeter() - l2.ToMillimeter(), Unit.Millimeter);
     }
+
+    #region Constructors
+
+    public Length(double value, Unit unit)
+    {
+        Value = value;
+        _unit = unit;
+    }
+
+    public Length(double value, string unitStr)
+    {
+        Value = value;
+        _unit = ParseUnit(unitStr);
+    }
+
+    #endregion
 }

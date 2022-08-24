@@ -1,13 +1,9 @@
 using System.Text.Json;
-using FINN.API.Contexts;
-using FINN.API.Models;
-using FINN.SHAREDKERNEL;
-using FINN.SHAREDKERNEL.Dtos;
-using FINN.SHAREDKERNEL.Dtos.Read;
-using FINN.SHAREDKERNEL.Interfaces;
-using FINN.SHAREDKERNEL.Models;
+using FINN.CORE.Interfaces;
+using FINN.CORE.Models;
+using FINN.SHAREDKERNEL.Constants;
+using FINN.SHAREDKERNEL.Dtos.Reader;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FINN.API.Controllers;
 
@@ -16,14 +12,14 @@ namespace FINN.API.Controllers;
 public class FileController : ControllerBase
 {
     private readonly IBroker _broker;
-    private readonly IDbContextFactory<JobContext> _factory;
+    private readonly IRepository<Job> _repository;
     private readonly ILogger<FileController> _logger;
 
-    public FileController(ILogger<FileController> logger, IBroker broker, IDbContextFactory<JobContext> factory)
+    public FileController(ILogger<FileController> logger, IBroker broker, IRepository<Job> repository)
     {
         _logger = logger;
         _broker = broker;
-        _factory = factory;
+        _repository = repository;
     }
 
     [HttpPost("upload")]
@@ -36,13 +32,11 @@ public class FileController : ControllerBase
             await using var stream = System.IO.File.Create(filePath);
             await file.CopyToAsync(stream);
 
-            await using var context = await _factory.CreateDbContextAsync();
-            var job = new Job(filePath);
-            context.Add(job);
-            await context.SaveChangesAsync();
+            var job = await _repository.AddAsync(new Job(filePath));
+            await _repository.SaveChangesAsync();
 
-            _broker.Send(RoutingKey.Read,
-                JsonSerializer.Serialize(new ReaderDto(job.Id, filePath)));
+            _broker.Send(RoutingKeys.ReadXlsx,
+                JsonSerializer.Serialize(new ReadRequestDto(job.Id, filePath)));
             return AcceptedAtAction(nameof(CheckStatus), new { jobId = job.Id }, job);
         }
 
@@ -55,8 +49,7 @@ public class FileController : ControllerBase
     [HttpGet("check")]
     public async Task<IActionResult> CheckStatus([FromQuery] int jobId)
     {
-        await using var context = await _factory.CreateDbContextAsync();
-        var job = await context.Jobs.FindAsync(jobId);
+        var job = await _repository.GetByIdAsync(jobId);
 
         return job.Status switch
         {
@@ -69,8 +62,8 @@ public class FileController : ControllerBase
     [HttpGet("download")]
     public async Task<IActionResult> Download([FromQuery] int jobId)
     {
-        await using var context = await _factory.CreateDbContextAsync();
-        var job = await context.Jobs.FindAsync(jobId);
+        var job = await _repository.GetByIdAsync(jobId);
+
         var bytes = await System.IO.File.ReadAllBytesAsync(job.Output);
         return File(bytes, "text/plain", Path.GetFileName(job.Output));
     }

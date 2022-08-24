@@ -9,14 +9,13 @@
 
     <ItemGroup>
         <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj" />
+        <ProjectReference Include="..\FINN.PLUGINS.DXF\FINN.PLUGINS.DXF.csproj" />
+        <ProjectReference Include="..\FINN.PLUGINS.EFCORE\FINN.PLUGINS.EFCORE.csproj" />
         <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <None Remove="Template.las" />
-        <Content Include="Template.las">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
         <None Remove="Blocks\ASU150000.dxf" />
         <None Remove="Blocks\转轮-20万.dxf" />
     </ItemGroup>
@@ -28,10 +27,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="6.0.8" />
         <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Contexts" />
     </ItemGroup>
 
 </Project>

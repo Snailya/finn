@@ -17,4 +17,10 @@
         <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Reference Include="netDxf">
+            <HintPath>..\3rd\netDxf.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
 </Project>

@@ -1,9 +1,9 @@
 using System.Text.Json;
 using FINN.API.Dtos;
-using FINN.SHAREDKERNEL;
+using FINN.CORE.Interfaces;
+using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.Dtos;
-using FINN.SHAREDKERNEL.Dtos.InsertBlock;
-using FINN.SHAREDKERNEL.Interfaces;
+using FINN.SHAREDKERNEL.Dtos.Management;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FINN.API.Controllers;
@@ -35,7 +35,7 @@ public class BlockController : ControllerBase
         var message = new InsertBlockRequestDto { Filename = filePath, Names = dto.BlockNames }.ToJson();
         var response =
             JsonSerializer.Deserialize<Response<InsertBlockResponseDto>>(
-                await _broker.SendAsync(RoutingKey.InsertBlock, message));
+                await _broker.SendAsync(RoutingKeys.InsertBlock, message));
         return Accepted(response);
     }
 }

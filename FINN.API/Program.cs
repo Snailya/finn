@@ -1,15 +1,17 @@
 using FINN.API;
-using FINN.API.Contexts;
-using FINN.CORE;
-using FINN.SHAREDKERNEL.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using FINN.CORE.Interfaces;
+using FINN.CORE.Models;
+using FINN.PLUGINS.EFCORE;
+using FINN.PLUGINS.EFCORE.Data;
+using FINN.SHAREDKERNEL;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddSingleton<IBroker, RabbitMqBroker>();
-builder.Services.AddDbContextFactory<JobContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("JobContextSQLite")));
+builder.Services.AddDbContext(builder.Configuration.GetConnectionString("SqliteConnection"));
+builder.Services.AddScoped<IRepository<Job>, EfRepository<Job>>();
 builder.Services.AddHostedService<HostedService>();
 
 builder.Services.AddCors(options =>
@@ -19,7 +21,6 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -34,12 +35,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 
-// Create database
+// Ensure database created
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    var context = services.GetRequiredService<JobContext>();
+    var context = services.GetRequiredService<AppDbContext>();
     context.Database.EnsureCreated();
 }
 

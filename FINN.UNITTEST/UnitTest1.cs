@@ -1,15 +1,15 @@
 using System.Text.Json;
-using FINN.DRAFTER.Extensions;
-using FINN.DRAFTER.Models;
+using FINN.CORE.Models;
+using FINN.PLUGINS.DXF;
+using FINN.PLUGINS.DXF.Models;
+using FINN.PLUGINS.DXF.Utils;
 using FINN.SHAREDKERNEL.Dtos;
-using FINN.SHAREDKERNEL.Dtos.InsertBlock;
-using FINN.SHAREDKERNEL.Dtos.UpdateJobStatus;
+using FINN.SHAREDKERNEL.Dtos.Management;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;
-using netDxf.Tables;
-using RabbitMQ.Client;
+using Layer = netDxf.Tables.Layer;
 
 namespace FINN.UNITTEST;
 
@@ -23,9 +23,9 @@ public class Tests
     [Test]
     public void JsonSerializerDeserializeEnum_ReturnsAsSameAsBeforeSerialize()
     {
-        var updateJobStatusDto = new UpdateJobStatusDto(0, "string");
+        var updateJobStatusDto = new UpdateJobStatusRequestDto(0, "string");
         var serialized = JsonSerializer.Serialize(updateJobStatusDto);
-        var deserialized = JsonSerializer.Deserialize<UpdateJobStatusDto>(serialized);
+        var deserialized = JsonSerializer.Deserialize<UpdateJobStatusRequestDto>(serialized);
         Assert.That(deserialized, Is.Not.Null);
         Assert.That(deserialized!.Status, Is.EqualTo(JobStatus.Ready));
     }
@@ -144,6 +144,56 @@ public class Tests
 
         entities.ForEach(x => Assert.That(x, Is.Not.InstanceOf(typeof(Insert))));
     }
+
+    [Test]
+    public void GetAreaFromPolyLine()
+    {
+        var polyline =
+            new Polyline(
+                new List<Vector3> { Vector3.Zero, new(10, 0, 0), new(10, 5, 0), new(0, 5, 0) }, true);
+
+
+        var minX = polyline.Vertexes.MinBy(vertex => vertex.Position.X)!.Position.X;
+        var minY = polyline.Vertexes.MinBy(vertex => vertex.Position.Y)!.Position.Y;
+        var maxX = polyline.Vertexes.MaxBy(vertex => vertex.Position.X)!.Position.X;
+        var maxY = polyline.Vertexes.MaxBy(vertex => vertex.Position.Y)!.Position.Y;
+
+        Assert.That(maxY, Is.EqualTo(5));
+        Assert.That(maxX, Is.EqualTo(10));
+    }
+
+
+    [Test]
+    public void CreateAssociativeHatchTest()
+    {
+        var polyline =
+            new LwPolyline(
+                new List<Vector2>
+                {
+                    Vector2.Zero, new(10, 0), new(10, 5),
+                    new(0, 5)
+                }, true) { Color = AciColor.Red };
+
+
+        var boundary = new HatchBoundaryPath(new List<EntityObject> { polyline });
+        var hatch = new Hatch(HatchPattern.Solid, new[] { boundary }, true) { Color = AciColor.Blue };
+        polyline.TransformBy(Matrix3.Identity, new Vector3(0, 50, 0));
+
+
+        var polyline2 = EntityUtil.CreateLwPolyline(true, new Vector2d(0, 10), new Vector2d(10, 10),
+            new Vector2d(10, 15),
+            new Vector2d(0, 20));
+        var boundary2 = new HatchBoundaryPath(new List<EntityObject> { polyline2 });
+        var hatch2 = new Hatch(HatchPattern.Solid, new[] { boundary2 }, true) { Color = AciColor.Red };
+
+
+        var dxf = new DxfDocument();
+        dxf.AddEntity(hatch);
+        dxf.AddEntity(hatch2);
+        var filename = Path.GetRandomFileName() + ".dxf";
+        dxf.Save(filename);
+    }
+
 
     public class TestWrapper : DxfWrapper
     {

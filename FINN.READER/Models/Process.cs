@@ -1,5 +1,4 @@
-﻿using FINN.SHAREDKERNEL.Dtos;
-using FINN.SHAREDKERNEL.Dtos.Draw;
+﻿using FINN.SHAREDKERNEL.Dtos.Drafter;
 
 namespace FINN.READER.Models;
 
@@ -13,57 +12,57 @@ internal class Process
     /// <summary>
     ///     Name of the layer to draw.
     /// </summary>
-    public string? Layer { get; set; }
+    public string Layer { get; set; } = string.Empty;
 
     /// <summary>
     ///     Index of the process
     /// </summary>
-    public string Index { get; set; }
+    public string Index { get; set; } = string.Empty;
 
     /// <summary>
     ///     Name of process.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     ///     Key of parameters
     /// </summary>
-    public string RH { get; set; }
+    public string RH { get; set; } = string.Empty;
 
     /// <summary>
     ///     Time of process.
     /// </summary>
-    public string TimeString { get; set; }
+    public string TimeString { get; set; } = string.Empty;
 
     /// <summary>
     ///     Width(m) (length in y-direction) of room.
     /// </summary>
-    public Length Width { get; set; }
+    public Length Width { get; set; } = Length.Zero;
 
     /// <summary>
     ///     Lenght(m) (length in x-direction) of room.
     /// </summary>
-    public Length Length { get; set; }
+    public Length Length { get; set; } = Length.Zero;
 
     /// <summary>
     ///     Speed of conveyor
     /// </summary>
-    public string Speed { get; set; }
+    public string Speed { get; set; } = string.Empty;
 
     /// <summary>
     ///     Cycle pitch.
     /// </summary>
-    public string CyclePitch { get; set; }
+    public string CyclePitch { get; set; } = string.Empty;
 
     /// <summary>
     ///     Cycle time.
     /// </summary>
-    public string CycleTime { get; set; }
+    public string CycleTime { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gross capacity.
     /// </summary>
-    public string GrossCapacity { get; set; }
+    public string GrossCapacity { get; set; } = string.Empty;
 
 
     public ProcessDto ToLayoutProcessDto()

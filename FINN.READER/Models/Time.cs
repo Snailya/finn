@@ -12,6 +12,33 @@ public class Time
 
     private readonly Unit _unit;
 
+    public double Value { get; set; }
+
+    public static Unit ParseUnit(string unitStr)
+    {
+        var regex = new Regex(@"(min|minute|minutes)");
+        var matches = regex.Matches(unitStr);
+        return matches[0].Value.ToLower() switch
+        {
+            "min" => Unit.Minute,
+            "minute" => Unit.Minute,
+            "minutes" => Unit.Minute,
+            _ => Unit.Unknown
+        };
+    }
+
+    public override string ToString()
+    {
+        return _unit switch
+        {
+            Unit.Minute => $"{Value}min",
+            Unit.Unknown => $"{Value}",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    #region Constructors
+
     public Time(double value, Unit unit)
     {
         Value = value;
@@ -24,35 +51,5 @@ public class Time
         _unit = ParseUnit(unitStr);
     }
 
-    public double Value { get; set; }
-
-    public static Unit ParseUnit(string unitStr)
-    {
-        var regex = new Regex(@"(min|minute|minutes)");
-        var matches = regex.Matches(unitStr);
-        switch (matches[0].Value.ToLower())
-        {
-            case "min":
-                return Unit.Minute;
-            case "minute":
-                return Unit.Minute;
-            case "minutes":
-                return Unit.Minute;
-            default:
-                return Unit.Unknown;
-        }
-    }
-
-    public override string ToString()
-    {
-        switch (_unit)
-        {
-            case Unit.Minute:
-                return $"{Value}min";
-            case Unit.Unknown:
-                return $"{Value}";
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
+    #endregion
 }

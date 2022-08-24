@@ -52,4 +52,9 @@ public class BoundingBox
         AddPoint(box.Min);
         AddPoint(box.Max);
     }
+
+    public bool IsBoxInside(BoundingBox box)
+    {
+        return box.Min.X >= Min.X && box.Max.X <= Max.X && box.Min.Y >= Min.Y && box.Max.Y <= Max.Y;
+    }
 }

@@ -1,14 +1,18 @@
-using FINN.CORE;
+using FINN.CORE.Interfaces;
+using FINN.CORE.Models;
 using FINN.DRAFTER;
-using FINN.DRAFTER.Contexts;
+using FINN.PLUGINS.DXF;
+using FINN.PLUGINS.EFCORE;
+using FINN.PLUGINS.EFCORE.Data;
+using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 var host = Host.CreateDefaultBuilder(args).ConfigureServices((context, collection) =>
 {
     collection.AddSingleton<IBroker, RabbitMqBroker>();
-    collection.AddDbContextFactory<BlockContext>(options =>
-        options.UseSqlite(context.Configuration.GetConnectionString("BlockContextSQLite")));
+    collection.AddDbContext(context.Configuration.GetConnectionString("SqliteConnection"));
+    collection.AddScoped<IRepository<BlockDefinition>, EfRepository<BlockDefinition>>();
+    collection.AddSingleton<IReadWriteDxf, NetReadWriteDxf>();
     collection.AddHostedService<HostedService>();
 }).Build();
 
@@ -17,7 +21,7 @@ using (var scope = host.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    var context = services.GetRequiredService<BlockContext>();
+    var context = services.GetRequiredService<AppDbContext>();
     context.Database.EnsureCreated();
 }
 

@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj" />
+    </ItemGroup>
+
 </Project>

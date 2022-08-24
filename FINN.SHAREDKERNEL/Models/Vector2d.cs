@@ -2,13 +2,13 @@
 
 public class Vector2d
 {
-    public static Vector2d Zero => new(0, 0);
-
     public Vector2d(double x, double y)
     {
         X = x;
         Y = y;
     }
+
+    public static Vector2d Zero => new(0, 0);
 
     public double X { get; set; }
     public double Y { get; set; }

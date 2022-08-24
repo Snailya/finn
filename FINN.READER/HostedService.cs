@@ -1,9 +1,12 @@
 ﻿using System.Text.Json;
 using ExcelDataReader;
+using FINN.CORE.Interfaces;
+using FINN.CORE.Models;
+using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.Dtos;
-using FINN.SHAREDKERNEL.Dtos.Draw;
-using FINN.SHAREDKERNEL.Dtos.Read;
-using FINN.SHAREDKERNEL.Dtos.UpdateJobStatus;
+using FINN.SHAREDKERNEL.Dtos.Drafter;
+using FINN.SHAREDKERNEL.Dtos.Management;
+using FINN.SHAREDKERNEL.Dtos.Reader;
 using FINN.SHAREDKERNEL.Interfaces;
 using FINN.SHAREDKERNEL.Models;
 
@@ -12,22 +15,23 @@ namespace FINN.READER;
 public class HostedService : BackgroundService
 {
     private readonly IBroker _broker;
+    private readonly IDataTableReader _dataTableReader;
     private readonly ILogger<HostedService> _logger;
-    private readonly IReader _reader;
 
     public HostedService(ILogger<HostedService> logger, IBroker broker,
-        IReader reader)
+        IDataTableReader dataTableReader)
     {
         _logger = logger;
         _broker = broker;
-        _reader = reader;
+        _dataTableReader = dataTableReader;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Register handler for {Routing}", RoutingKey.Read);
+        _logger.LogInformation("Register handler for {Routing}", RoutingKeys.ReadXlsx);
 
-        _broker.RegisterHandler(RoutingKey.Read, (routingKey, correlationId, message) => HandleRead(message));
+        _broker.RegisterHandler(RoutingKeys.ReadXlsx, (routingKey, correlationId, message) => HandleReadXlsx(message));
+        _broker.RegisterHandler(RoutingKeys.ReadDxf, (routingKey, correlationId, message) => HandleReadDxf(message));
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -42,39 +46,57 @@ public class HostedService : BackgroundService
 
     #region Handlers
 
-    private void HandleRead(string message)
+    private void HandleReadXlsx(string message)
     {
-        var readerDto = JsonSerializer.Deserialize<ReaderDto>(message);
+        var request = JsonSerializer.Deserialize<ReadRequestDto>(message);
 
-        // update status
-        _broker.Send(RoutingKey.UpdateJobStatus,
-            new UpdateJobStatusDto(readerDto!.Id, JobStatus.Reading).ToJson());
+        UpdateJobStatus(request.JobId, JobStatus.Reading);
 
-        // do business logic
         try
         {
-            using var stream = File.Open(readerDto.Input, FileMode.Open, FileAccess.Read);
+            using var stream = File.Open(request.Filename, FileMode.Open, FileAccess.Read);
             using var excelDataReader = ExcelReaderFactory.CreateReader(stream);
             var spreadSheets = excelDataReader.AsDataSet().Tables;
 
             // validate spreadsheet
-            var draftDto = new DrafterDto { Id = readerDto.Id };
+            var drawRequestDto = new DrawLayoutRequestDto { Id = request.JobId };
             if (spreadSheets.Contains("轴网"))
-                (draftDto.Grids, draftDto.Plates) = _reader.ReadAsGridSheet(spreadSheets["轴网"]!);
+                (drawRequestDto.Grids, drawRequestDto.Platforms) =
+                    _dataTableReader.ReadAsGridSheet(spreadSheets["轴网"]!);
 
             if (spreadSheets.Contains("Process list"))
-                draftDto.Process = _reader.ReadAsProcessListSheet(spreadSheets["Process list"]!);
+                drawRequestDto.Process = _dataTableReader.ReadAsProcessListSheet(spreadSheets["Process list"]!);
 
             // hand over
-            _broker.Send(RoutingKey.Draw, draftDto.ToJson());
+            _broker.Send(RoutingKeys.Draw, drawRequestDto.ToJson());
         }
         catch (Exception e)
         {
             _logger.LogError(e.Message);
-
-            _broker.Send(RoutingKey.UpdateJobStatus,
-                new UpdateJobStatusDto(readerDto.Id, JobStatus.Error).ToJson());
+            UpdateJobStatus(request.JobId, JobStatus.Error);
         }
+    }
+
+    private void HandleReadDxf(string message)
+    {
+        var request = JsonSerializer.Deserialize<ReadRequestDto>(message);
+
+        UpdateJobStatus(request.JobId, JobStatus.Reading);
+
+        try
+        {
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            UpdateJobStatus(request.JobId, JobStatus.Error);
+        }
+    }
+
+    private void UpdateJobStatus(int id, JobStatus status)
+    {
+        // update status
+        _broker.Send(RoutingKeys.UpdateJobStatus, new UpdateJobStatusRequestDto(id, status).ToJson());
     }
 
     #endregion

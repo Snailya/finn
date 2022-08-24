@@ -1,5 +1,4 @@
-﻿using FINN.SHAREDKERNEL.Dtos;
-using FINN.SHAREDKERNEL.Dtos.Draw;
+﻿using FINN.SHAREDKERNEL.Dtos.Drafter;
 
 namespace FINN.READER.Models;
 
@@ -8,27 +7,27 @@ internal class Grid
     /// <summary>
     ///     The length of column in x direction.
     /// </summary>
-    public Length ColumnLength { get; set; }
+    public Length ColumnLength { get; set; } = Length.Zero;
 
     /// <summary>
     ///     The length of column in y direction.
     /// </summary>
-    public Length ColumnWidth { get; set; }
+    public Length ColumnWidth { get; set; } = Length.Zero;
 
     /// <summary>
     ///     The coordinates of grid line in x direction.
     /// </summary>
-    public Length[] XCoordinates { get; set; }
+    public List<Length> XCoordinates { get; set; } = new();
 
     /// <summary>
     ///     The coordinates of grid line in y direction.
     /// </summary>
-    public Length[] YCoordinates { get; set; }
+    public List<Length> YCoordinates { get; set; } = new();
 
     /// <summary>
     ///     The label of the current grid.
     /// </summary>
-    public Length Level { get; set; }
+    public Length Level { get; set; } = Length.Zero;
 
     public GridDto ToDto()
     {
