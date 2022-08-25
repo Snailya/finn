@@ -1,5 +1,6 @@
 ﻿using FINN.SHAREDKERNEL.Models;
 using netDxf.Entities;
+using netDxf.Tables;
 
 namespace FINN.PLUGINS.DXF.Models;
 
@@ -15,7 +16,7 @@ public abstract class DxfWrapper : IEntityWrapper<EntityObject>
 
     #region Constructors
 
-    protected DxfWrapper(netDxf.Tables.Layer layer, Vector2d basePoint)
+    protected DxfWrapper(Layer layer, Vector2d basePoint)
     {
         Layer = layer;
         _basePoint = basePoint;
@@ -28,7 +29,7 @@ public abstract class DxfWrapper : IEntityWrapper<EntityObject>
     /// <summary>
     ///     The dxf layer that should place the wrapper on.
     /// </summary>
-    public netDxf.Tables.Layer Layer { get; }
+    public Layer Layer { get; }
 
     /// <summary>
     ///     The geometric base point of the wrapper.

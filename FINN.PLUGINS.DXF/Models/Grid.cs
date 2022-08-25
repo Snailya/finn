@@ -5,7 +5,6 @@ using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;
 using netDxf.Tables;
-using Layer = netDxf.Tables.Layer;
 
 namespace FINN.PLUGINS.DXF.Models;
 
@@ -54,8 +53,10 @@ public sealed class Grid : DxfWrapper
             var label1 =
                 new Insert(_axios, line.StartPoint - Vector3.Normalize(line.Direction) * 1600)
                     { Scale = new Vector3(1600, 1600, 1600) };
+            label1.Sync();
             var label2 = new Insert(_axios, line.EndPoint + Vector3.Normalize(line.Direction) * 1600)
                 { Scale = new Vector3(1600, 1600, 1600) };
+            label2.Sync();
             AddEntity(label1);
             AddEntity(label2);
 
@@ -126,11 +127,14 @@ public sealed class Grid : DxfWrapper
         PopulateLevelLabel($"+{Level / 1000}m层");
 
         // convert to block
-        var block = new Block($"grid{Level}", Entities) { Origin = basePoint.ToVector3() };
+        var dims = Entities.Where(x => x is Dimension).ToList();
+        var entitiesWithoutDimension = Entities.Except(dims);
+        var block = new Block($"grid{Level}", entitiesWithoutDimension) { Origin = basePoint.ToVector3() };
         var insert = new Insert(block, basePoint.ToVector3());
         Entities.Clear();
+        dims.ForEach(x => Entities.Add(x));
         Entities.Add(insert);
-        
+
         // append xdata, which used for get grid level
         XDataUtil.GetRegistryByName("FINN.TYPE");
         insert.AddType("GRID");

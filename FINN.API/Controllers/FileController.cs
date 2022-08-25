@@ -12,8 +12,8 @@ namespace FINN.API.Controllers;
 public class FileController : ControllerBase
 {
     private readonly IBroker _broker;
-    private readonly IRepository<Job> _repository;
     private readonly ILogger<FileController> _logger;
+    private readonly IRepository<Job> _repository;
 
     public FileController(ILogger<FileController> logger, IBroker broker, IRepository<Job> repository)
     {

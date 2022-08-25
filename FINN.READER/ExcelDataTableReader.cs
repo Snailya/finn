@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Text.RegularExpressions;
-using FINN.CORE.Interfaces;
 using FINN.READER.Models;
 using FINN.SHAREDKERNEL.Dtos.Drafter;
 using FINN.SHAREDKERNEL.Interfaces;

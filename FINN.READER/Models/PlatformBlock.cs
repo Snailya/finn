@@ -13,12 +13,12 @@ public class PlatformBlock
 
     public PlatformBlockDto ToDto()
     {
-        return new PlatformBlockDto()
+        return new PlatformBlockDto
         {
-            Placement = new PositionDto() { X = XPosition.ToMillimeter(), Y = YPosition.ToMillimeter() },
+            Placement = new PositionDto { X = XPosition.ToMillimeter(), Y = YPosition.ToMillimeter() },
             Level = Level.ToMillimeter(),
             XLength = Length.ToMillimeter(),
-            YLength = Width.ToMillimeter(),
+            YLength = Width.ToMillimeter()
         };
     }
 }

@@ -1,5 +1,4 @@
-﻿using FINN.CORE.Interfaces;
-using FINN.SHAREDKERNEL.Interfaces;
+﻿using FINN.SHAREDKERNEL.Interfaces;
 
 namespace FINN.SHAREDKERNEL.Models;
 

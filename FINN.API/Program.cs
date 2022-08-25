@@ -5,7 +5,6 @@ using FINN.PLUGINS.EFCORE;
 using FINN.PLUGINS.EFCORE.Data;
 using FINN.SHAREDKERNEL;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

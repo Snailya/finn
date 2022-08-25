@@ -9,8 +9,8 @@ namespace FINN.API;
 public class HostedService : BackgroundService
 {
     private readonly IBroker _broker;
-    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<HostedService> _logger;
+    private readonly IServiceProvider _serviceProvider;
 
     public HostedService(ILogger<HostedService> logger, IBroker broker, IServiceProvider serviceProvider)
     {

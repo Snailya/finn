@@ -7,20 +7,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj" />
-      <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj" />
+        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj"/>
+        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="netDxf">
-        <HintPath>..\3rd\netDxf.dll</HintPath>
-      </Reference>
+        <Reference Include="netDxf">
+            <HintPath>..\3rd\netDxf.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="Template.las">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+        <Content Include="Template.las">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>

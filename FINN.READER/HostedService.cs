@@ -3,12 +3,10 @@ using ExcelDataReader;
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.SHAREDKERNEL.Constants;
-using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Dtos.Drafter;
 using FINN.SHAREDKERNEL.Dtos.Management;
 using FINN.SHAREDKERNEL.Dtos.Reader;
 using FINN.SHAREDKERNEL.Interfaces;
-using FINN.SHAREDKERNEL.Models;
 
 namespace FINN.READER;
 

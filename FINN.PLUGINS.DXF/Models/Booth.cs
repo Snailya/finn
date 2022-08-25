@@ -2,7 +2,7 @@
 using FINN.SHAREDKERNEL.Dtos.Drafter;
 using FINN.SHAREDKERNEL.Models;
 using netDxf.Entities;
-using Layer = netDxf.Tables.Layer;
+using netDxf.Tables;
 
 namespace FINN.PLUGINS.DXF.Models;
 

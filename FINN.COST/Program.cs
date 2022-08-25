@@ -1,5 +1,4 @@
-﻿using FINN.CORE;
-using FINN.CORE.Interfaces;
+﻿using FINN.CORE.Interfaces;
 using FINN.COST;
 using FINN.SHAREDKERNEL;
 using Microsoft.Extensions.DependencyInjection;

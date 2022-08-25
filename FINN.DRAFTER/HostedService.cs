@@ -7,14 +7,13 @@ using FINN.SHAREDKERNEL.Dtos.Drafter;
 using FINN.SHAREDKERNEL.Dtos.Management;
 using FINN.SHAREDKERNEL.Interfaces;
 
-
 namespace FINN.DRAFTER;
 
 public class HostedService : BackgroundService
 {
     private readonly IBroker _broker;
-    private readonly IReadWriteDxf _readWriteDxf;
     private readonly ILogger<HostedService> _logger;
+    private readonly IReadWriteDxf _readWriteDxf;
 
     public HostedService(ILogger<HostedService> logger, IBroker broker, IReadWriteDxf readWriteDxf)
     {
@@ -74,7 +73,7 @@ public class HostedService : BackgroundService
 
     private void HandleDraw(string message)
     {
-        var jobStatus = new UpdateJobStatusRequestDto() { Status = JobStatus.Drawing };
+        var jobStatus = new UpdateJobStatusRequestDto { Status = JobStatus.Drawing };
 
         try
         {

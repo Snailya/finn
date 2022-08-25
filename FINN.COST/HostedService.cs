@@ -1,6 +1,5 @@
 ﻿using FINN.CORE.Interfaces;
 using FINN.SHAREDKERNEL.Constants;
-using FINN.SHAREDKERNEL.Dtos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

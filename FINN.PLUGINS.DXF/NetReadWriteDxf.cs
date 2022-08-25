@@ -17,17 +17,16 @@ namespace FINN.PLUGINS.DXF;
 
 public class NetReadWriteDxf : IReadWriteDxf
 {
-    private readonly IRepository<BlockDefinition> _repository;
+    private const double Gutter = 1600;
     private readonly IConfiguration _configuration;
-    private string _blockFolder;
+    private readonly IRepository<BlockDefinition> _repository;
+    private readonly string _blockFolder;
 
     public NetReadWriteDxf(IRepository<BlockDefinition> repository, IConfiguration configuration)
     {
         _repository = repository;
         _blockFolder = configuration["storage"];
     }
-
-    private const double Gutter = 1600;
 
     public EstimateCostRequestDto EstimateFromFile(string filename)
     {
@@ -51,14 +50,14 @@ public class NetReadWriteDxf : IReadWriteDxf
         {
             var box = x.GetBoundingBox();
             var targetGrid = grids.SingleOrDefault(i => i.Box.IsBoxInside(box));
-            if (targetGrid == null) return new GeometryDto() { ZPosition = 0 };
+            if (targetGrid == null) return new GeometryDto { ZPosition = 0 };
 
             var minX = x.Vertexes.MinBy(vertex => vertex.Position.X)!.Position.X;
             var minY = x.Vertexes.MinBy(vertex => vertex.Position.Y)!.Position.Y;
             var maxX = x.Vertexes.MaxBy(vertex => vertex.Position.X)!.Position.X;
             var maxY = x.Vertexes.MaxBy(vertex => vertex.Position.Y)!.Position.Y;
 
-            return new GeometryDto()
+            return new GeometryDto
             {
                 XLength = maxX - minX,
                 YLength = maxY - minY,
@@ -131,7 +130,7 @@ public class NetReadWriteDxf : IReadWriteDxf
                 blocks.ForEach(x =>
                 {
                     var bd = _repository.SingleOrDefaultAsync(bd => bd.Name == x.Name).Result!;
-                    var doc = DxfDocument.Load((string)bd.DxfFileName);
+                    var doc = DxfDocument.Load(bd.DxfFileName);
                     var block = doc.Blocks.Items.Single(b => b.Name == bd.Name);
                     var insert = new Insert(block);
                     var blockWrapper = new SimpleWrapper(insert);
@@ -147,7 +146,8 @@ public class NetReadWriteDxf : IReadWriteDxf
         // draw plates
         foreach (var grid in grids.Items)
         {
-            var platformBlocks = drawLayoutRequestDto.Platforms.Where(x => Math.Abs(x.Level - grid.Level) < double.Epsilon);
+            var platformBlocks =
+                drawLayoutRequestDto.Platforms.Where(x => Math.Abs(x.Level - grid.Level) < double.Epsilon);
             foreach (var platformBlock in platformBlocks)
             {
                 var block = new PlatformBlock(new Vector2d(platformBlock.Placement.X, platformBlock.Placement.Y),

@@ -9,7 +9,7 @@ using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;
-using Layer = netDxf.Tables.Layer;
+using netDxf.Tables;
 
 namespace FINN.UNITTEST;
 
@@ -194,6 +194,34 @@ public class Tests
         dxf.Save(filename);
     }
 
+    [Test]
+    public void ScaleInsertScalesTheTextHeightOfAttribute()
+    {
+        var innerBlock = new Block("_inner", new[] { new Circle(Vector2.Zero, 1) }, new AttributeDefinition[]
+        {
+            new("X", 1, TextStyle.Default) { IsVisible = true, Value = "X", Height = 1 }
+        });
+        var innerInsert = new Insert(innerBlock, Vector2.Zero) { Scale = new Vector3(100, 100, 100) };
+        innerInsert.TransformAttributes();
+
+        Assert.That(innerInsert.Attributes.AttributeWithTag("X").Height, Is.EqualTo(100));
+    }
+
+    [Test]
+    public void Dimension()
+    {
+        var line = new Line(new Vector2(0, 10), new Vector2(1000, 10));
+        var ad = DimUtil.CreateAlignedDim(line, 1);
+
+        var block = new Block("DimensionBlock", new EntityObject[] { line, ad }) { Origin = Vector3.Zero };
+        var insert = new Insert(block) { Position = Vector3.Zero };
+        insert.TransformAttributes();
+
+        var dxf = new DxfDocument();
+        dxf.AddEntity(insert);
+
+        dxf.Save(Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".dxf");
+    }
 
     public class TestWrapper : DxfWrapper
     {

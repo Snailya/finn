@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace FINN.CORE.Interfaces;
+﻿namespace FINN.CORE.Interfaces;
 
 public interface IRepository<T> : IReadRepository<T>
 {

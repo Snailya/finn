@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using FINN.CORE.Models;
-using FINN.SHAREDKERNEL.Models;
 
 namespace FINN.SHAREDKERNEL.Dtos.Management;
 

@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using FINN.CORE.Interfaces;
 using FINN.SHAREDKERNEL.Interfaces;
 
 namespace FINN.SHAREDKERNEL.Dtos;
