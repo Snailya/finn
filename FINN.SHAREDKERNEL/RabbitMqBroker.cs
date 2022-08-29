@@ -1,6 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
+using System.Text.Json;
 using FINN.CORE.Interfaces;
+using FINN.CORE.Models;
+using FINN.SHAREDKERNEL.Constants;
+using FINN.SHAREDKERNEL.Dtos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
@@ -83,7 +87,25 @@ public class RabbitMqBroker : IBroker
         consumer.Received += (model, ea) =>
         {
             var props = ea.BasicProperties;
-            handler(props.ReplyTo, props.CorrelationId, Encoding.UTF8.GetString(ea.Body.ToArray()));
+
+            try
+            {
+                handler(props.ReplyTo, props.CorrelationId, Encoding.UTF8.GetString(ea.Body.ToArray()));
+            }
+            catch (JsonException e)
+            {
+                Reply(props.ReplyTo, props.CorrelationId,
+                    new Response(e.Message, ErrorCodes.DeserializeFailure).ToJson());
+            }
+            catch (ArgumentException e)
+            {
+                Reply(props.ReplyTo, props.CorrelationId,
+                    new Response(e.Message, ErrorCodes.InvalidArgument).ToJson());
+            }
+            catch (Exception e)
+            {
+                Reply(props.ReplyTo, props.CorrelationId, new Response(e.Message, ErrorCodes.Unknown).ToJson());
+            }
         };
 
         var queue = _channel.QueueDeclare(routingKey).QueueName;

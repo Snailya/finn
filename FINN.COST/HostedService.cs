@@ -1,5 +1,8 @@
-﻿using FINN.CORE.Interfaces;
+﻿using System.Text.Json;
+using FINN.CORE.Interfaces;
+using FINN.COST.Services;
 using FINN.SHAREDKERNEL.Constants;
+using FINN.SHAREDKERNEL.UseCases;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -9,19 +12,22 @@ namespace FINN.COST;
 public class HostedService : BackgroundService
 {
     private readonly IBroker _broker;
+    private readonly CostService _service;
     private readonly ILogger<HostedService> _logger;
 
-    public HostedService(ILogger<HostedService> logger, IConfiguration configuration, IBroker broker)
+    public HostedService(ILogger<HostedService> logger, IBroker broker, CostService service)
     {
         _logger = logger;
         _broker = broker;
+        _service = service;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Register handler for {Routing}", RoutingKeys.Estimate);
+        _logger.LogInformation("Register handler for {Routing}", nameof(RoutingKeys.CostService));
 
-        _broker.RegisterHandler(RoutingKeys.Estimate, (routingKey, correlationId, message) => HandleEstimate(message));
+        _broker.RegisterHandler(RoutingKeys.CostService.EstimateCost,
+            HandleEstimateCost);
 
         // monitor service status
         while (!stoppingToken.IsCancellationRequested)
@@ -37,8 +43,11 @@ public class HostedService : BackgroundService
 
     #region Handlers
 
-    private void HandleEstimate(string message)
+    private void HandleEstimateCost(string routingKey, string correlationId, string message)
     {
+        var dto = JsonSerializer.Deserialize<IEnumerable<GeometryDto>>(message);
+        if (dto == null) throw new ArgumentNullException();
+        var cost = _service.EstimateCost(dto);
     }
 
     #endregion

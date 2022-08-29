@@ -1,15 +1,13 @@
-﻿using FINN.PLUGINS.EFCORE.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FINN.PLUGINS.EFCORE;
 
 public static class Extension
 {
-    public static void AddDbContext(this IServiceCollection services, string connectionString)
+    public static void AddDbContext<T>(this IServiceCollection services, string connectionString) where T : DbContext
     {
-        services.AddDbContext<AppDbContext>(options =>
+        services.AddDbContext<T>(options =>
             options.UseSqlite(connectionString));
-        // will be created in web project root
     }
 }

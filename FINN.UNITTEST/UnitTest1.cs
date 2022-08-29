@@ -4,7 +4,7 @@ using FINN.PLUGINS.DXF;
 using FINN.PLUGINS.DXF.Models;
 using FINN.PLUGINS.DXF.Utils;
 using FINN.SHAREDKERNEL.Dtos;
-using FINN.SHAREDKERNEL.Dtos.Management;
+using FINN.SHAREDKERNEL.Dtos.Jobs;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
@@ -71,7 +71,7 @@ public class Tests
     public void DeserializeResponseCorrectly()
     {
         var str = "{\"msg\":\"success\",\"code\":0,\"data\":{\"Ids\":[4,3]}}";
-        var result = JsonSerializer.Deserialize<Response<InsertBlockResponseDto>>(str);
+        var result = JsonSerializer.Deserialize<Response<UploadOrUpdateBlocksReqsponse>>(str);
         Assert.That(result.Data.Blocks, Is.Not.Null);
     }
 

@@ -5,16 +5,18 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+        <Company>JetSnail</Company>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj"/>
-        <ProjectReference Include="..\FINN.PLUGINS.EFCORE\FINN.PLUGINS.EFCORE.csproj"/>
-        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj"/>
+        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj" />
+        <ProjectReference Include="..\FINN.COST\FINN.COST.csproj" />
+        <ProjectReference Include="..\FINN.PLUGINS.EFCORE\FINN.PLUGINS.EFCORE.csproj" />
+        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj" />
     </ItemGroup>
 
 </Project>

@@ -20,4 +20,5 @@
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.CreateBlockWithInnerBlockDoNotChangeTheTextHeightOfInnerBlockAttribute&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.Dimension&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+&lt;/SessionState&gt;</s:String>
+	</wpf:ResourceDictionary>

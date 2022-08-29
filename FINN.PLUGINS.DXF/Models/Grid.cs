@@ -1,6 +1,6 @@
 ﻿using FINN.PLUGINS.DXF.Utils;
-using FINN.SHAREDKERNEL.Dtos.Drafter;
 using FINN.SHAREDKERNEL.Models;
+using FINN.SHAREDKERNEL.UseCases;
 using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;

@@ -1,17 +1,13 @@
-using FINN.API;
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.PLUGINS.EFCORE;
-using FINN.PLUGINS.EFCORE.Data;
 using FINN.SHAREDKERNEL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddSingleton<IBroker, RabbitMqBroker>();
-builder.Services.AddDbContext(builder.Configuration.GetConnectionString("SqliteConnection"));
-builder.Services.AddScoped<IRepository<Job>, EfRepository<Job>>();
-builder.Services.AddHostedService<HostedService>();
+builder.Services.AddScoped<IRepository<LayoutJob>, EfRepository<LayoutJob>>();
 
 builder.Services.AddCors(options =>
 {
@@ -32,16 +28,6 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-
-// Ensure database created
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-
-    var context = services.GetRequiredService<AppDbContext>();
-    context.Database.EnsureCreated();
-}
 
 app.UseCors();
 

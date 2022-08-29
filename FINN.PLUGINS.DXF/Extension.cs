@@ -290,7 +290,7 @@ public static class Extension
     /// </summary>
     /// <param name="block"></param>
     /// <returns></returns>
-    public static IEnumerable<EntityObject> ExplodeIteratively(this Block block)
+    public static IEnumerable<EntityObject> ExplodeIteratively(this Block? block)
     {
         var entities = block.Entities;
 

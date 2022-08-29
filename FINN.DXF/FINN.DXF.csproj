@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+        <AssemblyName>FINN.DXF</AssemblyName>
+        <RootNamespace>FINN.DXF</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj" />
+        <ProjectReference Include="..\FINN.PLUGINS.DXF\FINN.PLUGINS.DXF.csproj" />
+        <ProjectReference Include="..\FINN.PLUGINS.EFCORE\FINN.PLUGINS.EFCORE.csproj" />
+        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Template.las" />
+        <None Remove="Blocks\ASU150000.dxf" />
+        <None Remove="Blocks\转轮-20万.dxf" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="netDxf">
+            <HintPath>..\3rd\netDxf.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Contexts" />
+    </ItemGroup>
+
+</Project>

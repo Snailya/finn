@@ -2,30 +2,24 @@
 
 public static class RoutingKeys
 {
-    public const string UpdateJobStatus = "api.job-status";
+    public static class ExcelService
+    {
+        public const string GetLayout = "excel-service.read-excel";
+    }
 
-    #region Drawer
+    public static class DxfService
+    {
+        public const string GetBlockDefinition = "dxf-service.get-block-definition";
+        public const string AddBlockDefinitions = "dxf-service.add-block-definitions";
+        public const string DeleteBlockDefinition = "dxf-service.delete-block-definition";
+        public const string DrawLayout = "dxf-service.draw-layout";
+        public const string ReadLayout = "dxf-service.read-layout";
+    }
 
-    public const string Draw = "drafter.draw";
+    public static class CostService
+    {
+        public const string EstimateCost = "cost-service.estimate-cost";
+    }
 
-    #endregion
-
-    #region Cost
-
-    public const string Estimate = "cost.estimate";
-
-    #endregion
-
-    #region Management
-
-    public const string InsertBlock = "drafter.insert-block";
-
-    #endregion
-
-    #region Reader
-
-    public const string ReadXlsx = "reader.read-excel";
-    public const string ReadDxf = "reader.read-dxf";
-
-    #endregion
+    public const string Dispatch = "job.dispatch";
 }

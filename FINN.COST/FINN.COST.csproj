@@ -11,14 +11,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj"/>
-        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj"/>
+        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj" />
+        <ProjectReference Include="..\FINN.PLUGINS.EFCORE\FINN.PLUGINS.EFCORE.csproj" />
+        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj" />
     </ItemGroup>
 
     <ItemGroup>
