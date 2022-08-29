@@ -40,22 +40,31 @@ public sealed class Grid : DxfWrapper
     private void PopulateLinesWidthLabelAndDims(IEnumerable<double> coordinates, double length,
         PopulateDirection direction)
     {
-        var lines = coordinates.Select(x =>
+        var lines = coordinates.Select((value, index) =>
         {
             var line = direction == PopulateDirection.Horizontal
-                ? EntityUtil.CreateLine(new Vector2d(x, 0) - new Vector2d(0, 6400),
-                    new Vector2d(x, length) + new Vector2d(0, 6400))
-                : EntityUtil.CreateLine(new Vector2d(length, x) + new Vector2d(6400, 0),
-                    new Vector2d(0, x) - new Vector2d(6400, 0));
+                ? EntityUtil.CreateLine(new Vector2d(value, 0) - new Vector2d(0, 6400),
+                    new Vector2d(value, length) + new Vector2d(0, 6400))
+                : EntityUtil.CreateLine(new Vector2d(length, value) + new Vector2d(6400, 0),
+                    new Vector2d(0, value) - new Vector2d(6400, 0));
             line.TransformBy(Scale.Identity, BasePoint);
             AddEntity(line);
+
+            // label content
+            var labelContent = direction switch
+            {
+                PopulateDirection.Horizontal => (index + 1).ToString(),
+                PopulateDirection.Vertical => ((char)(index + 65)).ToString()
+            };
 
             var label1 =
                 new Insert(_axios, line.StartPoint - Vector3.Normalize(line.Direction) * 1600)
                     { Scale = new Vector3(1600, 1600, 1600) };
+            label1.Attributes.AttributeWithTag("A").Value = labelContent;
             label1.Sync();
-            var label2 = new Insert(_axios, line.EndPoint + Vector3.Normalize(line.Direction) * 1600)
-                { Scale = new Vector3(1600, 1600, 1600) };
+
+            var label2 = label1.Clone() as Insert;
+            label2.Position = line.EndPoint + Vector3.Normalize(line.Direction) * 1600;
             label2.Sync();
             AddEntity(label1);
             AddEntity(label2);
