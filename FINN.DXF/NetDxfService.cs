@@ -35,7 +35,7 @@ public class NetDxfService : IDxfService
 
     private static Group<Grid> ToGridGroup(IEnumerable<GridDto> dtos, Vector2d location)
     {
-        var gridGroup = new Group<Grid>(location, GroupDirection.BottomToTop, GroupAlignment.Start, Gutter * 8);
+        var gridGroup = new Group<Grid>(location, GroupDirection.TopToBottom, GroupAlignment.Start, Gutter * 8);
         dtos.ToList().ForEach(x => gridGroup.Add(Grid.FromDto(x)));
         return gridGroup;
     }
