@@ -11,33 +11,18 @@ using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;
 
-namespace FINN.DXF;
+namespace FINN.DXF.Services;
 
 public class NetDxfService : IDxfService
 {
     private const double Gutter = 1600;
-    private readonly IRepository<BlockDefinition> _repository;
     private readonly string _blockFolder;
+    private readonly IRepository<BlockDefinition> _repository;
 
     public NetDxfService(IRepository<BlockDefinition> repository, IConfiguration configuration)
     {
         _repository = repository;
         _blockFolder = configuration["storage"];
-    }
-
-    private static Group<Booth> ToBoothGroup(IEnumerable<ProcessDto> dtos, Vector2d location)
-    {
-        var boothGroup =
-            new Group<Booth>(location, GroupDirection.LeftToRight, GroupAlignment.Middle, 0);
-        dtos.ToList().ForEach(x => boothGroup.Add(Booth.FromDto(x)));
-        return boothGroup;
-    }
-
-    private static Group<Grid> ToGridGroup(IEnumerable<GridDto> dtos, Vector2d location)
-    {
-        var gridGroup = new Group<Grid>(location, GroupDirection.TopToBottom, GroupAlignment.Start, Gutter * 8);
-        dtos.ToList().ForEach(x => gridGroup.Add(Grid.FromDto(x)));
-        return gridGroup;
     }
 
     public string DrawLayout(LayoutDto dto)
@@ -49,25 +34,45 @@ public class NetDxfService : IDxfService
         var canvas = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, gutter * 4);
 
         // draw grids
-        var grids = ToGridGroup(dto.Grids, Vector2d.Zero);
+        var grids = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, Gutter * 8);
+        foreach (var gridDto in dto.Grids)
+        {
+            var grid = Grid.FromDto(gridDto);
+            var wrapper = new Group(Vector2d.Zero, GroupDirection.LeftToRight, GroupAlignment.Middle, Gutter)
+            {
+                Label = grid.Label,
+                IsLabelVisible = true
+            };
+            wrapper.Add(grid);
+            grids.Add(wrapper);
+        }
+
         canvas.Add(grids);
 
+        // draw layouts
         var layouts = new Group(Vector2d.Zero, GroupDirection.TopToBottom, GroupAlignment.Start, gutter);
-        dto.Process.ToList().ForEach(dto =>
+        dto.Process?.ToList().ForEach(item =>
         {
-            var layoutItem = new Group(Vector2d.Zero, GroupDirection.LeftToRight, GroupAlignment.Middle, gutter);
-            layoutItem.Add(Booth.FromDto(dto));
+            var layoutItem = new Group(Vector2d.Zero, GroupDirection.LeftToRight, GroupAlignment.Middle, gutter)
+            {
+                Label = item.Name,
+                IsLabelVisible = true
+            };
+
+            // add primary
+            layoutItem.Add(Booth.FromDto(item));
 
             // divide into booth and blocks
-            var blocks = dto.SubProcess.Where(x =>
+            if (item.SubProcess == null) return;
+            var blocks = item.SubProcess.Where(x =>
                 x.XLength == 0 && x.YLength == 0 &&
                 _repository.SingleOrDefaultAsync(bd => bd.Name == x.Name).Result != null).ToList();
-            var booths = dto.SubProcess.Except(blocks).ToList();
+            var booths = item.SubProcess.Except(blocks).ToList();
 
             // handle booths first
             if (booths.Count > 0)
             {
-                var boothGroup = ToBoothGroup(dto.SubProcess, Vector2d.Zero);
+                var boothGroup = ToBoothGroup(item.SubProcess, Vector2d.Zero);
                 layoutItem.Add(boothGroup);
             }
 
@@ -91,12 +96,14 @@ public class NetDxfService : IDxfService
             layouts.Add(layoutItem);
         });
         canvas.Add(layouts);
+        dxf.Add(canvas);
 
         // draw plates
-        foreach (var grid in grids.Items)
+        foreach (var grid in grids.Items.OfType<Group>().SelectMany(x => x.Items).OfType<Grid>())
         {
             var platformBlocks =
-                dto.Platforms.Where(x => Math.Abs(x.Level - grid.Level) < double.Epsilon);
+                dto.Platforms.Where(x =>
+                    Math.Abs(x.Level - grid.Level) < double.Epsilon);
             foreach (var platformBlock in platformBlocks)
             {
                 var block = new PlatformBlock(new Vector2d(platformBlock.Placement.X, platformBlock.Placement.Y),
@@ -106,8 +113,6 @@ public class NetDxfService : IDxfService
                 dxf.Add(block);
             }
         }
-
-        dxf.Add(canvas);
 
         var filename = Path.GetTempFileName().Replace(".tmp", ".dxf");
         dxf.Save(filename);
@@ -204,6 +209,23 @@ public class NetDxfService : IDxfService
         return blocks.Select(x => new BlockDefinitionDto { Id = x.Id, Filename = x.DxfFileName, Name = x.Name });
     }
 
+    public BlockDefinitionDto? GetBlockDefinition(int id)
+    {
+        var blockDefinition = _repository.GetByIdAsync(id).GetAwaiter().GetResult();
+        return blockDefinition == null
+            ? null
+            : new BlockDefinitionDto
+                { Id = blockDefinition.Id, Name = blockDefinition.Name, Filename = blockDefinition.DxfFileName };
+    }
+
+    private static Group<Booth> ToBoothGroup(IEnumerable<ProcessDto> dtos, Vector2d location)
+    {
+        var boothGroup =
+            new Group<Booth>(location, GroupDirection.LeftToRight, GroupAlignment.Middle, 0);
+        dtos.ToList().ForEach(x => boothGroup.Add(Booth.FromDto(x)));
+        return boothGroup;
+    }
+
     private BlockDefinition CopyAndSaveBlock(Block source, string name)
     {
         // explode
@@ -220,14 +242,5 @@ public class NetDxfService : IDxfService
         file.Save(dxfFileName);
 
         return new BlockDefinition { Name = name, DxfFileName = dxfFileName };
-    }
-
-    public BlockDefinitionDto? GetBlockDefinition(int id)
-    {
-        var blockDefinition = _repository.GetByIdAsync(id).GetAwaiter().GetResult();
-        return blockDefinition == null
-            ? null
-            : new BlockDefinitionDto()
-                { Id = blockDefinition.Id, Name = blockDefinition.Name, Filename = blockDefinition.DxfFileName };
     }
 }

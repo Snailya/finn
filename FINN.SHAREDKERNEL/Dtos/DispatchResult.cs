@@ -1,5 +1,4 @@
-﻿
-namespace FINN.SHAREDKERNEL.Dtos;
+﻿namespace FINN.SHAREDKERNEL.Dtos;
 
 public class DispatchResult
 {

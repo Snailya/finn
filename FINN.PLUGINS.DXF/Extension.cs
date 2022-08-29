@@ -263,6 +263,9 @@ public static class Extension
     /// <param name="wrapper"></param>
     public static void Add(this DxfDocument doc, DxfWrapper wrapper)
     {
+        // call event if implemented
+        wrapper.OnAddToDocument?.Invoke(doc);
+
         doc.AddEntity(wrapper.Entities);
     }
 

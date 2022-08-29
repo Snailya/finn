@@ -1,2 +1,1 @@
 ﻿namespace FINN.CORE.Models;
-

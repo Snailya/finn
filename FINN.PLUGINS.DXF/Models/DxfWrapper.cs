@@ -1,4 +1,5 @@
 ﻿using FINN.SHAREDKERNEL.Models;
+using netDxf;
 using netDxf.Entities;
 using netDxf.Tables;
 
@@ -30,6 +31,11 @@ public abstract class DxfWrapper : IEntityWrapper<EntityObject>
     ///     The dxf layer that should place the wrapper on.
     /// </summary>
     public Layer Layer { get; }
+
+    /// <summary>
+    ///     Event to call on add dxf wrapper to document.
+    /// </summary>
+    public Action<DxfDocument>? OnAddToDocument { get; protected set; }
 
     /// <summary>
     ///     The geometric base point of the wrapper.

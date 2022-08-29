@@ -28,12 +28,18 @@ public sealed class Grid : DxfWrapper
     public Vector2d Origin => BasePoint;
 
     /// <summary>
+    ///     The height of the grid that represents.
     /// </summary>
     public double Level { get; }
 
-    private void PopulateLevelLabel(string level)
+    /// <summary>
+    ///     The label for the item.
+    /// </summary>
+    public string Label => $"+{Level / 1000}m层";
+
+    private void PopulateLabel()
     {
-        var levelLabel = TextUtil.CreateText(level, Box.TopLeft + new Vector2d(0, 1600), 500);
+        var levelLabel = TextUtil.CreateText(Label, Box.TopLeft + new Vector2d(0, 1600), 500);
         AddEntity(levelLabel);
     }
 
@@ -133,7 +139,7 @@ public sealed class Grid : DxfWrapper
         PopulateLinesWidthLabelAndDims(xCoordinates, yLength, PopulateDirection.Horizontal);
         PopulateLinesWidthLabelAndDims(yCoordinates, xLength, PopulateDirection.Vertical);
         PopulateColumns(xCoordinates, yCoordinates, columnXLength, columnYLength);
-        PopulateLevelLabel($"+{Level / 1000}m层");
+        PopulateLabel();
 
         // convert to block
         var dims = Entities.Where(x => x is Dimension).ToList();

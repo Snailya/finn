@@ -1,6 +1,4 @@
-﻿using FINN.CORE.Models;
-using FINN.SHAREDKERNEL.Dtos.Jobs;
-using FINN.SHAREDKERNEL.UseCases;
+﻿using FINN.SHAREDKERNEL.UseCases;
 
 namespace FINN.SHAREDKERNEL.Interfaces;
 

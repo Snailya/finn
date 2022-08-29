@@ -52,7 +52,7 @@ public class HostedService : BackgroundService
 
         if (spreadSheets.Contains("Process list"))
             layoutDto.Process = _reader.ReadAsProcessListSheet(spreadSheets["Process list"]!);
-        
+
 
         var response = new Response<LayoutDto>("", 0, layoutDto);
         _broker.Reply(routingKey, correlationId, response.ToJson());

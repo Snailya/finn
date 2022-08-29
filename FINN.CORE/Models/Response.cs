@@ -5,8 +5,6 @@ namespace FINN.CORE.Models;
 
 public class Response : JsonObject
 {
-    private int _code;
-
     public Response(string message, int code)
     {
         (Message, Code) = (message, code);
@@ -18,11 +16,7 @@ public class Response : JsonObject
 
     [JsonPropertyName("code")]
     [JsonPropertyOrder(1)]
-    public int Code
-    {
-        get => _code;
-        set { _code = value; }
-    }
+    public int Code { get; set; }
 }
 
 public class Response<TData> : Response

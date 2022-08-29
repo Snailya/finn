@@ -3,7 +3,6 @@ using FINN.CORE.Interfaces;
 using FINN.COST.Services;
 using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.UseCases;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -12,8 +11,8 @@ namespace FINN.COST;
 public class HostedService : BackgroundService
 {
     private readonly IBroker _broker;
-    private readonly CostService _service;
     private readonly ILogger<HostedService> _logger;
+    private readonly CostService _service;
 
     public HostedService(ILogger<HostedService> logger, IBroker broker, CostService service)
     {

@@ -1,4 +1,5 @@
-﻿using FINN.SHAREDKERNEL.Models;
+﻿using FINN.PLUGINS.DXF.Utils;
+using FINN.SHAREDKERNEL.Models;
 using netDxf.Entities;
 using netDxf.Tables;
 
@@ -9,7 +10,7 @@ public class Group : DxfWrapper
     private readonly GroupAlignment _alignment;
     private readonly GroupDirection _direction;
     private readonly double _gutter;
-    protected readonly List<DxfWrapper> Items = new();
+    public readonly List<DxfWrapper> Items = new();
 
     public Group(Vector2d basePoint, GroupDirection direction, GroupAlignment alignment, double gutter) : base(
         Layer.Default,
@@ -26,7 +27,20 @@ public class Group : DxfWrapper
             Box.TransformBy(new Scale(1), value - BasePoint);
             OuterBox.TransformBy(new Scale(1), value - BasePoint);
         };
+
+        OnAddToDocument = dxf =>
+        {
+            foreach (var item in Items) item.OnAddToDocument?.Invoke(dxf);
+
+            if (string.IsNullOrEmpty(Label) || !IsLabelVisible) return;
+            var label = TextUtil.CreateText(Label, Box.MiddleLeft - new Vector2d(gutter, 0), 1000,
+                TextAlignment.MiddleRight);
+            dxf.AddEntity(label);
+        };
     }
+
+    public string Label { get; set; }
+    public bool IsLabelVisible { get; set; }
 
     public override IList<EntityObject> Entities => Items.SelectMany(x => x.Entities).ToList();
 

@@ -3,7 +3,6 @@ using FINN.CORE.Models;
 using FINN.PLUGINS.DXF;
 using FINN.PLUGINS.DXF.Models;
 using FINN.PLUGINS.DXF.Utils;
-using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Dtos.Jobs;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;

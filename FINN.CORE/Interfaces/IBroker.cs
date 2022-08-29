@@ -1,6 +1,4 @@
-﻿using FINN.CORE.Models;
-
-namespace FINN.CORE.Interfaces;
+﻿namespace FINN.CORE.Interfaces;
 
 public interface IBroker
 {

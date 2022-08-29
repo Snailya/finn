@@ -18,7 +18,8 @@ public static class TextUtil
         return style;
     }
 
-    public static Text CreateText(string text, Vector2d position, double scaleFactor)
+    public static Text CreateText(string text, Vector2d position, double scaleFactor,
+        TextAlignment alignment = TextAlignment.BaselineLeft)
     {
         var style = GetStyleByName("Standard");
 
@@ -32,7 +33,8 @@ public static class TextUtil
         return new Text(text, position.ToVector2(), height, style)
         {
             Layer = LayerUtil.GetText(),
-            Width = text.Length * 1.25 * height
+            Width = text.Length * 1.25 * height,
+            Alignment = alignment
         };
     }
 

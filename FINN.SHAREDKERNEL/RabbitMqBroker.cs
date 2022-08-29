@@ -4,7 +4,6 @@ using System.Text.Json;
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.SHAREDKERNEL.Constants;
-using FINN.SHAREDKERNEL.Dtos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
@@ -96,15 +95,18 @@ public class RabbitMqBroker : IBroker
             {
                 Reply(props.ReplyTo, props.CorrelationId,
                     new Response(e.Message, ErrorCodes.DeserializeFailure).ToJson());
+                _logger.LogError(e.StackTrace);
             }
             catch (ArgumentException e)
             {
                 Reply(props.ReplyTo, props.CorrelationId,
                     new Response(e.Message, ErrorCodes.InvalidArgument).ToJson());
+                _logger.LogError(e.StackTrace);
             }
             catch (Exception e)
             {
                 Reply(props.ReplyTo, props.CorrelationId, new Response(e.Message, ErrorCodes.Unknown).ToJson());
+                _logger.LogError(e.StackTrace);
             }
         };
 

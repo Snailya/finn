@@ -3,8 +3,6 @@ using FINN.API.Dtos;
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.SHAREDKERNEL.Constants;
-using FINN.SHAREDKERNEL.Dtos;
-using FINN.SHAREDKERNEL.Dtos.Jobs;
 using FINN.SHAREDKERNEL.UseCases;
 using Microsoft.AspNetCore.Mvc;
 
