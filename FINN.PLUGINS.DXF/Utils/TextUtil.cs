@@ -13,7 +13,7 @@ public static class TextUtil
     {
         if (TextStyles.TryGetValue(name, out var style)) return style;
 
-        style = new TextStyle(name);
+        style = new TextStyle(name, "Arial.ttf");
         TextStyles.Add(name, style);
         return style;
     }
@@ -65,6 +65,8 @@ public static class TextUtil
     public static void Initialize(DxfDocument dxf)
     {
         TextStyles.Clear();
+
+        dxf.TextStyles["Standard"].FontFamilyName = "Microsoft YaHei";
 
         dxf.TextStyles.Items.ToList().ForEach(x => TextStyles.Add(x.Name, x));
     }

@@ -58,24 +58,24 @@ public class NetDxfService : IDxfService
                 Label = item.Name,
                 IsLabelVisible = true
             };
-
+        
             // add primary
             layoutItem.Add(Booth.FromDto(item));
-
+        
             // divide into booth and blocks
             if (item.SubProcess == null) return;
             var blocks = item.SubProcess.Where(x =>
                 x.XLength == 0 && x.YLength == 0 &&
                 _repository.SingleOrDefaultAsync(bd => bd.Name == x.Name).Result != null).ToList();
             var booths = item.SubProcess.Except(blocks).ToList();
-
+        
             // handle booths first
             if (booths.Count > 0)
             {
                 var boothGroup = ToBoothGroup(item.SubProcess, Vector2d.Zero);
                 layoutItem.Add(boothGroup);
             }
-
+        
             // handle blocks
             if (blocks.Count > 0)
             {
@@ -92,7 +92,7 @@ public class NetDxfService : IDxfService
                 });
                 layoutItem.Add(blockGroup);
             }
-
+        
             layouts.Add(layoutItem);
         });
         canvas.Add(layouts);
@@ -115,7 +115,7 @@ public class NetDxfService : IDxfService
         }
 
         var filename = Path.GetTempFileName().Replace(".tmp", ".dxf");
-        dxf.Save(filename);
+        var isOk = dxf.Save(filename, true);
         return filename;
     }
 
@@ -236,8 +236,7 @@ public class NetDxfService : IDxfService
         // save as individual files
         var file = new DxfDocument();
         file.Blocks.Add(exploded);
-
-
+        
         var dxfFileName = Path.Join(_blockFolder, Path.GetFileName(Path.GetTempFileName()).Replace(".tmp", ".dxf"));
         file.Save(dxfFileName);
 

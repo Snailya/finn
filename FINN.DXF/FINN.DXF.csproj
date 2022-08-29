@@ -10,16 +10,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj"/>
-        <ProjectReference Include="..\FINN.PLUGINS.DXF\FINN.PLUGINS.DXF.csproj"/>
-        <ProjectReference Include="..\FINN.PLUGINS.EFCORE\FINN.PLUGINS.EFCORE.csproj"/>
-        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj"/>
+        <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj" />
+        <ProjectReference Include="..\FINN.PLUGINS.DXF\FINN.PLUGINS.DXF.csproj" />
+        <ProjectReference Include="..\FINN.PLUGINS.EFCORE\FINN.PLUGINS.EFCORE.csproj" />
+        <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Template.las"/>
-        <None Remove="Blocks\ASU150000.dxf"/>
-        <None Remove="Blocks\转轮-20万.dxf"/>
+        <None Remove="Template.las" />
+        <None Remove="Blocks\ASU150000.dxf" />
+        <None Remove="Blocks\转轮-20万.dxf" />
     </ItemGroup>
 
     <ItemGroup>
@@ -29,11 +29,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Drawing.Common" Version="4.5.0"/>
+        <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Contexts"/>
+        <Folder Include="Contexts" />
     </ItemGroup>
 
 </Project>

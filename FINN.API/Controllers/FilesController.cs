@@ -39,8 +39,14 @@ public class FilesController : ControllerBase
             if (getLayoutResponse.Code != 0) return Ok(getLayoutResponse);
 
             var drawLayoutResponse =
-                await _broker.SendAsync(RoutingKeys.DxfService.DrawLayout, getLayoutResponse.Data.ToJson());
-            return Ok(drawLayoutResponse);
+                JsonSerializer.Deserialize<Response<string>>(await _broker.SendAsync(RoutingKeys.DxfService.DrawLayout,
+                    getLayoutResponse.Data.ToJson()));
+            if (drawLayoutResponse.Code != 0) return Ok(drawLayoutResponse);
+
+            // convert to download link
+            var output = drawLayoutResponse.Data;
+            var bytes = await System.IO.File.ReadAllBytesAsync(output);
+            return File(bytes, "text/plain", Path.GetFileName(output));
         }
 
         return BadRequest();

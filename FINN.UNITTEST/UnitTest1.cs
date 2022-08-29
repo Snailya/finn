@@ -222,6 +222,18 @@ public class Tests
         dxf.Save(Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".dxf");
     }
 
+    [Test]
+    public void SaveBinaryTest()
+    {
+        var path = @"C:\Users\snailya\Desktop\tmp792F.dxf";
+
+        var loaded = DxfDocument.Load(path);
+        if (loaded != null)
+        {
+            Assert.Pass();
+        }
+    }
+
     public class TestWrapper : DxfWrapper
     {
         public TestWrapper() : base(Layer.Default, Vector2d.Zero)

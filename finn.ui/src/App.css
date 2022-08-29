@@ -1,5 +1,12 @@
 @import "~antd/dist/antd.css";
 
-.App {
+.layout {
+  height: 100vh;
   margin: 32px 64px;
+}
+
+.site-layout-content {
+  min-height: 280px;
+  padding: 24px;
+  background: #fff;
 }
