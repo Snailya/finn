@@ -1,4 +1,7 @@
+using System.Globalization;
 using System.Text.Json;
+using FINN.API.Models;
+using FINN.CORE;
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.SHAREDKERNEL.Constants;
@@ -12,84 +15,143 @@ namespace FINN.API.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly IBroker _broker;
-
     private readonly ILogger<FilesController> _logger;
-    // private readonly IRepository<LayoutJob> _repository;
+    private readonly IRepository<RequestLog> _repository;
 
-    public FilesController(ILogger<FilesController> logger, IBroker broker)
+    public FilesController(ILogger<FilesController> logger, IBroker broker, IRepository<RequestLog> repository)
     {
         _logger = logger;
         _broker = broker;
-        // _repository = repository;
+        _repository = repository;
     }
 
     [HttpPost("upload")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> UploadXlsx(IFormFile file)
     {
-        if (file.Length > 0)
+        // not allow empty body
+        var extension = Path.GetExtension(file.FileName);
+        if (file.Length <= 0 || (extension != ".dxf" && extension != ".xlsx")) return BadRequest();
+
+        // persist to local storage
+        var input = Path.GetTempFileName();
+        await using var stream = System.IO.File.Create(input);
+        await file.CopyToAsync(stream);
+        stream.Close();
+
+        return extension switch
         {
-            var filePath = Path.GetTempFileName();
-            await using var stream = System.IO.File.Create(filePath);
-            await file.CopyToAsync(stream);
-            stream.Close();
+            ".xlsx" => await HandleXlsxUpload(input),
+            ".dxf" => await HandleDxfUpload(input)
+        };
+    }
 
-            var getLayoutResponse = JsonSerializer.Deserialize<Response<LayoutDto>>(
-                await _broker.SendAsync(RoutingKeys.ExcelService.GetLayout, filePath));
-            if (getLayoutResponse.Code != 0) return Ok(getLayoutResponse);
+    private async Task<IActionResult> HandleDxfUpload(string input)
+    {
+        // create log
+        var log = new RequestLog
+        {
+            Input = input,
+            Ip = Request.Host.Host,
+            RequestType = "cost",
+            Status = "pending"
+        };
+        await _repository.AddAsync(log);
+        await _repository.SaveChangesAsync();
 
-            var drawLayoutResponse =
-                JsonSerializer.Deserialize<Response<string>>(await _broker.SendAsync(RoutingKeys.DxfService.DrawLayout,
-                    getLayoutResponse.Data.ToJson()));
-            if (drawLayoutResponse.Code != 0) return Ok(drawLayoutResponse);
+        // ask microservice to handle
+        var geo = JsonSerializer.Deserialize<Response<IEnumerable<GeometryDto>>>(
+            await _broker.SendAsync(RoutingKeys.DxfService.ReadLayout, input))!;
+        if (geo.Code != 0)
+        {
+            log.Output = geo.Message;
+            log.Status = "error";
+            await _repository.UpdateAsync(log);
+            await _repository.SaveChangesAsync();
 
-            // convert to download link
-            var output = drawLayoutResponse.Data;
-            var bytes = await System.IO.File.ReadAllBytesAsync(output);
-            return File(bytes, "text/plain", Path.GetFileName(output));
+            return Ok(geo);
+        }
+
+        var cost =
+            JsonSerializer.Deserialize<Response<CostDto>>(await _broker.SendAsync(
+                RoutingKeys.CostService.EstimateCost,
+                geo.Data.ToJson()))!;
+        if (cost.Code != 0)
+        {
+            log.Output = cost.Message;
+            log.Status = "error";
+            await _repository.UpdateAsync(log);
+            await _repository.SaveChangesAsync();
+            return Ok(cost);
+        }
+
+        log.Output = cost.Data.ToJson();
+        log.Status = "done";
+        await _repository.UpdateAsync(log);
+        await _repository.SaveChangesAsync();
+        return Ok(cost);
+    }
+
+    private async Task<IActionResult> HandleXlsxUpload(string input)
+    {
+        // create log
+        var log = new RequestLog
+        {
+            Input = input,
+            Ip = Request.Host.Host,
+            RequestType = "layout",
+            Status = "pending"
+        };
+        await _repository.AddAsync(log);
+        await _repository.SaveChangesAsync();
+
+        // ask microservice to handle
+        var getLayoutResponse = JsonSerializer.Deserialize<Response<LayoutDto>>(
+            await _broker.SendAsync(RoutingKeys.ExcelService.GetLayout, input));
+        if (getLayoutResponse.Code != 0)
+        {
+            // update status
+            log.Output = getLayoutResponse.Message;
+            log.Status = "error";
+            await _repository.UpdateAsync(log);
+            await _repository.SaveChangesAsync();
+
+            return Ok(getLayoutResponse);
+        }
+
+        var drawLayoutResponse =
+            JsonSerializer.Deserialize<Response<string>>(await _broker.SendAsync(RoutingKeys.DxfService.DrawLayout,
+                getLayoutResponse.Data.ToJson()));
+        if (drawLayoutResponse.Code != 0)
+        {
+            // update status
+            log.Output = drawLayoutResponse.Message;
+            log.Status = "error";
+            await _repository.UpdateAsync(log);
+            await _repository.SaveChangesAsync();
+
+            return Ok(drawLayoutResponse);
+        }
+
+        // convert to download link
+        log.Output = drawLayoutResponse.Data;
+        log.Status = "done";
+        await _repository.UpdateAsync(log);
+        await _repository.SaveChangesAsync();
+
+        return AcceptedAtAction(nameof(Download), new { id = log.Id }, new Response<int>("", 0, log.Id));
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> Download(int id)
+    {
+        var log = await _repository.GetByIdAsync(id);
+        if (log is { Status: "done" })
+        {
+            var bytes = await System.IO.File.ReadAllBytesAsync(log.Output!);
+            return File(bytes, "text/plain", Path.GetFileName(log.Output));
         }
 
         return BadRequest();
-
-        // if (file.Length > 0)
-        // {
-        //     var filePath = Path.GetTempFileName();
-        //     await using var stream = System.IO.File.Create(filePath);
-        //     await file.CopyToAsync(stream);
-        //
-        //     var job = await _repository.AddAsync(new LayoutJob(filePath));
-        //     await _repository.SaveChangesAsync();
-        //
-        //     _broker.Send(RoutingKeys.ReadXlsx,
-        //         JsonSerializer.Serialize(new ReadRequestDto(job.Id, filePath)));
-        //     return AcceptedAtAction(nameof(CheckStatus), new { jobId = job.Id }, job);
-        // }
-        //
-        // // Process uploaded files
-        // // Don't rely on or trust the FileName property without validation.
-        //
-        // return BadRequest();
     }
-
-    // [HttpGet("check")]
-    // public async Task<IActionResult> CheckStatus([FromQuery] int jobId)
-    // {
-    //     var job = await _repository.GetByIdAsync(jobId);
-    //
-    //     return job.Status switch
-    //     {
-    //         JobStatus.Error => Accepted(job),
-    //         JobStatus.Ready => AcceptedAtAction(nameof(Download), new { jobId = job.Id }, job),
-    //         _ => AcceptedAtAction(nameof(CheckStatus), new { jobId = job.Id }, job)
-    //     };
-    // }
-    //
-    // [HttpGet("download")]
-    // public async Task<IActionResult> Download([FromQuery] int jobId)
-    // {
-    //     var job = await _repository.GetByIdAsync(jobId);
-    //
-    //     var bytes = await System.IO.File.ReadAllBytesAsync(job.Output);
-    //     return File(bytes, "text/plain", Path.GetFileName(job.Output));
-    // }
 }

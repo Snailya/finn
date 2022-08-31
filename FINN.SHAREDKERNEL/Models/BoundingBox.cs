@@ -12,21 +12,31 @@ public class BoundingBox
         Max = max;
     }
 
-    public Vector2d Min { get; private set; } = new(0, 0);
-    public Vector2d Max { get; private set; } = new(0, 0);
+    public Vector2d? Min { get; private set; }
+    public Vector2d? Max { get; private set; }
 
-    public Vector2d TopLeft => new(Min.X, Max.Y);
-    public Vector2d TopMiddle => new((Min.X + Max.X) / 2, Max.Y);
-    public Vector2d TopRight => Max;
-    public Vector2d MiddleLeft => new(Min.X, (Min.Y + Max.Y) / 2);
-    public Vector2d Center => new((Min.X + Max.X) / 2, (Min.Y + Max.Y) / 2);
-    public Vector2d MiddleRight => new(Max.X, (Min.Y + Max.Y) / 2);
-    public Vector2d BottomLeft => Min;
-    public Vector2d BottomMiddle => new((Min.X + Max.X) / 2, Min.Y);
-    public Vector2d BottomRight => new(Max.X, Min.Y);
+    public Vector2d? TopLeft => Min != null && Max != null ? new Vector2d(Min.X, Max.Y) : null;
+    public Vector2d? TopMiddle => Min != null && Max != null ? new Vector2d((Min.X + Max.X) / 2, Max.Y) : null;
+    public Vector2d? TopRight => Max;
+    public Vector2d? MiddleLeft => Min != null && Max != null ? new Vector2d(Min.X, (Min.Y + Max.Y) / 2) : null;
+
+    public Vector2d? Center =>
+        Min != null && Max != null ? new Vector2d((Min.X + Max.X) / 2, (Min.Y + Max.Y) / 2) : null;
+
+    public Vector2d? MiddleRight => Min != null && Max != null ? new Vector2d(Max.X, (Min.Y + Max.Y) / 2) : null;
+    public Vector2d? BottomLeft => Min;
+    public Vector2d? BottomMiddle => Min != null && Max != null ? new Vector2d((Min.X + Max.X) / 2, Min.Y) : null;
+    public Vector2d? BottomRight => Min != null && Max != null ? new Vector2d(Max.X, Min.Y) : null;
 
     public void AddPoint(Vector2d point)
     {
+        if (Min == null || Max == null)
+        {
+            Min = point;
+            Max = point;
+            return;
+        }
+
         var minX = new[] { Min.X, point.X }.Min();
         var minY = new[] { Min.Y, point.Y }.Min();
 
@@ -43,18 +53,24 @@ public class BoundingBox
     /// <param name="translation">平移</param>
     public void TransformBy(Scale scale, Vector2d translation)
     {
-        Min.TransformBy(scale, translation);
-        Max.TransformBy(scale, translation);
+        Min?.TransformBy(scale, translation);
+        Max?.TransformBy(scale, translation);
     }
 
     public void AddBox(BoundingBox box)
     {
+        if (box.Min == null || box.Max == null)
+            throw new Exception("Adding a box that is not initialized is not allowed.");
+
         AddPoint(box.Min);
         AddPoint(box.Max);
     }
 
-    public bool IsBoxInside(BoundingBox box)
+    public bool Contains(BoundingBox box)
     {
+        if (Min == null || Max == null || box.Min == null || box.Max == null)
+            throw new Exception("Compoare a box that is not initialized is not allowed.");
+
         return box.Min.X >= Min.X && box.Max.X <= Max.X && box.Min.Y >= Min.Y && box.Max.Y <= Max.Y;
     }
 }

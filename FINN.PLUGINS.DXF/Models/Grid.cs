@@ -151,8 +151,7 @@ public sealed class Grid : DxfWrapper
         Entities.Add(insert);
 
         // append xdata, which used for get grid level
-        XDataUtil.GetRegistryByName("FINN.TYPE");
-        insert.AddType("GRID");
+        XDataUtil.RegistryAsGrid(insert, Level);
     }
 
     public Grid(IEnumerable<double> xCoordinates, IEnumerable<double> yCoordinates, double columnXLength,

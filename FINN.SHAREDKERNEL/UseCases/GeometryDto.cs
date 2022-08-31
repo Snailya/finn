@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using FINN.CORE.Models;
 
 namespace FINN.SHAREDKERNEL.UseCases;
 
@@ -39,6 +40,6 @@ public class GeometryDto : JsonObject
     /// <summary>
     ///     The length in z direction from the placement.
     /// </summary>
-    [JsonPropertyName("yLength")]
+    [JsonPropertyName("zLength")]
     public double ZLength { get; set; }
 }

@@ -1,9 +1,6 @@
-using System.Text.Json;
-using FINN.CORE.Models;
 using FINN.PLUGINS.DXF;
 using FINN.PLUGINS.DXF.Models;
 using FINN.PLUGINS.DXF.Utils;
-using FINN.SHAREDKERNEL.Dtos.Jobs;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
@@ -17,16 +14,6 @@ public class Tests
     [SetUp]
     public void Setup()
     {
-    }
-
-    [Test]
-    public void JsonSerializerDeserializeEnum_ReturnsAsSameAsBeforeSerialize()
-    {
-        var updateJobStatusDto = new UpdateJobStatusRequestDto(0, "string");
-        var serialized = JsonSerializer.Serialize(updateJobStatusDto);
-        var deserialized = JsonSerializer.Deserialize<UpdateJobStatusRequestDto>(serialized);
-        Assert.That(deserialized, Is.Not.Null);
-        Assert.That(deserialized!.Status, Is.EqualTo(JobStatus.Ready));
     }
 
     [Test]
@@ -64,14 +51,6 @@ public class Tests
             Assert.That(line.StartPoint.ToVector2d(), Is.EqualTo(new Vector2d(0, -1)));
             Assert.That(line.EndPoint.ToVector2d(), Is.EqualTo(new Vector2d(2, 1)));
         });
-    }
-
-    [Test]
-    public void DeserializeResponseCorrectly()
-    {
-        var str = "{\"msg\":\"success\",\"code\":0,\"data\":{\"Ids\":[4,3]}}";
-        var result = JsonSerializer.Deserialize<Response<UploadOrUpdateBlocksReqsponse>>(str);
-        Assert.That(result.Data.Blocks, Is.Not.Null);
     }
 
     [Test]
@@ -228,10 +207,7 @@ public class Tests
         var path = @"C:\Users\snailya\Desktop\tmp792F.dxf";
 
         var loaded = DxfDocument.Load(path);
-        if (loaded != null)
-        {
-            Assert.Pass();
-        }
+        if (loaded != null) Assert.Pass();
     }
 
     public class TestWrapper : DxfWrapper

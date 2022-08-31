@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using FINN.CORE.Interfaces;
+using FINN.CORE.Models;
 using FINN.COST.Services;
 using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.UseCases;
@@ -47,6 +48,8 @@ public class HostedService : BackgroundService
         var dto = JsonSerializer.Deserialize<IEnumerable<GeometryDto>>(message);
         if (dto == null) throw new ArgumentNullException();
         var cost = _service.EstimateCost(dto);
+        var response = new Response<CostDto>("", 0, cost);
+        _broker.Reply(routingKey, correlationId, response.ToJson());
     }
 
     #endregion

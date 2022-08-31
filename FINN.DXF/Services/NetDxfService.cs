@@ -58,24 +58,24 @@ public class NetDxfService : IDxfService
                 Label = item.Name,
                 IsLabelVisible = true
             };
-        
+
             // add primary
             layoutItem.Add(Booth.FromDto(item));
-        
+
             // divide into booth and blocks
             if (item.SubProcess == null) return;
             var blocks = item.SubProcess.Where(x =>
                 x.XLength == 0 && x.YLength == 0 &&
                 _repository.SingleOrDefaultAsync(bd => bd.Name == x.Name).Result != null).ToList();
             var booths = item.SubProcess.Except(blocks).ToList();
-        
+
             // handle booths first
             if (booths.Count > 0)
             {
                 var boothGroup = ToBoothGroup(item.SubProcess, Vector2d.Zero);
                 layoutItem.Add(boothGroup);
             }
-        
+
             // handle blocks
             if (blocks.Count > 0)
             {
@@ -92,7 +92,7 @@ public class NetDxfService : IDxfService
                 });
                 layoutItem.Add(blockGroup);
             }
-        
+
             layouts.Add(layoutItem);
         });
         canvas.Add(layouts);
@@ -115,68 +115,72 @@ public class NetDxfService : IDxfService
         }
 
         var filename = Path.GetTempFileName().Replace(".tmp", ".dxf");
-        var isOk = dxf.Save(filename, true);
+        dxf.Save(filename);
         return filename;
     }
 
+
     public IEnumerable<GeometryDto> ReadLayout(string filename)
     {
+        var geos = new List<GeometryDto>();
+
         var doc = DxfDocument.Load(filename);
-        var typeReg = XDataUtil.GetRegistryByName("FINN.TYPE");
-        var levelReg = XDataUtil.GetRegistryByName("FINN.LEVEL");
-
-        // find out grids from blocks
-        var grids = doc.Inserts.Where(x =>
-                x.XData.ContainsAppId(typeReg.Name) &&
-                ReferenceEquals(x.XData[typeReg.Name].XDataRecord[0].Value, "GRID"))
-            .Select(x => new { Level = (double)x.XData[levelReg.Name].XDataRecord[0].Value, Box = x.GetBoundingBox() });
-
-        var rects = doc.Polylines.Where(x => x.Vertexes.Count == 4 && x.IsClosed && x.Owner.Equals(Block.ModelSpace))
+        var rects = doc.LwPolylines
+            .Where(x => x.Vertexes.Count == 4 && x.IsClosed && x.Owner.Equals(Block.ModelSpace))
             .ToList();
-        var potentialPlatformBlocks = rects.Where(x => x.Layer.Name == LayerNames.Platform).ToList();
-        var potentialBooth = rects.Where(x => LayerNames.Booths.Contains(x.Layer.Name)).ToList();
 
-        // only treat those lies on grids as valid ones
-        var platforms = potentialPlatformBlocks.Select(x =>
+        // find out grids by reg
+        var gridReg = XDataUtil.GetRegistryByName("FINN.GRID");
+        var grids = doc.Inserts.Where(x =>
+            x.XData.ContainsAppId(gridReg.Name)).Select(x =>
         {
-            var box = x.GetBoundingBox();
-            var targetGrid = grids.SingleOrDefault(i => i.Box.IsBoxInside(box));
-            if (targetGrid == null) return new GeometryDto { ZPosition = 0 };
-
-            var minX = x.Vertexes.MinBy(vertex => vertex.Position.X)!.Position.X;
-            var minY = x.Vertexes.MinBy(vertex => vertex.Position.Y)!.Position.Y;
-            var maxX = x.Vertexes.MaxBy(vertex => vertex.Position.X)!.Position.X;
-            var maxY = x.Vertexes.MaxBy(vertex => vertex.Position.Y)!.Position.Y;
-
-            return new GeometryDto
+            var levelStr = x.XData[gridReg.Name].XDataRecord[0].Value as string ?? string.Empty;
+            var level = double.Parse(levelStr);
+            return new
             {
-                Type = "platform",
-                XLength = maxX - minX,
-                YLength = maxY - minY,
-                ZPosition = targetGrid?.Level ?? 0
+                Box = x.GetBoundingBox(),
+                Level = level
             };
-        }).Where(x => x.ZPosition != 0);
+        }).ToList();
 
-        var booths = potentialBooth.Where(x =>
+        foreach (var rect in rects)
         {
-            var box = x.GetBoundingBox();
-            return grids.Any(y => y.Box.IsBoxInside(box));
-        }).Select(x =>
-        {
-            var minX = x.Vertexes.MinBy(vertex => vertex.Position.X)!.Position.X;
-            var minY = x.Vertexes.MinBy(vertex => vertex.Position.Y)!.Position.Y;
-            var maxX = x.Vertexes.MaxBy(vertex => vertex.Position.X)!.Position.X;
-            var maxY = x.Vertexes.MaxBy(vertex => vertex.Position.Y)!.Position.Y;
+            // check if on grid
+            var boundingBox = rect.GetBoundingBox();
+            var onGrid = grids.SingleOrDefault(item => item.Box.Contains(boundingBox));
+            if (onGrid == null) continue;
 
-            return new GeometryDto
+            var minX = rect.Vertexes.MinBy(vertex => vertex.Position.X)!.Position.X;
+            var minY = rect.Vertexes.MinBy(vertex => vertex.Position.Y)!.Position.Y;
+            var maxX = rect.Vertexes.MaxBy(vertex => vertex.Position.X)!.Position.X;
+            var maxY = rect.Vertexes.MaxBy(vertex => vertex.Position.Y)!.Position.Y;
+
+            if (rect.Layer.Name == LayerNames.Platform)
             {
-                Type = "booth",
-                XLength = maxX - minX,
-                YLength = maxY - minY
-            };
-        });
+                var geo = new GeometryDto
+                {
+                    Type = "platform",
+                    XLength = maxX - minX,
+                    YLength = maxY - minY,
+                    ZPosition = onGrid.Level
+                };
+                geos.Add(geo);
+                continue;
+            }
 
-        return booths.Concat(platforms);
+            if (LayerNames.Booths.Contains(rect.Layer.Name))
+            {
+                var geo = new GeometryDto
+                {
+                    Type = "booth",
+                    XLength = maxX - minX,
+                    YLength = maxY - minY
+                };
+                geos.Add(geo);
+            }
+        }
+
+        return geos;
     }
 
     public void DeleteBlockDefinitionById(int id)
@@ -236,7 +240,7 @@ public class NetDxfService : IDxfService
         // save as individual files
         var file = new DxfDocument();
         file.Blocks.Add(exploded);
-        
+
         var dxfFileName = Path.Join(_blockFolder, Path.GetFileName(Path.GetTempFileName()).Replace(".tmp", ".dxf"));
         file.Save(dxfFileName);
 

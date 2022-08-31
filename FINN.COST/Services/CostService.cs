@@ -16,8 +16,14 @@ public class CostService
         _repository = repository;
     }
 
-    public decimal EstimateCost(IEnumerable<GeometryDto> dto)
+    public CostDto EstimateCost(IEnumerable<GeometryDto> dto)
     {
-        throw new NotImplementedException();
+        return new CostDto
+        {
+            Platform = (from platform in dto.Where(x => x.Type == "platform")
+                let unitPrice = (platform.ZPosition > 5000 ? 130 : 120) * 1.2E-9M
+                let area = platform.XLength * platform.YLength
+                select unitPrice * (decimal)area).Sum()
+        };
     }
 }

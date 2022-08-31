@@ -1,4 +1,4 @@
-﻿namespace FINN.SHAREDKERNEL.Interfaces;
+﻿namespace FINN.CORE.Interfaces;
 
 public interface IJson
 {

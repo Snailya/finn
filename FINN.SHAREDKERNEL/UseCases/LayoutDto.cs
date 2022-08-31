@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using FINN.CORE.Models;
 
 namespace FINN.SHAREDKERNEL.UseCases;
 

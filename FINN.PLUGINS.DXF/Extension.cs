@@ -1,5 +1,4 @@
 ﻿using FINN.PLUGINS.DXF.Models;
-using FINN.PLUGINS.DXF.Utils;
 using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
@@ -9,6 +8,86 @@ namespace FINN.PLUGINS.DXF;
 
 public static class Extension
 {
+    #region Transformation
+
+    /// <summary>
+    ///     Transform a entity in net.dxf using the scale model defined in the application
+    /// </summary>
+    /// <param name="entity">a net.dxf entity</param>
+    /// <param name="scale"></param>
+    /// <param name="translate"></param>
+    public static void TransformBy(this EntityObject entity, Scale scale, Vector2d translate)
+    {
+        switch (entity)
+        {
+            case Hatch hatch:
+                hatch.BoundaryPaths.SelectMany(x => x.Entities).ToList().ForEach(x =>
+                    x.TransformBy(Matrix3.Scale(scale.Factor.X, scale.Factor.Y, 1),
+                        (scale.BasePoint * (new Vector2d(1, 1) - scale.Factor) + translate).ToVector3()));
+                break;
+            default:
+                entity.TransformBy(Matrix3.Scale(scale.Factor.X, scale.Factor.Y, 1),
+                    (scale.BasePoint * (new Vector2d(1, 1) - scale.Factor) + translate).ToVector3());
+                break;
+        }
+    }
+
+    #endregion
+
+
+    /// <summary>
+    ///     Add <see cref="DxfWrapper" /> object to the document.
+    /// </summary>
+    /// <param name="doc"></param>
+    /// <param name="wrapper"></param>
+    public static void Add(this DxfDocument doc, DxfWrapper wrapper)
+    {
+        // call event if implemented
+        wrapper.OnAddToDocument?.Invoke(doc);
+
+        doc.AddEntity(wrapper.Entities);
+    }
+
+    /// <summary>
+    ///     Explode a insert iteratively.
+    /// </summary>
+    /// <param name="insert"></param>
+    /// <returns></returns>
+    private static IEnumerable<EntityObject> ExplodeIteratively(this Insert insert)
+    {
+        var entities = insert.Explode();
+
+        // filter entities that are not insert
+        var noInsert = entities.Where(x => x is not Insert).ToList();
+
+        // explode iteratively for Insert type
+        foreach (var item in entities.Except(noInsert).OfType<Insert>().ToList())
+            noInsert.AddRange(item.ExplodeIteratively());
+
+        return noInsert;
+    }
+
+    /// <summary>
+    ///     Explode a block iteratively.
+    /// </summary>
+    /// <param name="block"></param>
+    /// <returns></returns>
+    public static IEnumerable<EntityObject> ExplodeIteratively(this Block? block)
+    {
+        var entities = block.Entities;
+
+        // filter entities that are not insert
+        var noInsert = entities.Where(x => x is not Insert).ToList();
+
+        // explode iteratively for Insert type
+        foreach (var item in entities.Except(noInsert).OfType<Insert>().ToList())
+            noInsert.AddRange(item.ExplodeIteratively());
+
+        return noInsert;
+    }
+
+    #region Vector manipulation
+
     /// <summary>
     ///     Convert a <see cref="Vector2d" /> object to <see cref="Vector2" /> object, which is the model of the application.
     /// </summary>
@@ -59,35 +138,99 @@ public static class Extension
         return new Vector2d(vector.X, vector.Y);
     }
 
+    #endregion
+
+    #region Bounding box
+
+    public static BoundingBox GetBoundingBox(this EntityObject entity)
+    {
+        return entity switch
+        {
+            Point point => new BoundingBox(point.Position.ToVector2d(), point.Position.ToVector2d()),
+            Line line => new BoundingBox(line.StartPoint.ToVector2d(), line.EndPoint.ToVector2d()),
+            LwPolyline lwPolyline => lwPolyline.GetBoundingBox(),
+            Polyline polyline => polyline.GetBoundingBox(),
+            Circle circle => new BoundingBox(circle.Center.ToVector2d() - new Vector2d(circle.Radius, circle.Radius),
+                circle.Center.ToVector2d() + new Vector2d(circle.Radius, circle.Radius)),
+            Text text => text.GetBoundingBox(),
+            MText mText => mText.GetBoundingBox(),
+            Insert insert => insert.GetBoundingBox(),
+            _ => new BoundingBox()
+        };
+    }
+
     /// <summary>
-    ///     Transform a entity in net.dxf using the scale model defined in the application
+    ///     Add the bounding box of <see cref="EntityObject" /> in net.dxf to <see cref="BoundingBox" />.
     /// </summary>
-    /// <param name="entity">a net.dxf entity</param>
-    /// <param name="scale"></param>
-    /// <param name="translate"></param>
-    public static void TransformBy(this EntityObject entity, Scale scale, Vector2d translate)
+    /// <param name="box"></param>
+    /// <param name="entity"></param>
+    public static void AddEntity(this BoundingBox box, EntityObject entity)
     {
         switch (entity)
         {
-            case Hatch hatch:
-                hatch.BoundaryPaths.SelectMany(x => x.Entities).ToList().ForEach(x =>
-                    x.TransformBy(Matrix3.Scale(scale.Factor.X, scale.Factor.Y, 1),
-                        (scale.BasePoint * (new Vector2d(1, 1) - scale.Factor) + translate).ToVector3()));
+            case Point point:
+                box.AddPoint(point.Position.ToVector2d());
                 break;
-            default:
-                entity.TransformBy(Matrix3.Scale(scale.Factor.X, scale.Factor.Y, 1),
-                    (scale.BasePoint * (new Vector2d(1, 1) - scale.Factor) + translate).ToVector3());
+            case Line line:
+                box.AddPoint(line.StartPoint.ToVector2d());
+                box.AddPoint(line.EndPoint.ToVector2d());
+                break;
+            case LwPolyline lwPolyline:
+                lwPolyline.Vertexes.ToList().ForEach(x => box.AddPoint(x.Position.ToVector2d()));
+                break;
+            case Polyline polyline:
+                polyline.Vertexes.ToList().ForEach(x => box.AddPoint(x.Position.ToVector2d()));
+                break;
+            case Circle circle:
+                box.AddPoint(new Vector2d(circle.Center.X - circle.Radius, circle.Center.Y - circle.Radius));
+                box.AddPoint(new Vector2d(circle.Center.X + circle.Radius, circle.Center.Y + circle.Radius));
+                break;
+            case Text text:
+                box.AddBox(text.GetBoundingBox());
+                break;
+            case MText mText:
+                box.AddBox(mText.GetBoundingBox());
+                break;
+            case Insert insert:
+                box.AddBox(insert.GetBoundingBox());
+                break;
+            case Hatch hatch:
+                hatch.BoundaryPaths.SelectMany(x => x.Entities).ToList().ForEach(box.AddEntity);
                 break;
         }
     }
 
-    /// <summary>
-    ///     Get the bounding box of a <see cref="MText" /> object.
-    /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static BoundingBox GetBoundingBox(this MText text)
+    private static BoundingBox GetBoundingBox(this Block block)
+    {
+        var box = new BoundingBox();
+        foreach (var entity in block.Entities) box.AddEntity(entity);
+
+        return box;
+    }
+
+    private static BoundingBox GetBoundingBox(this Insert insert)
+    {
+        var entities = insert.Explode();
+        var box = new BoundingBox();
+        entities.ForEach(x => box.AddEntity(x));
+        return box;
+    }
+
+    private static BoundingBox GetBoundingBox(this Polyline polyline)
+    {
+        var box = new BoundingBox();
+        polyline.Vertexes.ToList().ForEach(x => box.AddPoint(x.Position.ToVector2d()));
+        return box;
+    }
+
+    private static BoundingBox GetBoundingBox(this LwPolyline polyline)
+    {
+        var box = new BoundingBox();
+        polyline.Vertexes.ToList().ForEach(x => box.AddPoint(x.Position.ToVector2d()));
+        return box;
+    }
+
+    private static BoundingBox GetBoundingBox(this MText text)
     {
         return text.AttachmentPoint switch
         {
@@ -121,13 +264,7 @@ public static class Extension
         };
     }
 
-    /// <summary>
-    ///     Get the bounding box of a <see cref="Text" /> object.
-    /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static BoundingBox GetBoundingBox(this Text text)
+    private static BoundingBox GetBoundingBox(this Text text)
     {
         switch (text.Alignment)
         {
@@ -177,141 +314,5 @@ public static class Extension
         }
     }
 
-    /// <summary>
-    ///     Add the bounding box of <see cref="EntityObject" /> in net.dxf to <see cref="BoundingBox" />.
-    /// </summary>
-    /// <param name="box"></param>
-    /// <param name="entity"></param>
-    public static void AddEntity(this BoundingBox box, EntityObject entity)
-    {
-        switch (entity)
-        {
-            case Point point:
-                box.AddPoint(point.Position.ToVector2d());
-                break;
-            case Line line:
-                box.AddPoint(line.StartPoint.ToVector2d());
-                box.AddPoint(line.EndPoint.ToVector2d());
-                break;
-            case LwPolyline lwPolyline:
-                lwPolyline.Vertexes.ToList().ForEach(x => box.AddPoint(x.Position.ToVector2d()));
-                break;
-            case Polyline polyline:
-                polyline.Vertexes.ToList().ForEach(x => box.AddPoint(x.Position.ToVector2d()));
-                break;
-            case Circle circle:
-                box.AddPoint(new Vector2d(circle.Center.X - circle.Radius, circle.Center.Y - circle.Radius));
-                box.AddPoint(new Vector2d(circle.Center.X + circle.Radius, circle.Center.Y + circle.Radius));
-                break;
-            case Text text:
-                box.AddBox(text.GetBoundingBox());
-                break;
-            case MText mText:
-                box.AddBox(mText.GetBoundingBox());
-                break;
-            case Insert insert:
-                box.AddBox(insert.GetBoundingBox());
-                break;
-            case Hatch hatch:
-                hatch.BoundaryPaths.SelectMany(x => x.Entities).ToList().ForEach(box.AddEntity);
-                break;
-        }
-    }
-
-    /// <summary>
-    ///     Get the bounding box of the <see cref="Block" /> in net.dxf.
-    /// </summary>
-    /// <param name="block"></param>
-    /// <returns></returns>
-    public static BoundingBox GetBoundingBox(this Block block)
-    {
-        var box = new BoundingBox();
-        foreach (var entity in block.Entities) box.AddEntity(entity);
-
-        return box;
-    }
-
-    /// <summary>
-    ///     Get the bounding box of the <see cref="Insert" /> in net.dxf.
-    /// </summary>
-    /// <param name="insert"></param>
-    /// <returns></returns>
-    public static BoundingBox GetBoundingBox(this Insert insert)
-    {
-        var entities = insert.Explode();
-        var box = new BoundingBox();
-        entities.ForEach(x => box.AddEntity(x));
-        return box;
-    }
-
-    /// <summary>
-    ///     Get the bounding box of the <see cref="Polyline" /> in net.dxf.
-    /// </summary>
-    /// <param name="polyline"></param>
-    /// <returns></returns>
-    public static BoundingBox GetBoundingBox(this Polyline polyline)
-    {
-        var box = new BoundingBox();
-        polyline.Vertexes.ToList().ForEach(x => box.AddPoint(x.Position.ToVector2d()));
-        return box;
-    }
-
-    /// <summary>
-    ///     Add <see cref="DxfWrapper" /> object to the document.
-    /// </summary>
-    /// <param name="doc"></param>
-    /// <param name="wrapper"></param>
-    public static void Add(this DxfDocument doc, DxfWrapper wrapper)
-    {
-        // call event if implemented
-        wrapper.OnAddToDocument?.Invoke(doc);
-
-        doc.AddEntity(wrapper.Entities);
-    }
-
-    /// <summary>
-    ///     Explode a insert iteratively.
-    /// </summary>
-    /// <param name="insert"></param>
-    /// <returns></returns>
-    public static IEnumerable<EntityObject> ExplodeIteratively(this Insert insert)
-    {
-        var entities = insert.Explode();
-
-        // filter entities that are not insert
-        var noInsert = entities.Where(x => x is not Insert).ToList();
-
-        // explode iteratively for Insert type
-        foreach (var item in entities.Except(noInsert).OfType<Insert>().ToList())
-            noInsert.AddRange(item.ExplodeIteratively());
-
-        return noInsert;
-    }
-
-    /// <summary>
-    ///     Explode a block iteratively.
-    /// </summary>
-    /// <param name="block"></param>
-    /// <returns></returns>
-    public static IEnumerable<EntityObject> ExplodeIteratively(this Block? block)
-    {
-        var entities = block.Entities;
-
-        // filter entities that are not insert
-        var noInsert = entities.Where(x => x is not Insert).ToList();
-
-        // explode iteratively for Insert type
-        foreach (var item in entities.Except(noInsert).OfType<Insert>().ToList())
-            noInsert.AddRange(item.ExplodeIteratively());
-
-        return noInsert;
-    }
-
-
-    public static void AddType(this EntityObject entity, string typeName)
-    {
-        var xData = new XData(XDataUtil.GetRegistryByName("FINN.TYPE"));
-        xData.XDataRecord.Add(new XDataRecord(XDataCode.String, typeName));
-        entity.XData.Add(xData);
-    }
+    #endregion
 }

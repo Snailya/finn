@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using FINN.SHAREDKERNEL.Interfaces;
+using FINN.CORE.Interfaces;
 
-namespace FINN.SHAREDKERNEL.UseCases;
+namespace FINN.CORE.Models;
 
 public abstract class JsonObject : IJson
 {
