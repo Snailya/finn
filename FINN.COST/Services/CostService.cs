@@ -1,6 +1,6 @@
 ﻿using FINN.CORE.Interfaces;
 using FINN.COST.Models;
-using FINN.SHAREDKERNEL.UseCases;
+using FINN.SHAREDKERNEL.Dtos;
 using Microsoft.Extensions.Logging;
 
 namespace FINN.COST.Services;

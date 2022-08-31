@@ -3,7 +3,7 @@ using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.COST.Services;
 using FINN.SHAREDKERNEL.Constants;
-using FINN.SHAREDKERNEL.UseCases;
+using FINN.SHAREDKERNEL.Dtos;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

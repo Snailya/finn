@@ -3,7 +3,7 @@ using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.EXCEL.Services;
 using FINN.SHAREDKERNEL.Constants;
-using FINN.SHAREDKERNEL.UseCases;
+using FINN.SHAREDKERNEL.Dtos;
 
 namespace FINN.EXCEL;
 

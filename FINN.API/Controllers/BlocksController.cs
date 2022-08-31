@@ -3,7 +3,7 @@ using FINN.API.Dtos;
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.SHAREDKERNEL.Constants;
-using FINN.SHAREDKERNEL.UseCases;
+using FINN.SHAREDKERNEL.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FINN.API.Controllers;

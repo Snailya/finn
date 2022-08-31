@@ -7,6 +7,7 @@
         <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
         <AssemblyName>FINN.DXF</AssemblyName>
         <RootNamespace>FINN.DXF</RootNamespace>
+        <Company>JetSnail</Company>
     </PropertyGroup>
 
     <ItemGroup>

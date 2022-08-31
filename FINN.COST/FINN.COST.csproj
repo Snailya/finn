@@ -8,6 +8,7 @@
         <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
         <AssemblyName>FINN.COST</AssemblyName>
         <RootNamespace>FINN.COST</RootNamespace>
+        <Company>JetSnail</Company>
     </PropertyGroup>
 
     <ItemGroup>

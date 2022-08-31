@@ -8,9 +8,19 @@ public class Vector2d
         Y = y;
     }
 
+    /// <summary>
+    ///     The vector represents origin.
+    /// </summary>
     public static Vector2d Zero => new(0, 0);
 
+    /// <summary>
+    ///     X value from origin
+    /// </summary>
     public double X { get; set; }
+
+    /// <summary>
+    ///     Y value from origin
+    /// </summary>
     public double Y { get; set; }
 
     public static Vector2d operator /(Vector2d v, double scalar)
@@ -39,6 +49,7 @@ public class Vector2d
     }
 
     /// <summary>
+    ///     Transform the point.
     /// </summary>
     /// <param name="scale">变换系数</param>
     /// <param name="translation">平移</param>

@@ -2,8 +2,8 @@
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.SHAREDKERNEL.Constants;
+using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Interfaces;
-using FINN.SHAREDKERNEL.UseCases;
 
 namespace FINN.DXF;
 

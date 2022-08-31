@@ -1,4 +1,4 @@
-﻿using FINN.SHAREDKERNEL.UseCases;
+﻿using FINN.SHAREDKERNEL.Dtos;
 
 namespace FINN.EXCEL.Models;
 

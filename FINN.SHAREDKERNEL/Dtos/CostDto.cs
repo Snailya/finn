@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using FINN.CORE.Models;
 
-namespace FINN.SHAREDKERNEL.UseCases;
+namespace FINN.SHAREDKERNEL.Dtos;
 
 public class CostDto : JsonObject
 {

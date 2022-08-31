@@ -2,8 +2,6 @@
 
 public static class RoutingKeys
 {
-    public const string Dispatch = "job.dispatch";
-
     public static class ExcelService
     {
         public const string GetLayout = "excel-service.read-excel";

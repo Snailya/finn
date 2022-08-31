@@ -1,11 +1,10 @@
-using System.Globalization;
 using System.Text.Json;
 using FINN.API.Models;
 using FINN.CORE;
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
 using FINN.SHAREDKERNEL.Constants;
-using FINN.SHAREDKERNEL.UseCases;
+using FINN.SHAREDKERNEL.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FINN.API.Controllers;

@@ -9,10 +9,16 @@ public class Response : JsonObject
         (Message, Code) = (message, code);
     }
 
+    /// <summary>
+    ///     The error message of the response
+    /// </summary>
     [JsonPropertyName("msg")]
     [JsonPropertyOrder(0)]
     public string Message { get; set; }
 
+    /// <summary>
+    ///     The state code of the response. 0 for success.
+    /// </summary>
     [JsonPropertyName("code")]
     [JsonPropertyOrder(1)]
     public int Code { get; set; }
@@ -26,6 +32,9 @@ public class Response<TData> : Response
         Data = data;
     }
 
+    /// <summary>
+    ///     Data.
+    /// </summary>
     [JsonPropertyName("data")]
     [JsonPropertyOrder(2)]
     public TData Data { get; set; }

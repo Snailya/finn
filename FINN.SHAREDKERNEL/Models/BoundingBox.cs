@@ -48,6 +48,7 @@ public class BoundingBox
     }
 
     /// <summary>
+    ///     Transform the bounding box with scale and translation.
     /// </summary>
     /// <param name="scale">变换系数</param>
     /// <param name="translation">平移</param>
@@ -57,19 +58,30 @@ public class BoundingBox
         Max?.TransformBy(scale, translation);
     }
 
+    /// <summary>
+    ///     Extends the bounding box with a new bounding box.
+    /// </summary>
+    /// <param name="box"></param>
+    /// <exception cref="Exception"></exception>
     public void AddBox(BoundingBox box)
     {
         if (box.Min == null || box.Max == null)
-            throw new Exception("Adding a box that is not initialized is not allowed.");
+            throw new ArgumentException("Adding a box that is not initialized is not allowed.");
 
         AddPoint(box.Min);
         AddPoint(box.Max);
     }
 
+    /// <summary>
+    ///     Check if the input box in inside the bounding box.
+    /// </summary>
+    /// <param name="box"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public bool Contains(BoundingBox box)
     {
         if (Min == null || Max == null || box.Min == null || box.Max == null)
-            throw new Exception("Compoare a box that is not initialized is not allowed.");
+            throw new ArgumentException("Compare a box that is not initialized is not allowed.");
 
         return box.Min.X >= Min.X && box.Max.X <= Max.X && box.Min.Y >= Min.Y && box.Max.Y <= Max.Y;
     }
