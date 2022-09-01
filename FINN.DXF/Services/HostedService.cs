@@ -55,6 +55,8 @@ public class HostedService : BackgroundService
 
     private void HandleReadLayout(string routingKey, string correlationId, string filename)
     {
+        _logger.LogInformation("Read layout from {Filename}", filename);
+        
         var geometries = _service.ReadLayout(filename);
         var response = new Response<IEnumerable<GeometryDto>>("", 0, geometries);
         _broker.Reply(routingKey, correlationId, response.ToJson());

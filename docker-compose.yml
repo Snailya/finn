@@ -1,10 +1,13 @@
 services:
+  # rabbitmq
   rabbitmq:
     image: rabbitmq:management
     restart: always
     ports:
       - "15672:15672"
       - "5672:5672"
+
+  # frontend
   frontend:
     build:
       context: ./finn.ui
@@ -13,9 +16,10 @@ services:
     restart: always
     environment:
       - REACT_APP_BACKEND_URL=http://localhost
-    command: npm run start
     ports:
       - "3000:3000"
+  
+  # backend
   api:
     build:
       dockerfile: ./FINN.API/Dockerfile
@@ -25,17 +29,19 @@ services:
       - rabbitmq
     environment:
       - RabbitMQ__Uri=amqp://rabbitmq:5672
-      - ConnectionStrings__SqliteConnection=Data Source=./sqlite/FINN.sqlite
+      - ConnectionStrings__SqliteConnection=Data Source=./sqlite/api.sqlite
     ports:
       - "443:443"
       - "80:80"
     volumes:
       - /app/sqlite
       - tmp:/tmp
-  reader:
+
+  # microservice
+  excel-service:
     build:
-      dockerfile: ./FINN.READER/Dockerfile
-    image: snailya2005/finn_reader
+      dockerfile: ./FINN.EXCEL/Dockerfile
+    image: snailya2005/finn_excel
     restart: always
     depends_on:
       - rabbitmq
@@ -43,20 +49,39 @@ services:
       - RabbitMQ__Uri=amqp://rabbitmq:5672
     volumes:
       - tmp:/tmp
-  drafter:
+
+  # microservice
+  dxf-service:
     build:
-      dockerfile: ./FINN.DRAFTER/Dockerfile
-    image: snailya2005/finn_drafter
+      dockerfile: ./FINN.DXF/Dockerfile
+    image: snailya2005/finn_dxf
     restart: always
     depends_on:
       - rabbitmq
     environment:
       - RabbitMQ__Uri=amqp://rabbitmq:5672
-      - ConnectionStrings__SqliteConnection=Data Source=./sqlite/FINN.sqlite
+      - ConnectionStrings__SqliteConnection=Data Source=./sqlite/dxf.sqlite
       - Storage=/app/data
     volumes:
-      - /app/data
+      - /app/data # save block dxf
       - /app/sqlite
       - tmp:/tmp
+
+  # microservice
+  cost-service:
+    build:
+      dockerfile: ./FINN.COST/Dockerfile
+    image: snailya2005/finn_cost
+    restart: always
+    depends_on:
+      - rabbitmq
+    environment:
+      - RabbitMQ__Uri=amqp://rabbitmq:5672
+      - ConnectionStrings__SqliteConnection=Data Source=./sqlite/cost.sqlite
+      - Storage=/app/data
+    volumes:
+      - /app/sqlite
+      - tmp:/tmp
+
 volumes:
   tmp:

@@ -10,16 +10,16 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["FINN.DRAFTER/FINN.DRAFTER.csproj", "FINN.DRAFTER/"]
-RUN dotnet restore "FINN.DRAFTER/FINN.DRAFTER.csproj"
+COPY ["FINN.DXF/FINN.DXF.csproj", "FINN.DXF/"]
+RUN dotnet restore "FINN.DXF/FINN.DXF.csproj"
 COPY . .
-WORKDIR "/src/FINN.DRAFTER"
-RUN dotnet build "FINN.DRAFTER.csproj" -c Release -o /app/build
+WORKDIR "/src/FINN.DXF"
+RUN dotnet build "FINN.DXF.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "FINN.DRAFTER.csproj" -c Release -o /app/publish
+RUN dotnet publish "FINN.DXF.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "FINN.DRAFTER.dll"]
+ENTRYPOINT ["dotnet", "FINN.DXF.dll"]

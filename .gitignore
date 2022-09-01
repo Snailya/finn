@@ -11,5 +11,8 @@
 # Rider config
 .idea/
 
+# webpack build
+/*/build/
+
 # database
 *.sqlite*

@@ -29,7 +29,7 @@ public class BlocksController : ControllerBase
 
     [HttpPost("upload")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Add([FromForm] BlockFileDto dto)
+    public async Task<IActionResult> Add([FromForm] UploadBlockFileDto dto)
     {
         // do not allow empty file
         if (dto.File.Length <= 0) return BadRequest();
@@ -49,47 +49,8 @@ public class BlocksController : ControllerBase
         var response = JsonSerializer.Deserialize<Response<IEnumerable<BlockDefinitionDto>>>(
             await _broker.SendAsync(RoutingKeys.DxfService.AddBlockDefinitions, request.ToJson()));
         return Ok(response);
-
-        // // send to dispatcher
-        // var request = new DispatchRequest
-        // {
-        //     Task = DispatchTask.UploadBlocks,
-        //     Data = new UploadOrUpdateBlocksDto { Filename = filePath, Names = dto.BlockNames }.ToJson()
-        // };
-        // var response =
-        //     JsonSerializer.Deserialize<Response<DispatchResult>>(
-        //         await _broker.SendAsync(RoutingKeys.Dispatch, request.ToJson()));
-        // if (response is { Code: not 0 }) return BadRequest();
-        //
-        // return Accepted(response);
     }
 
-    // [HttpPut("update")]
-    // public async Task<IActionResult> Update([FromForm] BlockFileDto dto)
-    // {
-    // // do not allow empty file
-    // if (dto.File.Length <= 0) return BadRequest();
-    //
-    // // persist file to temp storage, notice that the temp storage is regard as unsafe
-    // // todo: validation
-    // var filePath = Path.GetTempFileName();
-    // await using var stream = System.IO.File.Create(filePath);
-    // await dto.File.CopyToAsync(stream);
-    // stream.Close();
-
-    // // send to dispatcher
-    // var request = new DispatchRequest
-    // {
-    //     Task = DispatchTask.UpdateBlocks,
-    //     Data = new UploadOrUpdateBlocksDto { Filename = filePath, Names = dto.BlockNames }.ToJson()
-    // };
-    // var response =
-    //     JsonSerializer.Deserialize<Response<DispatchResult>>(
-    //         await _broker.SendAsync(RoutingKeys.Dispatch, request.ToJson()));
-    // if (response is { Code: not 0 }) return BadRequest();
-    //
-    // return Accepted(response);
-    // }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
@@ -97,18 +58,5 @@ public class BlocksController : ControllerBase
         var response = JsonSerializer.Deserialize<Response>(
             await _broker.SendAsync(RoutingKeys.DxfService.DeleteBlockDefinition, id.ToString()));
         return Ok(response);
-
-        // // send to dispatcher
-        // var request = new DispatchRequest
-        // {
-        //     Task = DispatchTask.DeleteBlock,
-        //     Data = id.ToString()
-        // };
-        // var response =
-        //     JsonSerializer.Deserialize<Response<DispatchResult>>(
-        //         await _broker.SendAsync(RoutingKeys.Dispatch, request.ToJson()));
-        // if (response is { Code: not 0 }) return BadRequest();
-        //
-        // return Accepted(response);
     }
 }

@@ -1,13 +1,14 @@
 import { Layout } from "antd";
-import { Content, Footer } from "antd/lib/layout/layout";
-import React from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import Admin from "./Pages/Admin";
-import Home from "./Pages/Home";
+import { Content, Footer, Header } from "antd/lib/layout/layout";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Admin from "./Pages/Admin/Admin";
+import Home from "./Pages/Home/Home";
+import "./App.css";
 
 export default function App() {
   return (
     <Layout className="layout">
+      <Header className="site-layout-header"></Header>
       <Content style={{ padding: "0 50px" }}>
         <div className="site-layout-content">
           <BrowserRouter>
@@ -19,7 +20,7 @@ export default function App() {
         </div>
       </Content>
       <Footer style={{ textAlign: "center" }}>
-        Ant Design ©2018 Created by Ant UED
+        ©2022 Coded by JetSnail
       </Footer>
     </Layout>
   );

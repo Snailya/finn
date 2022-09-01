@@ -3,16 +3,16 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["FINN.COSTER/FINN.COSTER.csproj", "FINN.COSTER/"]
-RUN dotnet restore "FINN.COSTER/FINN.COSTER.csproj"
+COPY ["FINN.COST/FINN.COST.csproj", "FINN.COST/"]
+RUN dotnet restore "FINN.COST/FINN.COST.csproj"
 COPY . .
-WORKDIR "/src/FINN.COSTER"
-RUN dotnet build "FINN.COSTER.csproj" -c Release -o /app/build
+WORKDIR "/src/FINN.COST"
+RUN dotnet build "FINN.COST.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "FINN.COSTER.csproj" -c Release -o /app/publish
+RUN dotnet publish "FINN.COST.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "FINN.COSTER.dll"]
+ENTRYPOINT ["dotnet", "FINN.COST.dll"]

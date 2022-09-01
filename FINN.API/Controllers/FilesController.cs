@@ -26,7 +26,7 @@ public class FilesController : ControllerBase
 
     [HttpPost("upload")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> UploadXlsx(IFormFile file)
+    public async Task<IActionResult> Upload(IFormFile file)
     {
         // not allow empty body
         var extension = Path.GetExtension(file.FileName);
@@ -43,6 +43,19 @@ public class FilesController : ControllerBase
             ".xlsx" => await HandleXlsxUpload(input),
             ".dxf" => await HandleDxfUpload(input)
         };
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> Download(int id)
+    {
+        var log = await _repository.GetByIdAsync(id);
+        if (log is { Status: "done" })
+        {
+            var bytes = await System.IO.File.ReadAllBytesAsync(log.Output!);
+            return File(bytes, "text/plain", Path.GetFileName(log.Output));
+        }
+
+        return BadRequest();
     }
 
     private async Task<IActionResult> HandleDxfUpload(string input)
@@ -139,18 +152,5 @@ public class FilesController : ControllerBase
         await _repository.SaveChangesAsync();
 
         return AcceptedAtAction(nameof(Download), new { id = log.Id }, new Response<int>("", 0, log.Id));
-    }
-
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> Download(int id)
-    {
-        var log = await _repository.GetByIdAsync(id);
-        if (log is { Status: "done" })
-        {
-            var bytes = await System.IO.File.ReadAllBytesAsync(log.Output!);
-            return File(bytes, "text/plain", Path.GetFileName(log.Output));
-        }
-
-        return BadRequest();
     }
 }
