@@ -19,7 +19,11 @@ builder.Services.AddCors(options =>
         policy =>
         {
             // only allow request from localhost
-            policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost").AllowAnyHeader();
+            policy.SetIsOriginAllowed(origin =>
+            {
+                var uri = new Uri(origin);
+                return uri.Host is "localhost" or "10.25.141.134";
+            }).AllowAnyHeader();
         });
 });
 

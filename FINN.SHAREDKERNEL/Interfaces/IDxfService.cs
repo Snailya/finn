@@ -19,4 +19,5 @@ public interface IDxfService
     BlockDefinitionDto? GetBlockDefinition(int id);
     IEnumerable<BlockDefinitionDto> AddBlockDefinitions(string filename, IEnumerable<string>? blockNames);
     void DeleteBlockDefinitionById(int id);
+    IEnumerable<BlockDefinitionDto> ListBlockDefinitions();
 }

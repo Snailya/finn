@@ -24,6 +24,7 @@ public class HostedService : BackgroundService
     {
         _logger.LogInformation("Register handler for {Routing}", nameof(RoutingKeys.DxfService));
 
+        _broker.RegisterHandler(RoutingKeys.DxfService.ListBlockDefinitions, HandleListBlockDefinitions);
         _broker.RegisterHandler(RoutingKeys.DxfService.GetBlockDefinition, HandleGetBlockDefinition);
         _broker.RegisterHandler(RoutingKeys.DxfService.AddBlockDefinitions, HandleAddBlockDefinitions);
         _broker.RegisterHandler(RoutingKeys.DxfService.DeleteBlockDefinition, HandleDeleteBlockDefinition);
@@ -42,6 +43,13 @@ public class HostedService : BackgroundService
         _logger.LogInformation("Connection closed");
     }
 
+    private void HandleListBlockDefinitions(string routingKey, string correlationId, string message)
+    {
+        var blockDefinitions = _service.ListBlockDefinitions();
+        var response = new Response<IEnumerable<BlockDefinitionDto>>("", 0, blockDefinitions);
+        _broker.Reply(routingKey, correlationId, response.ToJson());
+    }
+
     #region Handlers
 
     private void HandleDrawLayout(string routingKey, string correlationId, string message)
@@ -56,7 +64,7 @@ public class HostedService : BackgroundService
     private void HandleReadLayout(string routingKey, string correlationId, string filename)
     {
         _logger.LogInformation("Read layout from {Filename}", filename);
-        
+
         var geometries = _service.ReadLayout(filename);
         var response = new Response<IEnumerable<GeometryDto>>("", 0, geometries);
         _broker.Reply(routingKey, correlationId, response.ToJson());

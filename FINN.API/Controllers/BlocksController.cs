@@ -19,6 +19,14 @@ public class BlocksController : ControllerBase
         _broker = broker;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> List()
+    {
+        var response = JsonSerializer.Deserialize<Response<IEnumerable<BlockDefinitionDto>>>(
+            await _broker.SendAsync(RoutingKeys.DxfService.ListBlockDefinitions, ""));
+        return Ok(response);
+    }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {

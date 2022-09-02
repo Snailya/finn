@@ -190,6 +190,15 @@ public class NetDxfService : IDxfService
         _repository.DeleteAsync(blockDefinition).Wait();
     }
 
+    public IEnumerable<BlockDefinitionDto> ListBlockDefinitions()
+    {
+        var blockDefinitions = _repository.ListAsync().GetAwaiter().GetResult();
+        return blockDefinitions.Select(x => new BlockDefinitionDto
+        {
+            Id = x.Id, Name = x.Name, Filename = x.DxfFileName
+        });
+    }
+
     public IEnumerable<BlockDefinitionDto> AddBlockDefinitions(string filename, IEnumerable<string>? blockNames)
     {
         var doc = DxfDocument.Load(filename);
@@ -210,7 +219,8 @@ public class NetDxfService : IDxfService
         _repository.AddRangeAsync(blocks).Wait();
         _repository.SaveChangesAsync().Wait();
 
-        return blocks.Select(x => new BlockDefinitionDto { Id = x.Id, Filename = x.DxfFileName, Name = x.Name });
+        return blocks.Select(x => new BlockDefinitionDto
+            { Id = x.Id, Filename = x.DxfFileName, Name = x.Name });
     }
 
     public BlockDefinitionDto? GetBlockDefinition(int id)
@@ -219,7 +229,9 @@ public class NetDxfService : IDxfService
         return blockDefinition == null
             ? null
             : new BlockDefinitionDto
-                { Id = blockDefinition.Id, Name = blockDefinition.Name, Filename = blockDefinition.DxfFileName };
+            {
+                Id = blockDefinition.Id, Name = blockDefinition.Name, Filename = blockDefinition.DxfFileName
+            };
     }
 
     private static Group<Booth> ToBoothGroup(IEnumerable<ProcessDto> dtos, Vector2d location)
@@ -241,7 +253,8 @@ public class NetDxfService : IDxfService
         var file = new DxfDocument();
         file.Blocks.Add(exploded);
 
-        var dxfFileName = Path.Join(_blockFolder, Path.GetFileName(Path.GetTempFileName()).Replace(".tmp", ".dxf"));
+        var dxfFileName = Path.Join(_blockFolder,
+            Path.GetFileName(Path.GetTempFileName()).Replace(".tmp", ".dxf"));
         file.Save(dxfFileName);
 
         return new BlockDefinition { Name = name, DxfFileName = dxfFileName };

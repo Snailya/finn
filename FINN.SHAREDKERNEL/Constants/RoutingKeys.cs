@@ -9,6 +9,7 @@ public static class RoutingKeys
 
     public static class DxfService
     {
+        public const string ListBlockDefinitions = "dxf-service.list-block-definitions";
         public const string GetBlockDefinition = "dxf-service.get-block-definition";
         public const string AddBlockDefinitions = "dxf-service.add-block-definitions";
         public const string DeleteBlockDefinition = "dxf-service.delete-block-definition";
