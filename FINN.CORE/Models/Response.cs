@@ -4,6 +4,10 @@ namespace FINN.CORE.Models;
 
 public class Response : JsonObject
 {
+    public Response()
+    {
+    }
+
     public Response(string message, int code)
     {
         (Message, Code) = (message, code);
@@ -26,7 +30,10 @@ public class Response : JsonObject
 
 public class Response<TData> : Response
 {
-    [JsonConstructor]
+    public Response()
+    {
+    }
+
     public Response(string message, int code, TData data) : base(message, code)
     {
         Data = data;
@@ -38,4 +45,20 @@ public class Response<TData> : Response
     [JsonPropertyName("data")]
     [JsonPropertyOrder(2)]
     public TData Data { get; set; }
+}
+
+public class PagedResponse<TData> : Response<TData>
+{
+    public PagedResponse()
+    {
+    }
+
+    public PagedResponse(string message, int code, TData data, PaginationFilter filter) : base(message, code, data)
+    {
+        PageNumber = filter.PageNumber;
+        PageSize = filter.PageSize;
+    }
+
+    [JsonPropertyName("pageNumber")] public int PageNumber { get; set; }
+    [JsonPropertyName("pageSize")] public int PageSize { get; set; }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using FINN.CORE.Models;
 
 namespace FINN.CORE.Interfaces;
 
@@ -19,6 +20,14 @@ public interface IReadRepository<T>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<List<T>> ListAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     List entities at specified page.
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<T>> ListAsync(PaginationFilter filter, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     List entities that matches predicate.

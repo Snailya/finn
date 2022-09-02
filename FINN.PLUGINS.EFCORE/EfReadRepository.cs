@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using FINN.CORE.Interfaces;
+using FINN.CORE.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FINN.PLUGINS.EFCORE;
@@ -21,6 +22,12 @@ public class EfReadRepository<T> : IReadRepository<T> where T : class
     public async Task<List<T>> ListAsync(CancellationToken cancellationToken = default)
     {
         return await DbContext.Set<T>().ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<T>> ListAsync(PaginationFilter filter, CancellationToken cancellationToken = default)
+    {
+        return await DbContext.Set<T>().Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<List<T>> ListAsync(Expression<Func<T, bool>> predicate,

@@ -5,7 +5,7 @@ using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Interfaces;
 
-namespace FINN.DXF;
+namespace FINN.DXF.Services;
 
 public class HostedService : BackgroundService
 {
@@ -45,8 +45,12 @@ public class HostedService : BackgroundService
 
     private void HandleListBlockDefinitions(string routingKey, string correlationId, string message)
     {
-        var blockDefinitions = _service.ListBlockDefinitions();
-        var response = new Response<IEnumerable<BlockDefinitionDto>>("", 0, blockDefinitions);
+        var dto = JsonSerializer.Deserialize<PaginationFilter>(message);
+        if (dto == null) throw new ArgumentNullException();
+
+        var blockDefinitions = _service.ListBlockDefinitions(dto);
+        var response =
+            new PagedResponse<IEnumerable<BlockDefinitionDto>>("", 0, blockDefinitions, dto);
         _broker.Reply(routingKey, correlationId, response.ToJson());
     }
 

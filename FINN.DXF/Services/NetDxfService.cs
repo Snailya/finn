@@ -1,4 +1,5 @@
 ﻿using FINN.CORE.Interfaces;
+using FINN.CORE.Models;
 using FINN.DXF.Models;
 using FINN.PLUGINS.DXF;
 using FINN.PLUGINS.DXF.Models;
@@ -190,9 +191,9 @@ public class NetDxfService : IDxfService
         _repository.DeleteAsync(blockDefinition).Wait();
     }
 
-    public IEnumerable<BlockDefinitionDto> ListBlockDefinitions()
+    public IEnumerable<BlockDefinitionDto> ListBlockDefinitions(PaginationFilter filter)
     {
-        var blockDefinitions = _repository.ListAsync().GetAwaiter().GetResult();
+        var blockDefinitions = _repository.ListAsync(filter).GetAwaiter().GetResult();
         return blockDefinitions.Select(x => new BlockDefinitionDto
         {
             Id = x.Id, Name = x.Name, Filename = x.DxfFileName

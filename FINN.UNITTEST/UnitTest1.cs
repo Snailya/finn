@@ -1,3 +1,5 @@
+using System.Text.Json;
+using FINN.CORE.Models;
 using FINN.PLUGINS.DXF;
 using FINN.PLUGINS.DXF.Models;
 using FINN.PLUGINS.DXF.Utils;
@@ -6,6 +8,7 @@ using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;
 using netDxf.Tables;
+using RabbitMQ.Client;
 
 namespace FINN.UNITTEST;
 
@@ -219,5 +222,61 @@ public class Tests
             AddEntity(point);
             AddEntity(line, false);
         }
+    }
+
+    [Test]
+    public void JsonPageResponseTest()
+    {
+        var obj = new PagedResponse<string>("", 0, "a", new PaginationFilter(5,5));
+        var str = obj.ToJson();
+        var newObj = JsonSerializer.Deserialize<PagedResponse<string>>(str);
+        Assert.That(newObj, Is.Not.Null);
+    }
+
+    [Test]
+    public void JsonPaginationFilterTest()
+    {
+        var obj = new PaginationFilter(5, 5);
+        var str = obj.ToJson();
+        var newObj = JsonSerializer.Deserialize<PaginationFilter>(str);
+        Assert.That(newObj, Is.Not.Null);
+    }
+
+    [Test]
+    public void JsonResponseTest()
+    {
+        var obj = new Response<string>("", 0, "a");
+        var str = obj.ToJson();
+        var newObj = JsonSerializer.Deserialize<Response<string>>(str);
+        Assert.That(newObj, Is.Not.Null);
+    }
+
+    public class JsonClass
+    {
+        public JsonClass()
+        {
+            
+        }
+        
+        public JsonClass(JsonClassParameter parameter)
+        {
+            Number = parameter.Number;
+        }
+
+        public int Number { get; set; }
+    }
+
+    public class JsonClassParameter
+    {
+        public int Number { get; set; }
+    }
+
+    [Test]
+    public void JsonTest()
+    {
+        var obj = new JsonClass(new JsonClassParameter(){Number = 5});
+        var str = JsonSerializer.Serialize(obj);
+        var newObj = JsonSerializer.Deserialize<JsonClass>(str);
+        Assert.That(newObj, Is.Not.Null);
     }
 }

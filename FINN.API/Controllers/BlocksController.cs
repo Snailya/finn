@@ -20,10 +20,11 @@ public class BlocksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> List()
+    public async Task<IActionResult> List([FromQuery] PaginationFilter filter)
     {
-        var response = JsonSerializer.Deserialize<Response<IEnumerable<BlockDefinitionDto>>>(
-            await _broker.SendAsync(RoutingKeys.DxfService.ListBlockDefinitions, ""));
+        var tmp = await _broker.SendAsync(RoutingKeys.DxfService.ListBlockDefinitions, filter.ToJson());
+        var response = JsonSerializer.Deserialize<PagedResponse<IEnumerable<BlockDefinitionDto>>>(
+            tmp);
         return Ok(response);
     }
 
