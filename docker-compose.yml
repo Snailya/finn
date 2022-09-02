@@ -28,6 +28,7 @@ services:
     depends_on:
       - rabbitmq
     environment:
+      - AllowedHosts=localhost # this should be set to server ip
       - RabbitMQ__Uri=amqp://rabbitmq:5672
       - ConnectionStrings__SqliteConnection=Data Source=./sqlite/api.sqlite
     ports:

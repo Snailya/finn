@@ -1,6 +1,6 @@
 @import "~antd/dist/antd.css";
 
-#page-container {
+.home {
   margin: auto;
 
   height: 720px;
@@ -19,7 +19,7 @@
   padding: 32px;
 }
 
-.result-wrapper {
+.home__result {
   padding: 96px;
 
   display: flex;
@@ -27,11 +27,11 @@
   color: white;
 }
 
-.result-wrapper .result-text{
+.home__result .result-text{
   font-size: 18px;
 }
 
-.upload-wrapper {
+.home__uploader {
   padding: 96px;
 }
 

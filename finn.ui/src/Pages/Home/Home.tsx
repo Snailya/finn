@@ -6,18 +6,10 @@ import {
   DownloadOutlined,
   InboxOutlined,
 } from "@ant-design/icons";
-import type { UploadProps } from "antd";
 import { RcFile, UploadChangeParam, UploadFile } from "antd/lib/upload";
 import { saveAs } from "../../service";
 
 const { Dragger } = Upload;
-
-const props: UploadProps = {
-  name: "file",
-  accept: ".xlsx,.dxf",
-  maxCount: 1,
-  multiple: false,
-};
 
 interface ResultProps {
   platform: number;
@@ -74,17 +66,21 @@ function Home() {
   }, []);
 
   return (
-    <div id="page-container">
-      <div className="result-wrapper">
+    <div className="home">
+      <div className="home__result">
         {result && (
           <div className="result-text">
-            投资估算: <span>{result.platform}</span> 万元
+            投资估算: <span>{result.platform.toFixed(0)}</span> 万元
           </div>
         )}
       </div>
-      <div className="upload-wrapper">
+      <div className="home__uploader">
         <Dragger
           className="upload"
+          name="file"
+          accept=".xlsx,.dxf"
+          maxCount={1}
+          multiple={false}
           action={`${process.env.REACT_APP_BACKEND_URL}/files/upload`}
           onDrop={() => {
             setResult(undefined);
@@ -97,7 +93,6 @@ function Home() {
             showRemoveIcon: true,
             removeIcon: <DeleteOutlined />,
           }}
-          {...props}
         >
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
