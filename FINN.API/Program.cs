@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Sockets;
 using FINN.API.Data;
 using FINN.API.Models;
 using FINN.CORE.Interfaces;
@@ -18,12 +20,8 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(
         policy =>
         {
-            // only allow request from localhost
-            policy.SetIsOriginAllowed(origin =>
-            {
-                var uri = new Uri(origin);
-                return uri.Host is "localhost" or "10.25.141.134";
-            }).AllowAnyHeader();
+            // cors is controlled by AllowedHosts in appsettings.json
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
         });
 });
 
