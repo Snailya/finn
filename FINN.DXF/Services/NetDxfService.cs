@@ -213,7 +213,7 @@ public class NetDxfService : IDxfService
         foreach (var name in names.Where(name =>
                      _repository.SingleOrDefaultAsync(x => x.Name == name).Result != null))
             throw new ArgumentException(
-                "Block with the same name already exist. Please check the content and consider using update.",
+                $"Block with the same name: {name} already exist. Please check the content and consider using update.",
                 nameof(name));
 
         var blocks = names.Select(name => CopyAndSaveBlock(doc.Blocks[name], name)).ToList();
