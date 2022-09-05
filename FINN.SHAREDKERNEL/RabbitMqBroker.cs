@@ -89,6 +89,10 @@ public class RabbitMqBroker : IBroker
 
             try
             {
+                // assure received
+                _channel.BasicAck(ea.DeliveryTag, false);
+                
+                // handle
                 handler(props.ReplyTo, props.CorrelationId, Encoding.UTF8.GetString(ea.Body.ToArray()));
             }
             catch (JsonException e)
@@ -115,7 +119,7 @@ public class RabbitMqBroker : IBroker
         _logger.LogInformation(
             "[{QueueName}][{RoutingKey}] {Status}", queue, routingKey, "created");
 
-        _channel.BasicConsume(queue, false, consumer);
+        _channel.BasicConsume(queue, autoAck: false, consumer);
         _logger.LogInformation(
             "[{QueueName}][{RoutingKey}] {Status}", queue, routingKey, "started");
     }
