@@ -61,7 +61,7 @@ public class NetDxfService : IDxfService
             };
 
             // add primary
-            layoutItem.Add(Booth.FromDto(item));
+            layoutItem.Add(Booth.FromDto(item, true));
 
             // divide into booth and blocks
             if (item.SubProcess == null) return;
@@ -239,7 +239,7 @@ public class NetDxfService : IDxfService
     {
         var boothGroup =
             new Group<Booth>(location, GroupDirection.LeftToRight, GroupAlignment.Middle, 0);
-        dtos.ToList().ForEach(x => boothGroup.Add(Booth.FromDto(x)));
+        dtos.ToList().ForEach(x => boothGroup.Add(Booth.FromDto(x, false)));
         return boothGroup;
     }
 

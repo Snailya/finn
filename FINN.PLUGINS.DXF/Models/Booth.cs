@@ -11,6 +11,7 @@ public class Booth : DxfWrapper
     private readonly string _name;
     private readonly double _xLength;
     private readonly double _yLength;
+    private bool _colored = true;
 
     private bool IsConceptual => _xLength == 0 || _yLength == 0;
 
@@ -55,29 +56,36 @@ public class Booth : DxfWrapper
 
     private void AddWall(LwPolyline wall)
     {
-        // create hatch
-        var boundary = new HatchBoundaryPath(new List<EntityObject> { wall });
-        var hatch = ColorUtil.GetHatchMatchesLayer(Layer, new[] { boundary });
+        if (_colored)
+        {
+            // create hatch
+            var boundary = new HatchBoundaryPath(new List<EntityObject> { wall });
+            var hatch = ColorUtil.GetHatchMatchesLayer(Layer, new[] { boundary });
+            AddEntity(hatch);
+        }
 
-        AddEntity(hatch);
+        else
+        {
+            AddEntity(wall);
+        }
     }
 
-    public static Booth FromDto(ProcessDto dto, Vector2d location)
+    public static Booth FromDto(ProcessDto dto, Vector2d location, bool colored)
     {
         return dto.XLength == 0 || dto.YLength == 0
             ? new Booth(LayerUtil.GetLayerByName(dto.Layer), location, dto.Name)
-            : new Booth(LayerUtil.GetLayerByName(dto.Layer), location, dto.XLength, dto.YLength,
+            : new Booth(LayerUtil.GetLayerByName(dto.Layer), location, dto.XLength, dto.YLength, colored,
                 dto.Line1, dto.Line2);
     }
 
-    public static Booth FromDto(ProcessDto dto)
+    public static Booth FromDto(ProcessDto dto, bool colored)
     {
-        return FromDto(dto, Vector2d.Zero);
+        return FromDto(dto, Vector2d.Zero, colored);
     }
 
     #region Constructors
 
-    public Booth(Layer layer, Vector2d basePoint, double xLength, double yLength,
+    public Booth(Layer layer, Vector2d basePoint, double xLength, double yLength, bool colored,
         params string[] texts) : base(layer,
         basePoint)
     {
@@ -88,14 +96,15 @@ public class Booth : DxfWrapper
 
         _xLength = xLength;
         _yLength = yLength;
+        _colored = colored;
 
         PrepareWallOrPlaceHolder();
         PrepareLabel(texts);
         PrepareCentralLine();
     }
 
-    public Booth(Layer layer, double xLength, double yLength, params string[] texts) : this(
-        layer, Vector2d.Zero, xLength, yLength, texts)
+    public Booth(Layer layer, double xLength, double yLength, bool colored, params string[] texts) : this(
+        layer, Vector2d.Zero, xLength, yLength, colored, texts)
     {
     }
 
