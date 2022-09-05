@@ -20,8 +20,13 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(
         policy =>
         {
+            policy.SetIsOriginAllowed(origin =>
+            {
+                var uri = new Uri(origin);
+                return uri.Host is "10.25.141.134" or "localhost";
+            }).AllowAnyHeader().AllowAnyMethod();
             // cors is controlled by AllowedHosts in appsettings.json
-            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+            // policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
         });
 });
 
