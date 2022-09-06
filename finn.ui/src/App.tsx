@@ -1,8 +1,8 @@
 import { Layout } from "antd";
 import { Content, Footer, Header } from "antd/lib/layout/layout";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Admin from "./Pages/Admin/Admin";
-import Home from "./Pages/Home/Home";
+import Admin from "./pages/admin/Admin";
+import Home from "./pages/home/Home";
 import "./App.css";
 
 export default function App() {

@@ -22,18 +22,36 @@ public class BlocksController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] PaginationFilter filter)
     {
-        var tmp = await _broker.SendAsync(RoutingKeys.DxfService.ListBlockDefinitions, filter.ToJson());
-        var response = JsonSerializer.Deserialize<PagedResponse<IEnumerable<BlockDefinitionDto>>>(
-            tmp);
-        return Ok(response);
+        if ((filter.PageNumber == 0 && filter.PageSize != 0))
+            return BadRequest("Page number can't be 0 if page size is specified.");
+        if (filter.PageNumber != 0 && filter.PageSize == 0)
+            return BadRequest("Page size can't be 0 if page number is specified ");
+
+        var response =
+            JsonSerializer.Deserialize<PagedResponse<IEnumerable<BlockDefinitionDto>>>(await _broker.SendAsync(
+                RoutingKeys.DxfService.ListBlockDefinitions,
+                filter.ToJson()));
+        if (response != null)
+            return Ok(filter.PageNumber == 0 || filter.PageSize == 0
+                ? new Response<IEnumerable<BlockDefinitionDto>>(response.Message, response.Code, response.Data)
+                : response);
+
+        return BadRequest();
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> Get(int id)
+    public async Task<IActionResult> Download(int id)
     {
         var response = JsonSerializer.Deserialize<Response<BlockDefinitionDto>>(
             await _broker.SendAsync(RoutingKeys.DxfService.GetBlockDefinition, id.ToString()));
-        return Ok(response);
+
+        if (response?.Code == 0)
+        {
+            var bytes = await System.IO.File.ReadAllBytesAsync(response.Data.Filename!);
+            return File(bytes, "text/plain", response.Data.Name);
+        }
+
+        return BadRequest();
     }
 
     [HttpPost("upload")]

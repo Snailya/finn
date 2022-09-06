@@ -4,19 +4,40 @@ namespace FINN.CORE.Models;
 
 public class PaginationFilter : JsonObject
 {
-    [JsonPropertyName("pn")] public int PageNumber { get; set; }
+    private int _pageNumber;
+    private int _pageSize;
 
-    [JsonPropertyName("ps")] public int PageSize { get; set; }
+    [JsonPropertyName("pn")]
+    public int PageNumber
+    {
+        get => _pageNumber;
+        set
+        {
+            if (value < 0)
+                throw new ArgumentException();
+            _pageNumber = value;
+        }
+    }
+
+    [JsonPropertyName("ps")]
+    public int PageSize
+    {
+        get => _pageSize;
+        set
+        {
+            if (value < 0)
+                throw new ArgumentException();
+            _pageSize = value;
+        }
+    }
 
     public PaginationFilter()
     {
-        PageNumber = 1;
-        PageSize = 10;
     }
 
     public PaginationFilter(int pageNumber, int pageSize)
     {
-        PageNumber = pageNumber < 1 ? 1 : pageNumber;
-        PageSize = pageSize > 10 ? 10 : pageSize;
+        PageNumber = pageNumber;
+        PageSize = pageSize;
     }
 }

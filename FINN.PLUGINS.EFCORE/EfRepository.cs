@@ -1,4 +1,5 @@
 ﻿using FINN.CORE.Interfaces;
+using FINN.CORE.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FINN.PLUGINS.EFCORE;
@@ -26,6 +27,11 @@ public class EfRepository<T> : EfReadRepository<T>, IRepository<T> where T : cla
 
     public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
+        if (entity is BaseEntity be)
+        {
+            be.Modified = DateTime.UtcNow;
+        }
+
         DbContext.Set<T>().Update(entity);
         await SaveChangesAsync(cancellationToken);
     }

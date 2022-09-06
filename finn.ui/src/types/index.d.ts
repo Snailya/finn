@@ -2,17 +2,53 @@ declare module "three-dxf-loader";
 
 declare module "dxf-viewer" {
   export class DxfViewer {
-    constructor(container: HTMLDivElement, options: any = null);
-    HasRender();
-    GetCanvas();
+    /** @param domContainer Container element to create the canvas in. Usually empty div. Should not
+     *  have padding if auto-resize feature is used.
+     * @param options Some options can be overridden if specified. See DxfViewer.DefaultOptions.
+     */
+    constructor(domContainer, options: any = null);
+
+    /** @return {boolean} True if renderer exists. May be false in case when WebGL context is lost
+     * (e.g. after wake up from sleep). In such case page should be reloaded.
+     */
+    HasRenderer();
+
+    GetCanvas() {
+      return this.canvas;
+    }
+
     SetSize(width, height);
+
+    /** Load DXF into the viewer. Old content is discarded, state is reset.
+     * @param url {string} DXF file URL.
+     * @param fonts {?string[]} List of font URLs. Files should have typeface.js format. Fonts are
+     *  used in the specified order, each one is checked until necessary glyph is found. Text is not
+     *  rendered if fonts are not specified.
+     * @param progressCbk {?Function} (phase, processedSize, totalSize)
+     *  Possible phase values:
+     *  * "font"
+     *  * "fetch"
+     *  * "parse"
+     *  * "prepare"
+     * @param workerFactory {?Function} Factory for worker creation. The worker script should
+     *  invoke DxfViewer.SetupWorker() function.
+     */
     async Load({ url, fonts = null, progressCbk = null, workerFactory = null });
+
     Render();
+
+    /** @return {Iterable<{name:String, color:number}>} List of layer names. */
     GetLayers();
+
     ShowLayer(name, show);
+
     Clear();
+
     Destroy();
+
+    /** Reset the viewer state. */
     SetView(center, width);
+
     /** Set view to fit the specified bounds. */
     FitView(minX, maxX, minY, maxY, padding = 0.1);
 
@@ -26,6 +62,7 @@ declare module "dxf-viewer" {
 
     /** @return {Vector2} Scene origin in global drawing coordinates. */
     GetOrigin();
+
     /** Subscribe to the specified event. The following events are defined:
      *  * "loaded" - new scene loaded.
      *  * "cleared" - current scene cleared.
@@ -40,6 +77,7 @@ declare module "dxf-viewer" {
      * @param eventHandler {function} Accepts event object.
      */
     Subscribe(eventName, eventHandler);
+
     /** Unsubscribe from previously subscribed event. The arguments should match previous
      * Subscribe() call.
      *

@@ -1,0 +1,31 @@
+.blocks__container {
+  display: flex;
+  /* 主轴方向*/
+  justify-content: space-between;
+  /* 交叉轴方向*/
+  align-items: stretch;
+  gap: 32px;
+}
+
+.blocks__block-table {
+  padding: 32px !important;
+  min-width: 600px;
+  background-color: white;
+}
+
+.blocks__block-table-header {
+  display: flex;
+}
+
+.blocks__block-table-title {
+  flex-grow: 1;
+}
+
+.blocks__block-viewer {
+  flex-grow: 1;
+
+  /* 主轴方向*/
+  justify-content: center;
+  /* 交叉轴方向*/
+  align-items: center;
+}

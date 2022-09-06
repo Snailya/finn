@@ -64,7 +64,6 @@ public class FilesController : ControllerBase
         var log = new RequestLog
         {
             Input = input,
-            Ip = Request.Host.Host,
             RequestType = "cost",
             Status = "pending"
         };
@@ -110,7 +109,6 @@ public class FilesController : ControllerBase
         var log = new RequestLog
         {
             Input = input,
-            Ip = Request.Host.Host,
             RequestType = "layout",
             Status = "pending"
         };

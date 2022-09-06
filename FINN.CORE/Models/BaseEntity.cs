@@ -15,8 +15,7 @@ public abstract class BaseEntity
     /// <summary>
     ///     When the entity is created.
     /// </summary>
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public DateTime? Created { get; set; }
+    public DateTime? Created { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     ///     Last modified time of the entity.

@@ -193,7 +193,10 @@ public class NetDxfService : IDxfService
 
     public IEnumerable<BlockDefinitionDto> ListBlockDefinitions(PaginationFilter filter)
     {
-        var blockDefinitions = _repository.ListAsync(filter).GetAwaiter().GetResult();
+        var blockDefinitions =
+            (filter.PageNumber == 0 || filter.PageSize == 0 ? _repository.ListAsync() : _repository.ListAsync(filter))
+            .GetAwaiter()
+            .GetResult();
         return blockDefinitions.Select(x => new BlockDefinitionDto
         {
             Id = x.Id, Name = x.Name, Filename = x.DxfFileName
@@ -210,11 +213,11 @@ public class NetDxfService : IDxfService
                     !x.Name.StartsWith("*") && !x.Name.StartsWith("_"))
                 .Select(x => x.Name).ToList();
 
-        foreach (var name in names.Where(name =>
-                     _repository.SingleOrDefaultAsync(x => x.Name == name).Result != null))
+        var errorNames = names.Where(name => _repository.SingleOrDefaultAsync(x => x.Name == name).Result != null)
+            .ToList();
+        if (errorNames.Any())
             throw new ArgumentException(
-                $"Block with the same name: {name} already exist. Please check the content and consider using update.",
-                nameof(name));
+                $"Block with the same name: [{string.Join(",", errorNames)}] already exist. Please check the content and consider using update.");
 
         var blocks = names.Select(name => CopyAndSaveBlock(doc.Blocks[name], name)).ToList();
         _repository.AddRangeAsync(blocks).Wait();
@@ -253,6 +256,10 @@ public class NetDxfService : IDxfService
         // save as individual files
         var file = new DxfDocument();
         file.Blocks.Add(exploded);
+
+        // draw at origin
+        var insert = new Insert(exploded);
+        file.AddEntity(insert);
 
         var dxfFileName = Path.Join(_blockFolder,
             Path.GetFileName(Path.GetTempFileName()).Replace(".tmp", ".dxf"));
