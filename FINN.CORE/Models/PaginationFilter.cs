@@ -7,6 +7,16 @@ public class PaginationFilter : JsonObject
     private int _pageNumber;
     private int _pageSize;
 
+    public PaginationFilter()
+    {
+    }
+
+    public PaginationFilter(int pageNumber, int pageSize)
+    {
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+    }
+
     [JsonPropertyName("pn")]
     public int PageNumber
     {
@@ -31,13 +41,8 @@ public class PaginationFilter : JsonObject
         }
     }
 
-    public PaginationFilter()
+    public override string ToString()
     {
-    }
-
-    public PaginationFilter(int pageNumber, int pageSize)
-    {
-        PageNumber = pageNumber;
-        PageSize = pageSize;
+        return $"PageNumber: {PageNumber}, PageSize: {PageSize}";
     }
 }

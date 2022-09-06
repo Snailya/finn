@@ -28,6 +28,9 @@ public class FilesController : ControllerBase
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Upload(IFormFile file)
     {
+        _logger.LogInformation("[{DateTime}] Request {Action} received. Parameter: {Parameter}", DateTime.Now,
+            nameof(Upload), file);
+
         // not allow empty body
         var extension = Path.GetExtension(file.FileName);
         if (file.Length <= 0 || (extension != ".dxf" && extension != ".xlsx")) return BadRequest();
@@ -48,11 +51,20 @@ public class FilesController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Download(int id)
     {
+        _logger.LogInformation("[{DateTime}] Request {Action} received. Parameter: {Parameter}", DateTime.Now,
+            nameof(Download), id);
+
         var log = await _repository.GetByIdAsync(id);
-        if (log is { Status: "done" })
+        if (log is { Status: "done", RequestType: "layout" })
         {
             var bytes = await System.IO.File.ReadAllBytesAsync(log.Output!);
-            return File(bytes, "text/plain", Path.GetFileName(log.Output));
+            var file = File(bytes, "text/plain", Path.GetFileName(log.Output));
+
+            _logger.LogInformation("[{DateTime}] Download file prepared. File Name: {FileName}. Size: {Size} ",
+                DateTime.Now,
+                file.FileDownloadName, file.FileContents.Length);
+
+            return file;
         }
 
         return BadRequest();
@@ -60,6 +72,8 @@ public class FilesController : ControllerBase
 
     private async Task<IActionResult> HandleDxfUpload(string input)
     {
+        _logger.LogInformation("Route to handle as dxf. The tmp file is stored at path: {Path}", input);
+
         // create log
         var log = new RequestLog
         {
@@ -105,6 +119,8 @@ public class FilesController : ControllerBase
 
     private async Task<IActionResult> HandleXlsxUpload(string input)
     {
+        _logger.LogInformation("Route to handle as xlsx. The tmp file is stored at path: {Path}", input);
+
         // create log
         var log = new RequestLog
         {

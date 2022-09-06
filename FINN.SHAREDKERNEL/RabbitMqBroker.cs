@@ -37,24 +37,34 @@ public class RabbitMqBroker : IBroker
         _channel.ExchangeDeclare(_exchange, ExchangeType.Direct);
 
         // initialize a response queue
-        _replyQueueName = _channel.QueueDeclare().QueueName;
+        _replyQueueName = _channel.QueueDeclare($"{factory.ClientProvidedName}-reply").QueueName;
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += (model, ea) =>
         {
-            if (!_callbackMapper.TryRemove(ea.BasicProperties.CorrelationId, out var tcs))
+            var props = ea.BasicProperties;
+            _logger.LogInformation(
+                "[{DateTime}] Reply received. Correlation Id: {CorrelationId}", DateTime.Now,
+                props.CorrelationId);
+
+            if (!_callbackMapper.TryRemove(props.CorrelationId, out var tcs))
                 return;
-            var body = ea.Body.ToArray();
-            var response = Encoding.UTF8.GetString(body);
+            var response = Encoding.UTF8.GetString(ea.Body.ToArray());
+            _logger.LogInformation(
+                "[{DateTime}] Reply decoded. Content: {Content}", DateTime.Now, response);
             tcs.TrySetResult(response);
         };
         _channel.BasicConsume(consumer: consumer, queue: _replyQueueName, autoAck: true);
+
         _logger.LogInformation(
-            "Reply Queue [{ReplyQueueName}] {Status}", _replyQueueName, "created");
+            "[{DateTime}] Reply queue created. Queue: {QueueName}", DateTime.Now, _replyQueueName);
     }
 
     public void Send(string routingKey, string message)
     {
         _channel.BasicPublish(_exchange, routingKey, null, Encoding.UTF8.GetBytes(message));
+
+        _logger.LogInformation("[{DateTime}] Message sent. Receiver: {Receiver}. Content: {Content}", DateTime.Now,
+            routingKey, message);
     }
 
     public Task<string> SendAsync(string routingKey, string message,
@@ -69,15 +79,24 @@ public class RabbitMqBroker : IBroker
 
         _channel.BasicPublish(_exchange, routingKey, props, Encoding.UTF8.GetBytes(message));
 
+        _logger.LogInformation(
+            "[{DateTime}] Message sent and waiting for reply. Receiver: {Receiver}. Content: {Content}", DateTime.Now,
+            routingKey, message);
+
         cancellationToken.Register(() => _callbackMapper.TryRemove(correlationId, out var tmp));
         return tcs.Task;
     }
 
-    public void Reply(string queue, string correlationId, string message)
+    public void Reply(string replyTo, string correlationId, string message)
     {
         var replyProps = _channel.CreateBasicProperties();
         replyProps.CorrelationId = correlationId;
-        _channel.BasicPublish("", queue, replyProps, Encoding.UTF8.GetBytes(message));
+        _channel.BasicPublish("", replyTo, replyProps, Encoding.UTF8.GetBytes(message));
+
+        _logger.LogInformation(
+            "[{DateTime}] Message replied. Receiver: {Receiver}. Correlation Id: {CorrelationId}. Content: {Content}",
+            DateTime.Now,
+            replyTo, correlationId, message);
     }
 
     public void RegisterHandler(string routingKey, Action<string, string, string> handler)
@@ -85,42 +104,49 @@ public class RabbitMqBroker : IBroker
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += (model, ea) =>
         {
+            // assure received
+            _channel.BasicAck(ea.DeliveryTag, false);
+
             var props = ea.BasicProperties;
+            var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+
+            _logger.LogInformation(
+                "[{DateTime}] Message received. Reply to: {ReplyTo}. Content: {Content}", DateTime.Now,
+                props.ReplyTo, message);
 
             try
             {
-                // assure received
-                _channel.BasicAck(ea.DeliveryTag, false);
-                
                 // handle
-                handler(props.ReplyTo, props.CorrelationId, Encoding.UTF8.GetString(ea.Body.ToArray()));
+                handler(props.ReplyTo, props.CorrelationId, message);
             }
             catch (JsonException e)
             {
                 Reply(props.ReplyTo, props.CorrelationId,
                     new Response(e.Message, ErrorCodes.DeserializeFailure).ToJson());
-                _logger.LogError(e.StackTrace);
+
+                _logger.LogError("[{DateTime}] Error occured. Type: {Type} Trace: {Trace}", DateTime.Now,
+                    nameof(JsonException), e.StackTrace);
             }
             catch (ArgumentException e)
             {
                 Reply(props.ReplyTo, props.CorrelationId,
                     new Response(e.Message, ErrorCodes.InvalidArgument).ToJson());
-                _logger.LogError(e.StackTrace);
+                _logger.LogError("[{DateTime}] Error occured. Type: {Type} Trace: {Trace}", DateTime.Now,
+                    nameof(ArgumentException), e.StackTrace);
             }
             catch (Exception e)
             {
                 Reply(props.ReplyTo, props.CorrelationId, new Response(e.Message, ErrorCodes.Unknown).ToJson());
-                _logger.LogError(e.StackTrace);
+                _logger.LogError("[{DateTime}] Error occured. Type: {Type} Trace: {Trace}", DateTime.Now,
+                    nameof(ArgumentException), e.StackTrace);
             }
         };
 
         var queue = _channel.QueueDeclare(routingKey).QueueName;
         _channel.QueueBind(queue, _exchange, routingKey);
-        _logger.LogInformation(
-            "[{QueueName}][{RoutingKey}] {Status}", queue, routingKey, "created");
+        _channel.BasicConsume(queue, false, consumer);
 
-        _channel.BasicConsume(queue, autoAck: false, consumer);
         _logger.LogInformation(
-            "[{QueueName}][{RoutingKey}] {Status}", queue, routingKey, "started");
+            "[{DateTime}] Handler registered. Route: {Route}, Queue: {QueueName}", DateTime.Now, routingKey, queue);
     }
 }

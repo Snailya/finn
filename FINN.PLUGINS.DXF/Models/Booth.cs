@@ -8,10 +8,10 @@ namespace FINN.PLUGINS.DXF.Models;
 
 public class Booth : DxfWrapper
 {
+    private readonly bool _colored = true;
     private readonly string _name;
     private readonly double _xLength;
     private readonly double _yLength;
-    private bool _colored = true;
 
     private bool IsConceptual => _xLength == 0 || _yLength == 0;
 

@@ -203,6 +203,18 @@ public class NetDxfService : IDxfService
         });
     }
 
+    public string DownloadBlockFile(int id)
+    {
+        var blockDefinition = _repository.GetByIdAsync(id).GetAwaiter().GetResult();
+        if (blockDefinition == null) throw new ArgumentException($"Block file with id {id} not exist.");
+
+        var sourceFileName = blockDefinition.DxfFileName;
+        var destFileName = Path.Join(Path.GetTempPath(), Path.GetFileName(sourceFileName));
+        File.Copy(blockDefinition.DxfFileName, destFileName);
+        
+        return destFileName;
+    }
+
     public IEnumerable<BlockDefinitionDto> AddBlockDefinitions(string filename, IEnumerable<string>? blockNames)
     {
         var doc = DxfDocument.Load(filename);
@@ -249,7 +261,6 @@ public class NetDxfService : IDxfService
     private BlockDefinition CopyAndSaveBlock(Block source, string name)
     {
         // explode
-
         var entities = source.ExplodeIteratively();
         var exploded = new Block(name, entities.Select(x => x.Clone() as EntityObject));
 

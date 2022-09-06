@@ -1,5 +1,4 @@
 using FINN.CORE.Interfaces;
-using FINN.DXF;
 using FINN.DXF.Data;
 using FINN.DXF.Models;
 using FINN.DXF.Services;
@@ -15,7 +14,7 @@ var host = Host.CreateDefaultBuilder(args).ConfigureServices((context, collectio
     collection.AddScoped<DbContext, AppDbContext>();
     collection.AddScoped<IRepository<BlockDefinition>, EfRepository<BlockDefinition>>();
     collection.AddSingleton<IDxfService, NetDxfService>();
-    collection.AddHostedService<HostedService>();
+    collection.AddHostedService<HostedDxfService>();
 }).Build();
 
 // Create database

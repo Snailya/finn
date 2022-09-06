@@ -21,10 +21,10 @@ public interface IBroker
     /// <summary>
     ///     Send reply message to the reply queue.
     /// </summary>
-    /// <param name="queue"></param>
+    /// <param name="replyTo"></param>
     /// <param name="correlationId"></param>
     /// <param name="message"></param>
-    void Reply(string queue, string correlationId, string message);
+    void Reply(string replyTo, string correlationId, string message);
 
     /// <summary>
     ///     Register handler for subscription.

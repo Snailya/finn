@@ -9,7 +9,7 @@ var host = Host.CreateDefaultBuilder(args).ConfigureServices((context, collectio
 {
     collection.AddSingleton<IBroker, RabbitMqBroker>();
     collection.AddSingleton<ExcelDataTableReader>();
-    collection.AddHostedService<HostedService>();
+    collection.AddHostedService<HostedExcelService>();
 }).Build();
 
 await host.RunAsync();

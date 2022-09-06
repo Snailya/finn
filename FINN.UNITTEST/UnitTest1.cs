@@ -8,7 +8,6 @@ using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;
 using netDxf.Tables;
-using RabbitMQ.Client;
 
 namespace FINN.UNITTEST;
 
@@ -213,21 +212,10 @@ public class Tests
         if (loaded != null) Assert.Pass();
     }
 
-    public class TestWrapper : DxfWrapper
-    {
-        public TestWrapper() : base(Layer.Default, Vector2d.Zero)
-        {
-            var point = new Point(Vector2.Zero);
-            var line = new Line(new Vector2(-50, 0), new Vector2(50, 0));
-            AddEntity(point);
-            AddEntity(line, false);
-        }
-    }
-
     [Test]
     public void JsonPageResponseTest()
     {
-        var obj = new PagedResponse<string>("", 0, "a", new PaginationFilter(5,5));
+        var obj = new PagedResponse<string>("", 0, "a", new PaginationFilter(5, 5));
         var str = obj.ToJson();
         var newObj = JsonSerializer.Deserialize<PagedResponse<string>>(str);
         Assert.That(newObj, Is.Not.Null);
@@ -251,13 +239,32 @@ public class Tests
         Assert.That(newObj, Is.Not.Null);
     }
 
+    [Test]
+    public void JsonTest()
+    {
+        var obj = new JsonClass(new JsonClassParameter { Number = 5 });
+        var str = JsonSerializer.Serialize(obj);
+        var newObj = JsonSerializer.Deserialize<JsonClass>(str);
+        Assert.That(newObj, Is.Not.Null);
+    }
+
+    public class TestWrapper : DxfWrapper
+    {
+        public TestWrapper() : base(Layer.Default, Vector2d.Zero)
+        {
+            var point = new Point(Vector2.Zero);
+            var line = new Line(new Vector2(-50, 0), new Vector2(50, 0));
+            AddEntity(point);
+            AddEntity(line, false);
+        }
+    }
+
     public class JsonClass
     {
         public JsonClass()
         {
-            
         }
-        
+
         public JsonClass(JsonClassParameter parameter)
         {
             Number = parameter.Number;
@@ -269,14 +276,5 @@ public class Tests
     public class JsonClassParameter
     {
         public int Number { get; set; }
-    }
-
-    [Test]
-    public void JsonTest()
-    {
-        var obj = new JsonClass(new JsonClassParameter(){Number = 5});
-        var str = JsonSerializer.Serialize(obj);
-        var newObj = JsonSerializer.Deserialize<JsonClass>(str);
-        Assert.That(newObj, Is.Not.Null);
     }
 }

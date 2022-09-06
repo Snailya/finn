@@ -13,6 +13,7 @@ public static class RoutingKeys
         public const string GetBlockDefinition = "dxf-service.get-block-definition";
         public const string AddBlockDefinitions = "dxf-service.add-block-definitions";
         public const string DeleteBlockDefinition = "dxf-service.delete-block-definition";
+        public const string DownloadBlockFile = "dxf-service.download-block-file";
         public const string DrawLayout = "dxf-service.draw-layout";
         public const string ReadLayout = "dxf-service.read-layout";
     }

@@ -13,17 +13,23 @@ namespace FINN.API.Controllers;
 public class BlocksController : ControllerBase
 {
     private readonly IBroker _broker;
+    private readonly ILogger<BlocksController> _logger;
 
-    public BlocksController(IBroker broker)
+    public BlocksController(ILogger<BlocksController> logger, IBroker broker)
     {
+        _logger = logger;
         _broker = broker;
     }
 
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] PaginationFilter filter)
     {
-        if ((filter.PageNumber == 0 && filter.PageSize != 0))
+        _logger.LogInformation("[{DateTime}] Request {Action} received. Parameter: {Parameter}", DateTime.Now,
+            nameof(List), filter);
+
+        if (filter.PageNumber == 0 && filter.PageSize != 0)
             return BadRequest("Page number can't be 0 if page size is specified.");
+
         if (filter.PageNumber != 0 && filter.PageSize == 0)
             return BadRequest("Page size can't be 0 if page number is specified ");
 
@@ -42,13 +48,21 @@ public class BlocksController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Download(int id)
     {
-        var response = JsonSerializer.Deserialize<Response<BlockDefinitionDto>>(
-            await _broker.SendAsync(RoutingKeys.DxfService.GetBlockDefinition, id.ToString()));
+        _logger.LogInformation("[{DateTime}] Request {Action} received. Parameter: {Parameter}", DateTime.Now,
+            nameof(Download), id);
 
-        if (response?.Code == 0)
+        var response = JsonSerializer.Deserialize<Response<string>>(
+            await _broker.SendAsync(RoutingKeys.DxfService.DownloadBlockFile, id.ToString()));
+
+        if (response is { Code: 0, Data: { } })
         {
-            var bytes = await System.IO.File.ReadAllBytesAsync(response.Data.Filename!);
-            return File(bytes, "text/plain", response.Data.Name);
+            var bytes = await System.IO.File.ReadAllBytesAsync(response.Data!);
+            var file = File(bytes, "text/plain", Path.GetFileName(response.Data));
+
+            _logger.LogInformation("[{DateTime}] Download file prepared. File Name: {FileName}. Size: {Size} ",
+                DateTime.Now,
+                file.FileDownloadName, file.FileContents.Length);
+            return file;
         }
 
         return BadRequest();
@@ -58,6 +72,9 @@ public class BlocksController : ControllerBase
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Add([FromForm] UploadBlockFileDto dto)
     {
+        _logger.LogInformation("[{DateTime}] Request {Action} received. Parameter: {Parameter}", DateTime.Now,
+            nameof(Add), dto);
+
         // do not allow empty file
         if (dto.File.Length <= 0) return BadRequest();
 
@@ -82,6 +99,9 @@ public class BlocksController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
+        _logger.LogInformation("[{DateTime}] Request {Action} received. Parameter: {Parameter}", DateTime.Now,
+            nameof(Delete), id);
+
         var response = JsonSerializer.Deserialize<Response>(
             await _broker.SendAsync(RoutingKeys.DxfService.DeleteBlockDefinition, id.ToString()));
         return Ok(response);

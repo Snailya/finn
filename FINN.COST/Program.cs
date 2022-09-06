@@ -1,5 +1,4 @@
 ﻿using FINN.CORE.Interfaces;
-using FINN.COST;
 using FINN.COST.Data;
 using FINN.COST.Models;
 using FINN.COST.Services;
@@ -17,7 +16,7 @@ var host = Host.CreateDefaultBuilder(args).ConfigureServices((context, collectio
     collection.AddScoped<DbContext, AppDbContext>();
     collection.AddScoped<IRepository<Cost>, EfRepository<Cost>>();
     collection.AddSingleton<CostService>();
-    collection.AddHostedService<HostedService>();
+    collection.AddHostedService<HostedCostService>();
 }).Build();
 
 await host.RunAsync();

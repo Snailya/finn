@@ -26,7 +26,8 @@ public class EfReadRepository<T> : IReadRepository<T> where T : class
 
     public async Task<List<T>> ListAsync(PaginationFilter filter, CancellationToken cancellationToken = default)
     {
-        return await DbContext.Set<T>().Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize!)
+        return await DbContext.Set<T>().OrderBy(x => (x as BaseEntity)!.Id)
+            .Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize!)
             .ToListAsync(cancellationToken);
     }
 

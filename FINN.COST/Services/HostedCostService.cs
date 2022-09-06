@@ -1,44 +1,30 @@
 ﻿using System.Text.Json;
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
-using FINN.COST.Services;
+using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.Dtos;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace FINN.COST;
+namespace FINN.COST.Services;
 
-public class HostedService : BackgroundService
+public class HostedCostService : HostedService
 {
     private readonly IBroker _broker;
-    private readonly ILogger<HostedService> _logger;
     private readonly CostService _service;
 
-    public HostedService(ILogger<HostedService> logger, IBroker broker, CostService service)
+    public HostedCostService(ILogger<HostedCostService> logger, IBroker broker, CostService service) : base(logger)
     {
-        _logger = logger;
         _broker = broker;
         _service = service;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Register handler for {Routing}", nameof(RoutingKeys.CostService));
-
         _broker.RegisterHandler(RoutingKeys.CostService.EstimateCost,
             HandleEstimateCost);
 
-        // monitor service status
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            _logger.LogTrace(
-                "{Service} is running at {Time}... Next check is in {Duration}s", nameof(HostedService),
-                DateTime.Now.ToLocalTime(), 30);
-            await Task.Delay(30000, stoppingToken);
-        }
-
-        _logger.LogInformation("Connection closed");
+        await base.ExecuteAsync(stoppingToken);
     }
 
     #region Handlers

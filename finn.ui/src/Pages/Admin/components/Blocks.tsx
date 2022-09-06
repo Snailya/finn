@@ -22,7 +22,7 @@ export const Blocks: React.FC = () => {
   const [data, setData] = useState<BlockDefinition[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string>();
 
-  useEffect(() => {
+  const load = useCallback(() => {
     apiFetch(`/blocks`)
       .then((res) => res.json())
       .then((body) => {
@@ -32,11 +32,16 @@ export const Blocks: React.FC = () => {
       });
   }, []);
 
+  useEffect(() => {
+    load();
+  }, [load]);
+
   const onUploadChange = (info: UploadChangeParam<UploadFile>) => {
     if (info.file.status === "done") {
-      if (info.file.response.code === 0)
+      if (info.file.response.code === 0) {
         message.success(`${info.file.name}上传成功`);
-      else
+        load();
+      } else
         message.error(
           `${info.file.name}上传失败: ${info.file.response.msg}`,
           10
