@@ -1,0 +1,31 @@
+.formulas {
+  display: flex;
+
+  gap: 32px;
+}
+
+.formulas__formula-table {
+  padding: 32px !important;
+  background-color: white;
+
+  flex-grow: 1;
+}
+
+.formulas__formula-table .hint{
+  color: #00000073;
+  font-size: 14px;
+}
+
+.formulas__formula-description {
+  padding: 32px !important;
+
+  background-color: white;
+}
+
+.ant-descriptions-header {
+  margin-bottom: 0 !important;
+}
+
+.ant-descriptions-title {
+  padding: 16px;
+}

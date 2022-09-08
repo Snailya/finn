@@ -20,6 +20,10 @@ public static class RoutingKeys
 
     public static class CostService
     {
+        public const string ListFormulas = "cost-service.list-formulas";
+        public const string AddFormula = "cost-service.add-formula";
+        public const string UpdateFormula = "cost-service.update-formula";
+        public const string DeleteFormula = "cost-service.delete-formula";
         public const string EstimateCost = "cost-service.estimate-cost";
     }
 }

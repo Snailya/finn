@@ -87,12 +87,12 @@ export const Blocks: React.FC = () => {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" onClick={() => onPreviewClick(record.id)}>
+          <Typography.Link onClick={() => onPreviewClick(record.id)}>
             预览
-          </Button>
-          <Button type="link" danger onClick={() => onDeleteClick(record)}>
+          </Typography.Link>
+          <Typography.Link type="danger" onClick={() => onDeleteClick(record)}>
             删除
-          </Button>
+          </Typography.Link>
         </Space>
       ),
     },

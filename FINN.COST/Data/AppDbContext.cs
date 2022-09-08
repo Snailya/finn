@@ -9,5 +9,11 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Cost> Costs { get; set; }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Formula>()
+            .HasAlternateKey(x => x.Type);
+    }
+
+    public DbSet<Formula> Formulas { get; set; }
 }

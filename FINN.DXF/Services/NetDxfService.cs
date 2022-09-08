@@ -211,7 +211,7 @@ public class NetDxfService : IDxfService
         var sourceFileName = blockDefinition.DxfFileName;
         var destFileName = Path.Join(Path.GetTempPath(), Path.GetFileName(sourceFileName));
         File.Copy(blockDefinition.DxfFileName, destFileName);
-        
+
         return destFileName;
     }
 
@@ -233,7 +233,6 @@ public class NetDxfService : IDxfService
 
         var blocks = names.Select(name => CopyAndSaveBlock(doc.Blocks[name], name)).ToList();
         _repository.AddRangeAsync(blocks).Wait();
-        _repository.SaveChangesAsync().Wait();
 
         return blocks.Select(x => new BlockDefinitionDto
             { Id = x.Id, Filename = x.DxfFileName, Name = x.Name });

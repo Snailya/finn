@@ -20,6 +20,7 @@ public class EfRepository<T> : EfReadRepository<T>, IRepository<T> where T : cla
     public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities,
         CancellationToken cancellationToken = default)
     {
+        // todo: need to use context factory as it should be scoped
         DbContext.Set<T>().AddRange(entities);
         await SaveChangesAsync(cancellationToken);
         return entities;

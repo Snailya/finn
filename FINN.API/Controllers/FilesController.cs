@@ -98,7 +98,7 @@ public class FilesController : ControllerBase
         }
 
         var cost =
-            JsonSerializer.Deserialize<Response<CostDto>>(await _broker.SendAsync(
+            JsonSerializer.Deserialize<Response<IEnumerable<CostDto>>>(await _broker.SendAsync(
                 RoutingKeys.CostService.EstimateCost,
                 geo.Data.ToJson()))!;
         if (cost.Code != 0)

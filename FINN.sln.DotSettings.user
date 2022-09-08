@@ -1,7 +1,7 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005Csnailya_005CRiderProjects_005CFINN_005C3rd_005CnetDxf_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AExecutionContext_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2022_002E2_003Fresharper_002Dhost_003FSourcesCache_003Fc1da7b6c7c71a954fe3eb2531c6476711b3e6d93a8d76795386d326bb9dbc_003FExecutionContext_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=321885a7_002D1672_002D446a_002Db4b7_002Dddfa47e86ed2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GroupLocationChangeWillUpdateItemLocation" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=321885a7_002D1672_002D446a_002Db4b7_002Dddfa47e86ed2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GroupLocationChangeWillUpdateItemLocation" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.GroupLocationChangeWillUpdateItemLocation&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.OuterBoundingBox&lt;/TestId&gt;&#xD;
@@ -13,6 +13,7 @@
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.JsonResponseTest&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.JsonPageResponseTest&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.JsonPaginationFilterTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.XFuncTest.TestParse&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=702442f8_002Da025_002D453b_002Da118_002Ddc70aedc9d8f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="JsonSerializeTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
@@ -28,10 +29,16 @@
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.SaveBinaryTest&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=8adc085c_002Dd5d5_002D4cba_002D95a5_002D3bd0fdee4aa4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TestParse" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.XFuncTest.TestParse&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=cbca2aa4_002D6408_002D4f33_002D9122_002D88972616b226/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="SaveBinaryTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.SaveBinaryTest&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.Tests.JsonTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::3F295927-F53D-4161-BC46-F6BD116077F2::net6.0::FINN.UNITTEST.XFuncTest.TestParse&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>
