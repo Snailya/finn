@@ -35,7 +35,7 @@ public class HostedCostService : HostedService
 
     private void HandleListFormulas(string routingKey, string correlationId, string message)
     {
-        var formulas = _service.ListFormulas();
+        var formulas = _service.ListFormulas().GetAwaiter().GetResult();
         var response =
             new Response<IEnumerable<FormulaDto>>("", 0, formulas);
         _broker.Reply(routingKey, correlationId, response.ToJson());
@@ -45,7 +45,7 @@ public class HostedCostService : HostedService
     {
         var dto = JsonSerializer.Deserialize<FormulaDto>(message);
         if (dto == null) throw new ArgumentNullException();
-        var formulas = _service.UpdateFormula(dto);
+        var formulas = _service.UpdateFormula(dto).GetAwaiter().GetResult();
         var response = new Response<FormulaDto>("", 0, formulas);
         _broker.Reply(routingKey, correlationId, response.ToJson());
     }
@@ -54,7 +54,7 @@ public class HostedCostService : HostedService
     {
         var dto = JsonSerializer.Deserialize<FormulaDto>(message);
         if (dto == null) throw new ArgumentNullException();
-        var formulas = _service.AddFormula(dto);
+        var formulas = _service.AddFormula(dto).GetAwaiter().GetResult();
         var response = new Response<FormulaDto>("", 0, formulas);
         _broker.Reply(routingKey, correlationId, response.ToJson());
     }
@@ -62,7 +62,7 @@ public class HostedCostService : HostedService
     private void HandleDeleteFormula(string routingKey, string correlationId, string idStr)
     {
         var id = int.Parse(idStr);
-        _service.DeleteFormulaById(id);
+        _service.DeleteFormulaById(id).Wait();
         var response = new Response("", 0);
         _broker.Reply(routingKey, correlationId, response.ToJson());
     }

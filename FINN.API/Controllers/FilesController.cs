@@ -3,6 +3,7 @@ using FINN.API.Models;
 using FINN.CORE;
 using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
+using FINN.PLUGINS.EFCORE;
 using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.Dtos;
 using Microsoft.AspNetCore.Mvc;
@@ -14,14 +15,14 @@ namespace FINN.API.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly IBroker _broker;
+    private readonly IRepositoryFactory<RequestLog> _factory;
     private readonly ILogger<FilesController> _logger;
-    private readonly IRepository<RequestLog> _repository;
 
-    public FilesController(ILogger<FilesController> logger, IBroker broker, IRepository<RequestLog> repository)
+    public FilesController(ILogger<FilesController> logger, IBroker broker, IRepositoryFactory<RequestLog> factory)
     {
         _logger = logger;
         _broker = broker;
-        _repository = repository;
+        _factory = factory;
     }
 
     [HttpPost("upload")]
@@ -54,7 +55,8 @@ public class FilesController : ControllerBase
         _logger.LogInformation("[{DateTime}] Request {Action} received. Parameter: {Parameter}", DateTime.Now,
             nameof(Download), id);
 
-        var log = await _repository.GetByIdAsync(id);
+        using var repository = _factory.CreateReadRepository();
+        var log = await repository.GetByIdAsync(id);
         if (log is { Status: "done", RequestType: "layout" })
         {
             var bytes = await System.IO.File.ReadAllBytesAsync(log.Output!);
@@ -74,6 +76,7 @@ public class FilesController : ControllerBase
     {
         _logger.LogInformation("Route to handle as dxf. The tmp file is stored at path: {Path}", input);
 
+        using var repository = _factory.CreateRepository();
         // create log
         var log = new RequestLog
         {
@@ -81,8 +84,8 @@ public class FilesController : ControllerBase
             RequestType = "cost",
             Status = "pending"
         };
-        await _repository.AddAsync(log);
-        await _repository.SaveChangesAsync();
+        await repository.AddAsync(log);
+        await repository.SaveChangesAsync();
 
         // ask microservice to handle
         var geo = JsonSerializer.Deserialize<Response<IEnumerable<GeometryDto>>>(
@@ -91,8 +94,8 @@ public class FilesController : ControllerBase
         {
             log.Output = geo.Message;
             log.Status = "error";
-            await _repository.UpdateAsync(log);
-            await _repository.SaveChangesAsync();
+            await repository.UpdateAsync(log);
+            await repository.SaveChangesAsync();
 
             return Ok(geo);
         }
@@ -105,21 +108,23 @@ public class FilesController : ControllerBase
         {
             log.Output = cost.Message;
             log.Status = "error";
-            await _repository.UpdateAsync(log);
-            await _repository.SaveChangesAsync();
+            await repository.UpdateAsync(log);
+            await repository.SaveChangesAsync();
             return Ok(cost);
         }
 
         log.Output = cost.Data.ToJson();
         log.Status = "done";
-        await _repository.UpdateAsync(log);
-        await _repository.SaveChangesAsync();
+        await repository.UpdateAsync(log);
+        await repository.SaveChangesAsync();
         return Ok(cost);
     }
 
     private async Task<IActionResult> HandleXlsxUpload(string input)
     {
         _logger.LogInformation("Route to handle as xlsx. The tmp file is stored at path: {Path}", input);
+
+        using var repository = _factory.CreateRepository();
 
         // create log
         var log = new RequestLog
@@ -128,8 +133,8 @@ public class FilesController : ControllerBase
             RequestType = "layout",
             Status = "pending"
         };
-        await _repository.AddAsync(log);
-        await _repository.SaveChangesAsync();
+        await repository.AddAsync(log);
+        await repository.SaveChangesAsync();
 
         // ask microservice to handle
         var getLayoutResponse = JsonSerializer.Deserialize<Response<LayoutDto>>(
@@ -139,8 +144,8 @@ public class FilesController : ControllerBase
             // update status
             log.Output = getLayoutResponse.Message;
             log.Status = "error";
-            await _repository.UpdateAsync(log);
-            await _repository.SaveChangesAsync();
+            await repository.UpdateAsync(log);
+            await repository.SaveChangesAsync();
 
             return Ok(getLayoutResponse);
         }
@@ -153,8 +158,8 @@ public class FilesController : ControllerBase
             // update status
             log.Output = drawLayoutResponse.Message;
             log.Status = "error";
-            await _repository.UpdateAsync(log);
-            await _repository.SaveChangesAsync();
+            await repository.UpdateAsync(log);
+            await repository.SaveChangesAsync();
 
             return Ok(drawLayoutResponse);
         }
@@ -162,8 +167,8 @@ public class FilesController : ControllerBase
         // convert to download link
         log.Output = drawLayoutResponse.Data;
         log.Status = "done";
-        await _repository.UpdateAsync(log);
-        await _repository.SaveChangesAsync();
+        await repository.UpdateAsync(log);
+        await repository.SaveChangesAsync();
 
         return AcceptedAtAction(nameof(Download), new { id = log.Id }, new Response<int>("", 0, log.Id));
     }

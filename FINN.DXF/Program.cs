@@ -5,14 +5,12 @@ using FINN.DXF.Services;
 using FINN.PLUGINS.EFCORE;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 var host = Host.CreateDefaultBuilder(args).ConfigureServices((context, collection) =>
 {
     collection.AddSingleton<IBroker, RabbitMqBroker>();
-    collection.AddDbContext<AppDbContext>(context.Configuration.GetConnectionString("SqliteConnection"));
-    collection.AddScoped<DbContext, AppDbContext>();
-    collection.AddScoped<IRepository<BlockDefinition>, EfRepository<BlockDefinition>>();
+    collection.AddDbContextFactory<AppDbContext>(context.Configuration.GetConnectionString("SqliteConnection"));
+    collection.AddScoped<IRepositoryFactory<BlockDefinition>, RepositoryFactory<BlockDefinition, AppDbContext>>();
     collection.AddSingleton<IDxfService, NetDxfService>();
     collection.AddHostedService<HostedDxfService>();
 }).Build();

@@ -1,7 +1,7 @@
 using FINN.API.Dtos;
 using FINN.API.Models;
-using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
+using FINN.PLUGINS.EFCORE;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FINN.API.Controllers;
@@ -11,12 +11,12 @@ namespace FINN.API.Controllers;
 public class LogsController : ControllerBase
 {
     private readonly ILogger<LogsController> _logger;
-    private readonly IRepository<RequestLog> _repository;
+    private readonly IRepositoryFactory<RequestLog> _factory;
 
-    public LogsController(ILogger<LogsController> logger, IRepository<RequestLog> repository)
+    public LogsController(ILogger<LogsController> logger, IRepositoryFactory<RequestLog> factory)
     {
         _logger = logger;
-        _repository = repository;
+        _factory = factory;
     }
 
     [HttpGet]
@@ -25,7 +25,8 @@ public class LogsController : ControllerBase
         _logger.LogInformation("[{DateTime}] Request {Action} received", DateTime.Now,
             nameof(List));
 
-        var logs = await _repository.ListAsync();
+        using var repository = _factory.CreateRepository();
+        var logs = await repository.ListAsync();
         var response = new Response<IEnumerable<RequestLogDto>>("", 0, logs.Select(x => new RequestLogDto
         {
             Id = x.Id,

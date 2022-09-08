@@ -4,6 +4,7 @@ using FINN.DXF.Models;
 using FINN.PLUGINS.DXF;
 using FINN.PLUGINS.DXF.Models;
 using FINN.PLUGINS.DXF.Utils;
+using FINN.PLUGINS.EFCORE;
 using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Interfaces;
@@ -16,18 +17,20 @@ namespace FINN.DXF.Services;
 
 public class NetDxfService : IDxfService
 {
+    private readonly IRepositoryFactory<BlockDefinition> _factory;
     private const double Gutter = 1600;
     private readonly string _blockFolder;
-    private readonly IRepository<BlockDefinition> _repository;
 
-    public NetDxfService(IRepository<BlockDefinition> repository, IConfiguration configuration)
+    public NetDxfService(IRepositoryFactory<BlockDefinition> factory, IConfiguration configuration)
     {
-        _repository = repository;
+        _factory = factory;
         _blockFolder = configuration["storage"];
     }
 
     public string DrawLayout(LayoutDto dto)
     {
+        using var repository = _factory.CreateReadRepository();
+
         const int gutter = 3200;
 
         var dxf = DocUtil.CreateDoc();
@@ -67,7 +70,7 @@ public class NetDxfService : IDxfService
             if (item.SubProcess == null) return;
             var blocks = item.SubProcess.Where(x =>
                 x.XLength == 0 && x.YLength == 0 &&
-                _repository.SingleOrDefaultAsync(bd => bd.Name == x.Name).Result != null).ToList();
+                repository.SingleOrDefaultAsync(bd => bd.Name == x.Name).Result != null).ToList();
             var booths = item.SubProcess.Except(blocks).ToList();
 
             // handle booths first
@@ -84,7 +87,7 @@ public class NetDxfService : IDxfService
                     gutter);
                 blocks.ForEach(x =>
                 {
-                    var bd = _repository.SingleOrDefaultAsync(bd => bd.Name == x.Name).Result!;
+                    var bd = repository.SingleOrDefaultAsync(bd => bd.Name == x.Name).Result!;
                     var doc = DxfDocument.Load(bd.DxfFileName);
                     var block = doc.Blocks.Items.Single(b => b.Name == bd.Name);
                     var insert = new Insert(block);
@@ -184,28 +187,36 @@ public class NetDxfService : IDxfService
         return geos;
     }
 
-    public void DeleteBlockDefinitionById(int id)
+    public async Task DeleteBlockDefinitionById(int id)
     {
-        var blockDefinition = _repository.GetByIdAsync(id).GetAwaiter().GetResult();
+        using var repository = _factory.CreateRepository();
+
+        var blockDefinition = await repository.GetByIdAsync(id);
         if (blockDefinition == null) throw new ArgumentNullException();
-        _repository.DeleteAsync(blockDefinition).Wait();
+        await repository.DeleteAsync(blockDefinition);
+        await repository.SaveChangesAsync();
     }
 
-    public IEnumerable<BlockDefinitionDto> ListBlockDefinitions(PaginationFilter filter)
+    public async Task<IEnumerable<BlockDefinitionDto>> ListBlockDefinitions(PaginationFilter filter)
     {
+        using var repository = _factory.CreateReadRepository();
+
         var blockDefinitions =
-            (filter.PageNumber == 0 || filter.PageSize == 0 ? _repository.ListAsync() : _repository.ListAsync(filter))
-            .GetAwaiter()
-            .GetResult();
+            filter.PageNumber == 0 || filter.PageSize == 0
+                ? await repository.ListAsync()
+                : await repository.ListAsync(filter);
+
         return blockDefinitions.Select(x => new BlockDefinitionDto
         {
             Id = x.Id, Name = x.Name, Filename = x.DxfFileName
         });
     }
 
-    public string DownloadBlockFile(int id)
+    public async Task<string> DownloadBlockFile(int id)
     {
-        var blockDefinition = _repository.GetByIdAsync(id).GetAwaiter().GetResult();
+        using var repository = _factory.CreateReadRepository();
+
+        var blockDefinition = await repository.GetByIdAsync(id);
         if (blockDefinition == null) throw new ArgumentException($"Block file with id {id} not exist.");
 
         var sourceFileName = blockDefinition.DxfFileName;
@@ -215,8 +226,11 @@ public class NetDxfService : IDxfService
         return destFileName;
     }
 
-    public IEnumerable<BlockDefinitionDto> AddBlockDefinitions(string filename, IEnumerable<string>? blockNames)
+    public async Task<IEnumerable<BlockDefinitionDto>> AddBlockDefinitions(string filename,
+        IEnumerable<string>? blockNames)
     {
+        using var repository = _factory.CreateRepository();
+
         var doc = DxfDocument.Load(filename);
         var names = blockNames?.ToList();
         names = names != null && names.Any()
@@ -225,22 +239,25 @@ public class NetDxfService : IDxfService
                     !x.Name.StartsWith("*") && !x.Name.StartsWith("_"))
                 .Select(x => x.Name).ToList();
 
-        var errorNames = names.Where(name => _repository.SingleOrDefaultAsync(x => x.Name == name).Result != null)
+        var errorNames = names.Where(name => repository.SingleOrDefaultAsync(x => x.Name == name).Result != null)
             .ToList();
         if (errorNames.Any())
             throw new ArgumentException(
                 $"Block with the same name: [{string.Join(",", errorNames)}] already exist. Please check the content and consider using update.");
 
         var blocks = names.Select(name => CopyAndSaveBlock(doc.Blocks[name], name)).ToList();
-        _repository.AddRangeAsync(blocks).Wait();
+        await repository.AddRangeAsync(blocks);
+        await repository.SaveChangesAsync();
 
         return blocks.Select(x => new BlockDefinitionDto
             { Id = x.Id, Filename = x.DxfFileName, Name = x.Name });
     }
 
-    public BlockDefinitionDto? GetBlockDefinition(int id)
+    public async Task<BlockDefinitionDto?> GetBlockDefinition(int id)
     {
-        var blockDefinition = _repository.GetByIdAsync(id).GetAwaiter().GetResult();
+        using var repository = _factory.CreateReadRepository();
+
+        var blockDefinition = await repository.GetByIdAsync(id);
         return blockDefinition == null
             ? null
             : new BlockDefinitionDto

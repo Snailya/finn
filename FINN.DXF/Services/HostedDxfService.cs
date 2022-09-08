@@ -40,7 +40,7 @@ public class HostedDxfService : HostedService
         var dto = JsonSerializer.Deserialize<PaginationFilter>(message);
         if (dto == null) throw new ArgumentNullException();
 
-        var blockDefinitions = _service.ListBlockDefinitions(dto);
+        var blockDefinitions = _service.ListBlockDefinitions(dto).GetAwaiter().GetResult();
         var response =
             new PagedResponse<IEnumerable<BlockDefinitionDto>>("", 0, blockDefinitions, dto);
         _broker.Reply(routingKey, correlationId, response.ToJson());
@@ -74,7 +74,7 @@ public class HostedDxfService : HostedService
     {
         var dto = JsonSerializer.Deserialize<AddBlockDefinitionsDto>(message);
         if (dto == null || string.IsNullOrEmpty(dto.Filename)) throw new ArgumentException();
-        var blockDefinitions = _service.AddBlockDefinitions(dto.Filename, dto.BlockNames);
+        var blockDefinitions = _service.AddBlockDefinitions(dto.Filename, dto.BlockNames).GetAwaiter().GetResult();
         var response = new Response<IEnumerable<BlockDefinitionDto>>("", 0, blockDefinitions);
         _broker.Reply(routingKey, correlationId, response.ToJson());
     }
@@ -82,7 +82,7 @@ public class HostedDxfService : HostedService
     private void HandleGetBlockDefinition(string routingKey, string correlationId, string idStr)
     {
         var id = int.Parse(idStr);
-        var blockDefinition = _service.GetBlockDefinition(id);
+        var blockDefinition = _service.GetBlockDefinition(id).GetAwaiter().GetResult();
         var response = new Response<BlockDefinitionDto>("", 0, blockDefinition);
         _broker.Reply(routingKey, correlationId, response.ToJson());
     }
@@ -90,7 +90,7 @@ public class HostedDxfService : HostedService
     private void HandleDownloadBlock(string routingKey, string correlationId, string idStr)
     {
         var id = int.Parse(idStr);
-        var filePath = _service.DownloadBlockFile(id);
+        var filePath = _service.DownloadBlockFile(id).GetAwaiter().GetResult();
         var response = new Response<string>("", 0, filePath);
         _broker.Reply(routingKey, correlationId, response.ToJson());
     }

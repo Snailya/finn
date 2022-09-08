@@ -24,7 +24,7 @@ public interface IDxfService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    BlockDefinitionDto? GetBlockDefinition(int id);
+    Task<BlockDefinitionDto?> GetBlockDefinition(int id);
 
     /// <summary>
     ///     Add block definition to database by block names. If blockNames is null, all blocks inside the file will be added.
@@ -32,25 +32,25 @@ public interface IDxfService
     /// <param name="filename"></param>
     /// <param name="blockNames"></param>
     /// <returns></returns>
-    IEnumerable<BlockDefinitionDto> AddBlockDefinitions(string filename, IEnumerable<string>? blockNames);
+    Task<IEnumerable<BlockDefinitionDto>> AddBlockDefinitions(string filename, IEnumerable<string>? blockNames);
 
     /// <summary>
     ///     Delete a block definition from database by Id.
     /// </summary>
     /// <param name="id"></param>
-    void DeleteBlockDefinitionById(int id);
+    Task DeleteBlockDefinitionById(int id);
 
     /// <summary>
     ///     List a page of the block definitions.
     /// </summary>
     /// <param name="filter"></param>
     /// <returns></returns>
-    IEnumerable<BlockDefinitionDto> ListBlockDefinitions(PaginationFilter filter);
+    Task<IEnumerable<BlockDefinitionDto>> ListBlockDefinitions(PaginationFilter filter);
 
     /// <summary>
     ///     Prepare a downloaded file in tmp folder.
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    string DownloadBlockFile(int id);
+    Task<string> DownloadBlockFile(int id);
 }

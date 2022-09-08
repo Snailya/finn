@@ -3,15 +3,13 @@ using FINN.API.Models;
 using FINN.CORE.Interfaces;
 using FINN.PLUGINS.EFCORE;
 using FINN.SHAREDKERNEL;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddSingleton<IBroker, RabbitMqBroker>();
-builder.Services.AddDbContext<AppDbContext>(builder.Configuration.GetConnectionString("SqliteConnection"));
-builder.Services.AddScoped<DbContext, AppDbContext>();
-builder.Services.AddScoped<IRepository<RequestLog>, EfRepository<RequestLog>>();
+builder.Services.AddDbContextFactory<AppDbContext>(builder.Configuration.GetConnectionString("SqliteConnection"));
+builder.Services.AddScoped<IRepositoryFactory<RequestLog>, RepositoryFactory<RequestLog, AppDbContext>>();
 
 builder.Services.AddCors(options =>
 {
