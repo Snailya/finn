@@ -5,21 +5,16 @@ import { Button, message, Space, Table, Upload, Typography } from "antd";
 import type { UploadChangeParam, UploadFile } from "antd/lib/upload";
 import type { ColumnsType } from "antd/es/table";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { apiFetch } from "../../../service";
 import { Viewer } from "./Viewer";
-
-interface BlockDefinition {
-  id: number;
-  name: string;
-  filename: string;
-}
+import { BlockDefinitionDto, TableRecord } from "dto";
 
 const { Title } = Typography;
 
 export const Blocks: React.FC = () => {
-  const [data, setData] = useState<BlockDefinition[]>([]);
+  const [data, setData] = useState<TableRecord<BlockDefinitionDto>[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string>();
 
   const load = useCallback(() => {
@@ -56,7 +51,7 @@ export const Blocks: React.FC = () => {
   }, []);
 
   const onDeleteClick = useCallback(
-    (block: BlockDefinition) => {
+    (block: TableRecord<BlockDefinitionDto>) => {
       apiFetch(`/blocks/${block.id}`, { method: "DELETE" })
         .then((res) => res.json())
         .then((body) => {
@@ -76,15 +71,13 @@ export const Blocks: React.FC = () => {
     [data]
   );
 
-  const columns: ColumnsType<BlockDefinition> = [
+  const columns: ColumnsType<TableRecord<BlockDefinitionDto>> = [
     {
       title: "名称",
       dataIndex: "name",
-      key: "name",
     },
     {
       title: "动作",
-      key: "actions",
       render: (_, record) => (
         <Space size="middle">
           <Typography.Link onClick={() => onPreviewClick(record.id)}>

@@ -87,3 +87,33 @@ declare module "dxf-viewer" {
     Unsubscribe(eventName, eventHandler);
   }
 }
+
+declare module "dto" {
+  export interface RequestLogDto {
+    id: number;
+    status: string;
+    input: string;
+    output: string;
+    type: string;
+    created: string;
+  }
+
+  export interface CostDto {
+    category: string;
+    value: number;
+  }
+
+  export interface FormulaDto {
+    id: number;
+    type: string;
+    expression: string;
+  }
+
+  export interface BlockDefinitionDto {
+    id: number;
+    name: string;
+    filename: string;
+  }
+
+  export type TableRecord<T> = T & { key: string | number };
+}

@@ -4,7 +4,7 @@ import { Blocks } from "./components/Blocks";
 import { Formulas } from "./components/Formulas";
 import { Logs } from "./components/Logs";
 
-const Admin: React.FC = () => {
+export const Admin: React.FC = () => {
   return (
     <div className="admin">
       <Blocks />
@@ -15,5 +15,3 @@ const Admin: React.FC = () => {
     </div>
   );
 };
-
-export default Admin;

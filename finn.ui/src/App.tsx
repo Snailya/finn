@@ -1,8 +1,8 @@
 import { Layout } from "antd";
 import { Content, Footer, Header } from "antd/lib/layout/layout";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Admin from "./pages/admin/Admin";
-import Home from "./pages/home/Home";
+import { Admin } from "./pages/admin/Admin";
+import { Home } from "./pages/home/Home";
 import "./App.css";
 
 export default function App() {
@@ -19,9 +19,7 @@ export default function App() {
           </BrowserRouter>
         </div>
       </Content>
-      <Footer style={{ textAlign: "center" }}>
-        ©2022 Coded by JetSnail
-      </Footer>
+      <Footer style={{ textAlign: "center" }}>©2022 Coded by JetSnail</Footer>
     </Layout>
   );
 }

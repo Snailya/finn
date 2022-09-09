@@ -10,19 +10,11 @@ import type { ColumnsType } from "antd/es/table";
 import React, { useEffect, useState } from "react";
 import { apiFetch } from "../../../service";
 import { red, blue, green } from "@ant-design/colors";
+import { RequestLogDto, TableRecord } from "dto";
 
 const { Title } = Typography;
 
-interface RequestLog {
-  id: number;
-  type: string;
-  status: string;
-  input: string;
-  output: string;
-  created: string;
-}
-
-const columns: ColumnsType<RequestLog> = [
+const columns: ColumnsType<TableRecord<RequestLogDto>> = [
   {
     title: "时间",
     dataIndex: "created",
@@ -32,7 +24,7 @@ const columns: ColumnsType<RequestLog> = [
     title: "类型",
     dataIndex: "type",
     key: "type",
-    render: (value: string, record: RequestLog) => (
+    render: (value: string, record: TableRecord<RequestLogDto>) => (
       <Tag color={value === "layout" ? "geekblue" : "green"}>
         {value.toUpperCase()}
       </Tag>
@@ -42,7 +34,7 @@ const columns: ColumnsType<RequestLog> = [
     title: "状态",
     dataIndex: "status",
     key: "status",
-    render: (value: string, record: RequestLog) => {
+    render: (value: string, record: TableRecord<RequestLogDto>) => {
       switch (value) {
         case "pending":
           return <SyncOutlined spin style={{ color: blue[5] }} />;
@@ -68,7 +60,8 @@ const columns: ColumnsType<RequestLog> = [
         value: "error",
       },
     ],
-    onFilter: (value: any, record) => record.status.indexOf(value) === 0,
+    onFilter: (value: any, record: TableRecord<RequestLogDto>) =>
+      record.status.indexOf(value) === 0,
   },
   {
     title: "输入",
@@ -83,7 +76,7 @@ const columns: ColumnsType<RequestLog> = [
 ];
 
 export const Logs: React.FC = () => {
-  const [data, setData] = useState<RequestLog[]>([]);
+  const [data, setData] = useState<TableRecord<RequestLogDto>[]>([]);
 
   useEffect(() => {
     apiFetch("/logs")

@@ -16,3 +16,13 @@
 
 # database
 *.sqlite*
+.vs/FINN/DesignTimeBuild/.dtbcache.v2
+.vs/FINN/FileContentIndex/792a6eb2-8bfc-412b-a539-4f953841bcac.vsidx
+.vs/FINN/FileContentIndex/27217e1c-9f0f-42e9-b8ff-d43aa1802ab1.vsidx
+.vs/FINN/FileContentIndex/51851a5a-b4cf-4413-8909-47d2d0cc7f71.vsidx
+.vs/FINN/FileContentIndex/b618c332-1ecd-4361-b922-8ae8ae1eae9f.vsidx
+.vs/FINN/FileContentIndex/read.lock
+.vs/FINN/v17/.futdcache.v2
+.vs/FINN/v17/.suo
+.vs/ProjectEvaluation/finn.metadata.v5.1
+.vs/ProjectEvaluation/finn.projects.v5.1

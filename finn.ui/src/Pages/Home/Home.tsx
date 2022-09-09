@@ -11,16 +11,13 @@ import { RcFile, UploadChangeParam, UploadFile } from "antd/lib/upload";
 import { useState, useCallback } from "react";
 
 import { saveAs } from "../../service";
+import { CostTable } from "./compoents/CostTable";
+import { CostDto, TableRecord } from "dto";
 
 const { Dragger } = Upload;
 
-interface ResultProps {
-  platform: number;
-  booth: number;
-}
-
-function Home() {
-  const [result, setResult] = useState<ResultProps>();
+export const Home: React.FC = () => {
+  const [cost, setCost] = useState<TableRecord<CostDto>[]>();
   const [isDownloadIconVisible, setIsDownloadIconVisible] =
     useState<boolean>(false);
 
@@ -43,7 +40,7 @@ function Home() {
     }
 
     if (status === "removed") {
-      setResult(undefined);
+      setCost(undefined);
       return;
     }
 
@@ -63,20 +60,20 @@ function Home() {
 
       saveAs(info.file.url, info.file.fileName ?? "");
     } else if (info.file.name?.endsWith(".dxf")) {
-      setResult(info.file.response.data);
+      setCost(
+        info.file.response.data.map(
+          (x: { category: string; value: number }) => {
+            return { key: x.category, ...x };
+          }
+        )
+      );
       setIsDownloadIconVisible(false);
     }
   }, []);
 
   return (
     <div className="home">
-      <div className="home__result">
-        {result && (
-          <div className="result-text">
-            投资估算: <span>{result.platform.toFixed(0)}</span> 万元
-          </div>
-        )}
-      </div>
+      <div className="home__result">{cost && <CostTable data={cost} />}</div>
       <div className="home__uploader">
         <Dragger
           className="upload"
@@ -86,7 +83,7 @@ function Home() {
           multiple={false}
           action={`${process.env.REACT_APP_BACKEND_URL}/files/upload`}
           onDrop={() => {
-            setResult(undefined);
+            setCost(undefined);
           }}
           beforeUpload={beforeUpload}
           onChange={onChange}
@@ -106,6 +103,4 @@ function Home() {
       </div>
     </div>
   );
-}
-
-export default Home;
+};

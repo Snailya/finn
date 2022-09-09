@@ -39,8 +39,8 @@ public class CostService
         var costs = enumerable.GroupBy(x => x.Type)
             .Select(c => new CostDto()
             {
-                Type = c.Key,
-                Total = c.Sum(i => ((NumberValue)_expressions[i.Type].Execute(
+                Category = c.Key,
+                Value = c.Sum(i => ((NumberValue)_expressions[i.Type].Execute(
                     new ParameterCollection()
                     {
                         { "xp", i.XPosition },

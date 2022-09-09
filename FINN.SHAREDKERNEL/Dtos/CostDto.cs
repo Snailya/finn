@@ -5,6 +5,6 @@ namespace FINN.SHAREDKERNEL.Dtos;
 
 public class CostDto : JsonObject
 {
-    public string Type { get; set; }
-    public double Total { get; set; }
+    [JsonPropertyName("category")] public string Category { get; set; } = string.Empty;
+    [JsonPropertyName("value")] public double Value { get; set; }
 }
