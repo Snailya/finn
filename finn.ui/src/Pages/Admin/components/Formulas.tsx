@@ -62,7 +62,6 @@ export const Formulas = () => {
       .then((res) => res.json())
       .then((body) => {
         if (body.code === 0) {
-          console.log(body.data);
           var data = body.data.map((item: FormulaDto) => {
             return {
               key: item.id,

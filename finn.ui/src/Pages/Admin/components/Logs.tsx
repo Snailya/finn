@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { apiFetch } from "../../../service";
 import { red, blue, green } from "@ant-design/colors";
 import { RequestLogDto, TableRecord } from "dto";
+import moment from "moment";
 
 const { Title } = Typography;
 
@@ -19,6 +20,13 @@ const columns: ColumnsType<TableRecord<RequestLogDto>> = [
     title: "时间",
     dataIndex: "created",
     key: "created",
+    render: (value: string, record: TableRecord<RequestLogDto>) => (
+      <>{moment(value).format("yyyy-MM-DD HH:mm:ss")}</>
+    ),
+    sorter: (a: TableRecord<RequestLogDto>, b: TableRecord<RequestLogDto>) => {
+      return moment(a.created).valueOf() - moment(b.created).valueOf();
+    },
+    defaultSortOrder: "descend",
   },
   {
     title: "类型",
@@ -64,6 +72,11 @@ const columns: ColumnsType<TableRecord<RequestLogDto>> = [
       record.status.indexOf(value) === 0,
   },
   {
+    title: "源文件",
+    dataIndex: "origin",
+    key: "origin",
+  },
+  {
     title: "输入",
     dataIndex: "input",
     key: "input",
@@ -83,7 +96,14 @@ export const Logs: React.FC = () => {
       .then((res) => res.json())
       .then((body) => {
         if (body.code === 0) {
-          setData(body.data);
+          setData(
+            body.data.map((item: RequestLogDto) => {
+              return {
+                key: item.id,
+                ...item,
+              };
+            })
+          );
         }
       });
   }, []);

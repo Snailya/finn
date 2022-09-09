@@ -92,10 +92,11 @@ declare module "dto" {
   export interface RequestLogDto {
     id: number;
     status: string;
+    origin: string
     input: string;
     output: string;
     type: string;
-    created: string;
+    created: moment.Moment;
   }
 
   export interface CostDto {
