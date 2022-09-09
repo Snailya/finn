@@ -6,8 +6,9 @@ public class RequestLogDto
 {
     [JsonPropertyName("id")] public int Id { get; set; }
     [JsonPropertyName("status")] public string? Status { get; set; }
+    [JsonPropertyName("origin")] public string? Origin { get; set; }
     [JsonPropertyName("input")] public string? Input { get; set; }
     [JsonPropertyName("output")] public string? Output { get; set; }
     [JsonPropertyName("type")] public string? Type { get; set; }
-    [JsonPropertyName("created")] public string? Created { get; set; }
+    [JsonPropertyName("created")] public DateTime? Created { get; set; }
 }

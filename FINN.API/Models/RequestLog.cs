@@ -7,6 +7,7 @@ public class RequestLog : BaseEntity
     public string? Ip { get; set; }
     public string? RequestType { get; set; }
     public string? Status { get; set; }
+    public string? Origin { get; set; }
     public string? Input { get; set; }
     public string? Output { get; set; }
 }

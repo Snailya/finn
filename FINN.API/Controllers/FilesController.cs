@@ -44,8 +44,8 @@ public class FilesController : ControllerBase
 
         return extension switch
         {
-            ".xlsx" => await HandleXlsxUpload(input),
-            ".dxf" => await HandleDxfUpload(input)
+            ".xlsx" => await HandleXlsxUpload(input, file.FileName),
+            ".dxf" => await HandleDxfUpload(input, file.FileName)
         };
     }
 
@@ -72,7 +72,7 @@ public class FilesController : ControllerBase
         return BadRequest();
     }
 
-    private async Task<IActionResult> HandleDxfUpload(string input)
+    private async Task<IActionResult> HandleDxfUpload(string input, string origin)
     {
         _logger.LogInformation("Route to handle as dxf. The tmp file is stored at path: {Path}", input);
 
@@ -80,6 +80,7 @@ public class FilesController : ControllerBase
         // create log
         var log = new RequestLog
         {
+            Origin = origin,
             Input = input,
             RequestType = "cost",
             Status = "pending"
@@ -120,7 +121,7 @@ public class FilesController : ControllerBase
         return Ok(cost);
     }
 
-    private async Task<IActionResult> HandleXlsxUpload(string input)
+    private async Task<IActionResult> HandleXlsxUpload(string input, string origin)
     {
         _logger.LogInformation("Route to handle as xlsx. The tmp file is stored at path: {Path}", input);
 
@@ -129,6 +130,7 @@ public class FilesController : ControllerBase
         // create log
         var log = new RequestLog
         {
+            Origin = origin,
             Input = input,
             RequestType = "layout",
             Status = "pending"

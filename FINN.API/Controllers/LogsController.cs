@@ -30,9 +30,10 @@ public class LogsController : ControllerBase
         var response = new Response<IEnumerable<RequestLogDto>>("", 0, logs.Select(x => new RequestLogDto
         {
             Id = x.Id,
-            Created = x.Created?.ToLocalTime().ToString("yyyy/MM/dd HH:mm:ss"),
+            Created = x.Created?.ToLocalTime(),
             Type = x.RequestType,
             Status = x.Status,
+            Origin = x.Origin,
             Input = x.Input,
             Output = x.Output
         }));
