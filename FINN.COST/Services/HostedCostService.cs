@@ -4,6 +4,7 @@ using FINN.CORE.Models;
 using FINN.SHAREDKERNEL;
 using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace FINN.COST.Services;
@@ -11,9 +12,9 @@ namespace FINN.COST.Services;
 public class HostedCostService : HostedService
 {
     private readonly IBroker _broker;
-    private readonly CostService _service;
+    private readonly ICostService _service;
 
-    public HostedCostService(ILogger<HostedCostService> logger, IBroker broker, CostService service) : base(logger)
+    public HostedCostService(ILogger<HostedCostService> logger, IBroker broker, ICostService service) : base(logger)
     {
         _broker = broker;
         _service = service;
@@ -29,8 +30,7 @@ public class HostedCostService : HostedService
 
         await base.ExecuteAsync(stoppingToken);
     }
-
-
+    
     #region Handlers
 
     private void HandleListFormulas(string routingKey, string correlationId, string message)

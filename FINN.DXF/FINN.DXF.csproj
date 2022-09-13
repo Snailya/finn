@@ -11,9 +11,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\FINN.BROKER.RABBITMQ\FINN.BROKER.RABBITMQ.csproj" />
         <ProjectReference Include="..\FINN.CORE\FINN.CORE.csproj" />
-        <ProjectReference Include="..\FINN.PLUGINS.DXF\FINN.PLUGINS.DXF.csproj" />
-        <ProjectReference Include="..\FINN.PLUGINS.EFCORE\FINN.PLUGINS.EFCORE.csproj" />
+        <ProjectReference Include="..\FINN.REPOSITORY.EFCORE\FINN.REPOSITORY.EFCORE.csproj" />
         <ProjectReference Include="..\FINN.SHAREDKERNEL\FINN.SHAREDKERNEL.csproj" />
     </ItemGroup>
 
@@ -31,6 +31,12 @@
 
     <ItemGroup>
         <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Template.las">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

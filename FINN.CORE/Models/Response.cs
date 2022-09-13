@@ -16,9 +16,9 @@ public class Response : JsonObject
     /// <summary>
     ///     The error message of the response
     /// </summary>
-    [JsonPropertyName("msg")]
+    [JsonPropertyName("message")]
     [JsonPropertyOrder(0)]
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
     /// <summary>
     ///     The state code of the response. 0 for success.
@@ -44,7 +44,7 @@ public class Response<TData> : Response
     /// </summary>
     [JsonPropertyName("data")]
     [JsonPropertyOrder(2)]
-    public TData Data { get; set; }
+    public TData? Data { get; set; }
 }
 
 public class PagedResponse<TData> : Response<TData>

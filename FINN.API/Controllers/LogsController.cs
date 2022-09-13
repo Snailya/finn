@@ -1,7 +1,7 @@
 using FINN.API.Dtos;
 using FINN.API.Models;
+using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
-using FINN.PLUGINS.EFCORE;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FINN.API.Controllers;

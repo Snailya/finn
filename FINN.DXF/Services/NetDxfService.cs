@@ -1,14 +1,12 @@
 ﻿using FINN.CORE.Interfaces;
 using FINN.CORE.Models;
+using FINN.DXF.Geometries;
 using FINN.DXF.Models;
 using FINN.PLUGINS.DXF;
-using FINN.PLUGINS.DXF.Models;
 using FINN.PLUGINS.DXF.Utils;
-using FINN.PLUGINS.EFCORE;
 using FINN.SHAREDKERNEL.Constants;
 using FINN.SHAREDKERNEL.Dtos;
 using FINN.SHAREDKERNEL.Interfaces;
-using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;

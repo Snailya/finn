@@ -1,6 +1,7 @@
-﻿using FINN.COST.Models;
-using FINN.PLUGINS.EFCORE;
+﻿using FINN.CORE.Interfaces;
+using FINN.COST.Models;
 using FINN.SHAREDKERNEL.Dtos;
+using FINN.SHAREDKERNEL.Interfaces;
 using Microsoft.Extensions.Logging;
 using xFunc.Maths;
 using xFunc.Maths.Expressions;
@@ -8,7 +9,7 @@ using xFunc.Maths.Expressions.Collections;
 
 namespace FINN.COST.Services;
 
-public class CostService
+public class CostService : ICostService
 {
     private readonly ILogger<CostService> _logger;
     private readonly IRepositoryFactory<Formula> _factory;

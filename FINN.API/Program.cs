@@ -1,7 +1,8 @@
 using FINN.API.Data;
 using FINN.API.Models;
+using FINN.BROKER.RABBITMQ;
 using FINN.CORE.Interfaces;
-using FINN.PLUGINS.EFCORE;
+using FINN.REPOSITORY.EFCORE;
 using FINN.SHAREDKERNEL;
 
 var builder = WebApplication.CreateBuilder(args);

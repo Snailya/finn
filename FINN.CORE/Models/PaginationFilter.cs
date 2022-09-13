@@ -17,26 +17,26 @@ public class PaginationFilter : JsonObject
         PageSize = pageSize;
     }
 
-    [JsonPropertyName("pn")]
+    [JsonPropertyName("pageNumber")]
     public int PageNumber
     {
         get => _pageNumber;
         set
         {
             if (value < 0)
-                throw new ArgumentException();
+                throw new ArgumentException("Page number cannot be less than 0.");
             _pageNumber = value;
         }
     }
 
-    [JsonPropertyName("ps")]
+    [JsonPropertyName("pageSize")]
     public int PageSize
     {
         get => _pageSize;
         set
         {
             if (value < 0)
-                throw new ArgumentException();
+                throw new ArgumentException("Page size cannot be less than 0.");
             _pageSize = value;
         }
     }

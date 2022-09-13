@@ -1,9 +1,9 @@
 using System.Text.Json;
 using FINN.CORE.Models;
+using FINN.DXF.Geometries;
+using FINN.DXF.Models;
 using FINN.PLUGINS.DXF;
-using FINN.PLUGINS.DXF.Models;
 using FINN.PLUGINS.DXF.Utils;
-using FINN.SHAREDKERNEL.Models;
 using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;
@@ -23,7 +23,7 @@ public class Tests
     {
         var point11 = new Vector2d(1, 1);
         // zoom 2x based on (0,0)
-        point11.TransformBy(new Scale(2), Vector2d.Zero);
+        point11.TransformBy(new TransformScale(2), Vector2d.Zero);
         Assert.Multiple(() =>
         {
             Assert.That(point11.X, Is.EqualTo(2));
@@ -31,7 +31,7 @@ public class Tests
         });
         var point00 = new Vector2d(0, 0);
         // zoom 2x based on (1,1)
-        point00.TransformBy(new Scale(new Vector2d(1, 1), 2), Vector2d.Zero);
+        point00.TransformBy(new TransformScale(new Vector2d(1, 1), 2), Vector2d.Zero);
         Assert.Multiple(() =>
         {
             Assert.That(point00.X, Is.EqualTo(-1));
@@ -39,13 +39,13 @@ public class Tests
         });
         var point22 = new Vector2d(2, 2);
         // zoom 2x based on (0,0) and move (2,2)
-        point22.TransformBy(new Scale(new Vector2d(0, 0), 2), new Vector2d(2, 2));
+        point22.TransformBy(new TransformScale(new Vector2d(0, 0), 2), new Vector2d(2, 2));
         Assert.That(point22.X, Is.EqualTo(6));
         Assert.That(point22.Y, Is.EqualTo(6));
 
         var line = new Line(new Vector2(0, 0), new Vector2(1, 1));
         // zoom 2x based on (1,1) and move (1,0)
-        var scale = new Scale(new Vector2d(1, 1), 2);
+        var scale = new TransformScale(new Vector2d(1, 1), 2);
         var translate = new Vector2d(1, 0);
         line.TransformBy(scale, translate);
         Assert.Multiple(() =>
