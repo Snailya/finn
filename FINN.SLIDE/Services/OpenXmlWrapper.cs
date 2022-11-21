@@ -6,6 +6,13 @@ namespace FINN.SLIDE;
 
 public static class OpenXmlWrapper
 {
+    /// <summary>
+    ///     Copy and paste a slide from one into another.
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <param name="fromIndex"></param>
+    /// <param name="toIndex"></param>
     public static void Copy(PresentationDocument from, PresentationDocument to, int fromIndex, int? toIndex = null)
     {
         // copy the SlidePart from source to target document

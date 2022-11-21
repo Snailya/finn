@@ -1,47 +1,45 @@
-@import "~antd/dist/antd.css";
-
 .home {
-  margin: auto;
+    margin: auto;
 
-  height: 720px;
-  width: 1280px;
+    height: 720px;
+    width: 1280px;
 
-  background-image: url(../../../public/bg1280x720.png);
-  background-repeat: no-repeat;
-  background-position: center;
+    background-image: url(../../../public/bg1280x720.png);
+    background-repeat: no-repeat;
+    background-position: center;
 
-  display: flex;
-  /* 主轴方向*/
-  justify-content: space-between;
-  /* 交叉轴方向*/
-  align-items: stretch;
+    display: flex;
+    /* 主轴方向*/
+    justify-content: space-between;
+    /* 交叉轴方向*/
+    align-items: stretch;
 
-  padding: 32px;
+    padding: 32px;
 }
 
 .home__result {
-  padding: 96px;
+    padding: 96px;
 
-  display: flex;
-  align-items: flex-end;
-  color: white;
+    display: flex;
+    align-items: flex-end;
+    color: white;
 }
 
-.home__result .result-text{
-  font-size: 18px;
+.home__result .result-text {
+    font-size: 18px;
 }
 
 .home__uploader {
-  padding: 96px;
+    padding: 96px;
 }
 
 .upload {
-  background-color: white;
-  opacity: 80%;
-  width: 400px !important;
+    background-color: white;
+    opacity: 80%;
+    width: 400px !important;
 }
 
 .ant-upload-list {
-  background-color: white;
-  opacity: 80%;
+    background-color: white;
+    opacity: 80%;
 }

@@ -1,15 +1,16 @@
 .admin {
-  margin: auto;
+    margin: auto;
+    padding: 0 50px;
 }
 
 .admin__empty {
-  height: 100%;
+    height: 100%;
 }
 
 .canvasContainer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-width: 100px;
-  min-height: 100px;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-width: 100px;
+    min-height: 100px;
 }

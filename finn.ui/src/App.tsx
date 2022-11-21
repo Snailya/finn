@@ -1,28 +1,36 @@
-import {Layout} from "antd";
-import {Content, Footer, Header} from "antd/lib/layout/layout";
-import {BrowserRouter, Routes, Route} from "react-router-dom";
+import React from "react";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+
+import {ConfigProvider} from "antd";
+import 'antd/dist/reset.css';
+
 import {Admin} from "./pages/admin/Admin";
 import {Home} from "./pages/home/Home";
-import "./App.css";
-import React from "react";
-import {Slide} from "./pages/slide/Slide";
+import {Index as SlideIndex} from "./pages/slides/Index";
+import {SlidesShop} from "./pages/slides/SlidesShop";
+import {NotFound} from "./pages/notFound/NotFound";
+
 
 export default function App() {
     return (
-        <Layout className="layout">
-            <Header className="site-layout-header"></Header>
-            <Content style={{padding: "0 50px"}}>
-                <div className="site-layout-content">
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path="/admin" element={<Admin></Admin>}/>
-                            <Route path="/" element={<Home></Home>}/>
-                            <Route path="/slide" element={<Slide></Slide>}/>
-                        </Routes>
-                    </BrowserRouter>
-                </div>
-            </Content>
-            <Footer style={{textAlign: "center"}}>©2022 Coded by JetSnail</Footer>
-        </Layout>
+        <ConfigProvider theme={{
+            token: {}
+        }}>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/">
+                        <Route index element={<Home/>}/>
+                        <Route path="admin" element={<Admin/>}/>
+                        <Route path="slides">
+                            <Route index element={<SlideIndex/>}/>
+                            <Route path="standard" element={<SlidesShop fast={false}/>}/>
+                            <Route path="fast" element={<SlidesShop fast={true}/>}/>
+                        </Route>
+                    </Route>
+                    <Route path="*" element={<NotFound/>}/>
+                </Routes>
+            </BrowserRouter>
+        </ConfigProvider>
     );
 }
+

@@ -10,4 +10,5 @@ public class SlideDb : DbContext
     }
 
     public DbSet<Slide> Slides => Set<Slide>();
+    public DbSet<Topic> Topics => Set<Topic>();
 }
