@@ -1,12 +1,12 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Presentation;
+using Slide = FINN.SLIDE.Data.Slide;
 
 namespace FINN.SLIDE.Services;
 
 public static class SlideService
 {
-    private const string ContextFolder = "../data/";
-    private const string TemplatePath = @"C:\Users\snailya\Documents\Custom Office Templates\EmptySlide.potx";
+    private const string TemplatePath = "./Resources/_blank.potx";
 
     /// <summary>
     ///     Split the presentation file into many individual presentation files.
@@ -22,7 +22,8 @@ public static class SlideService
 
         for (var i = 0; i < from.PresentationPart.Presentation.SlideIdList.Count(); i++)
         {
-            var filePath = $"{ContextFolder}{GenerateFileName("pptx")}";
+            var filePath =
+                $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}/.finn/slides/{GenerateFileName("pptx")}";
 
             // save as individual
             using var to = PresentationDocument.CreateFromTemplate(TemplatePath);

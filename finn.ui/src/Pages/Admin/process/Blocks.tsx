@@ -9,12 +9,12 @@ import React, {useCallback, useEffect, useState} from "react";
 
 import {apiFetch} from "../../../service";
 import {Viewer} from "./Viewer";
-import {BlockDefinitionDto, TableRecord} from "dto";
+import {BlockDefinitionDto, TableViewModel} from "dto";
 
 const {Title} = Typography;
 
 export const Blocks: React.FC = () => {
-    const [data, setData] = useState<TableRecord<BlockDefinitionDto>[]>([]);
+    const [data, setData] = useState<TableViewModel<BlockDefinitionDto>[]>([]);
     const [previewUrl, setPreviewUrl] = useState<string>();
 
     const load = useCallback(() => {
@@ -51,7 +51,7 @@ export const Blocks: React.FC = () => {
     }, []);
 
     const onDeleteClick = useCallback(
-        (block: TableRecord<BlockDefinitionDto>) => {
+        (block: TableViewModel<BlockDefinitionDto>) => {
             apiFetch(`/blocks/${block.id}`, {method: "DELETE"})
                 .then((res) => res.json())
                 .then((body) => {
@@ -71,7 +71,7 @@ export const Blocks: React.FC = () => {
         [data]
     );
 
-    const columns: ColumnsType<TableRecord<BlockDefinitionDto>> = [
+    const columns: ColumnsType<TableViewModel<BlockDefinitionDto>> = [
         {
             title: "名称",
             dataIndex: "name",

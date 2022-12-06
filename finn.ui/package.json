@@ -15,6 +15,8 @@
     "antd": "^5.0.0",
     "axios": "^1.1.3",
     "dxf-viewer": "^1.0.15",
+    "immer": "^9.0.16",
+    "moment": "^2.29.4",
     "rc-virtual-list": "^3.4.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

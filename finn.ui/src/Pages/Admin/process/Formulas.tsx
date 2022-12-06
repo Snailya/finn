@@ -3,7 +3,7 @@ import "./Formulas.css";
 import {Col, Descriptions, Form, message, Row, Space, Table, Typography,} from "antd";
 import {useEffect, useState} from "react";
 import {apiFetch} from "../../../service";
-import {FormulaDto, TableRecord} from "dto";
+import {FormulaDto, TableViewModel} from "dto";
 import {EditableCell} from "../../../components/EditableCell";
 
 const {Title} = Typography;
@@ -45,7 +45,7 @@ const ParameterDescription = () => (
 
 export const Formulas = () => {
     const [form] = Form.useForm();
-    const [data, setData] = useState<TableRecord<FormulaDto>[]>();
+    const [data, setData] = useState<TableViewModel<FormulaDto>[]>();
     const [editingKey, setEditingKey] = useState<string | number>(-1);
 
     useEffect(() => {
@@ -77,10 +77,10 @@ export const Formulas = () => {
         setEditingKey(-1);
     };
 
-    const isEditing = (record: TableRecord<FormulaDto>) =>
+    const isEditing = (record: TableViewModel<FormulaDto>) =>
         record.key === editingKey;
 
-    const saveRecord = async (record: TableRecord<FormulaDto>) => {
+    const saveRecord = async (record: TableViewModel<FormulaDto>) => {
         try {
             var newRecord = form.getFieldsValue(true);
 
@@ -121,7 +121,7 @@ export const Formulas = () => {
         }
     };
 
-    const deleteRecord = (record: TableRecord<FormulaDto>) => {
+    const deleteRecord = (record: TableViewModel<FormulaDto>) => {
         try {
             apiFetch(`/formulas/${record.key}`, {
                 method: "DELETE",
@@ -163,7 +163,7 @@ export const Formulas = () => {
         {
             title: "动作",
             dataIndex: "operation",
-            render: (_: any, record: TableRecord<FormulaDto>) => {
+            render: (_: any, record: TableViewModel<FormulaDto>) => {
                 const editable = isEditing(record);
                 return editable ? (
                     <Space>
@@ -196,7 +196,7 @@ export const Formulas = () => {
 
         return {
             ...col,
-            onCell: (record: TableRecord<FormulaDto>) => ({
+            onCell: (record: TableViewModel<FormulaDto>) => ({
                 record,
                 dataIndex: col.dataIndex,
                 title: col.title,

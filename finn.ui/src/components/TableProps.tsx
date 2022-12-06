@@ -1,5 +1,5 @@
-import {TableRecord} from "dto";
+import {TableViewModel} from "dto";
 
 export interface TableProps<T> {
-    data: TableRecord<T>[];
+    data: TableViewModel<T>[];
 }

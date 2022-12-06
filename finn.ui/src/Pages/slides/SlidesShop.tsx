@@ -1,7 +1,10 @@
+import React, {useEffect, useState} from "react";
+import {useSearchParams} from "react-router-dom";
 import {
     Affix,
     Button,
     Checkbox,
+    Col,
     Drawer,
     Empty,
     FloatButton,
@@ -9,15 +12,16 @@ import {
     Layout,
     List,
     Menu,
+    Row,
     Skeleton,
     Space,
     theme,
     Typography
 } from "antd";
-import React, {useEffect, useState} from "react";
-import axios from "axios";
-import {Footer} from "../../components/Footer";
 import {CloseOutlined, ShoppingCartOutlined} from "@ant-design/icons";
+import axios from "axios";
+
+import {Footer} from "../../components/Footer";
 
 const {useToken} = theme;
 
@@ -26,7 +30,7 @@ interface Slide {
     image: string
 }
 
-const SelectedSlidesContext = React.createContext({
+const CartContext = React.createContext({
     slides: [] as Slide[],
     onAdd: (item: Slide) => {
     },
@@ -34,12 +38,69 @@ const SelectedSlidesContext = React.createContext({
     }
 });
 
-export const SlidesShop = ({fast}: { fast: boolean }) => {
-    const {token, theme} = useToken();
-    const [topics, setTopics] = useState([]);
+export const SlidesShop = () => {
     const [selectedTopic, setSelectedTopic] = useState<number[]>([]);
     const [selectedSlides, setSelectedSlides] = useState<Slide[]>([])
     const [open, setOpen] = useState(false);
+
+    const handleAdd = (item: { id: number; image: string }) => {
+        setSelectedSlides(x => [...x, item])
+    }
+
+    const handleRemove = (id: number) => {
+        setSelectedSlides(x => {
+            const index = x.findIndex((element) => element.id === id);
+            const previous = [...x];
+            previous.splice(index, 1);
+            return previous;
+        })
+    }
+
+
+    return (
+
+        <Layout style={{minHeight: '100vh'}}>
+            <Layout.Sider theme={"light"} style={{
+                minWidth: "200px"
+            }}>
+                <TopicMenu onSelect={setSelectedTopic}/>
+            </Layout.Sider>
+            <Layout>
+                <Layout.Content>
+                    {selectedTopic ? selectedTopic.map((topicId: number) => (
+                        <SlidesGallery key={topicId} id={topicId}/>
+                    )) : (<div>请选择主题</div>)}
+                </Layout.Content>
+                <Footer/>
+            </Layout>
+
+            <FloatButton style={{marginRight: "8px"}} icon={<ShoppingCartOutlined/>}
+                         onClick={() => setOpen(true)}/>
+
+            {/* 购物车 */}
+            <CartContext.Provider value={{
+                slides: selectedSlides,
+                onAdd: handleAdd,
+                onRemove: handleRemove
+            }}>
+                <Drawer title="购物车" placement="right" onClose={() => setOpen(false)} open={open}>
+                    <ShoppingCart items={selectedSlides}/>
+                </Drawer>
+            </CartContext.Provider>
+        </Layout>
+    );
+};
+
+const TopicMenu = ({onSelect}: { onSelect: (item: any) => void }) => {
+    const [searchParams] = useSearchParams({fast: "false"});
+    const fast = searchParams.get("fast") as unknown as boolean;
+
+    const [topics, setTopics] = useState([]);
+
+
+    const handleTopicSelected = ({item, key, keyPath, selectedKeys, domEvent}: any) => {
+        onSelect(item.props.topics);
+    }
 
     useEffect(() => {
         axios
@@ -58,60 +119,23 @@ export const SlidesShop = ({fast}: { fast: boolean }) => {
             });
     }, [])
 
-    const handleTopicSelected = ({item, key, keyPath, selectedKeys, domEvent}: any) => {
-        setSelectedTopic(item.props.topics);
-    }
-
-    const handleAdd = (item: { id: number; image: string }) => {
-        setSelectedSlides(x => [...x, item])
-    }
-
-    const handleRemove = (id: number) => {
-        setSelectedSlides(x => {
-            const index = x.findIndex((element) => element.id === id);
-            const previous = [...x];
-            previous.splice(index, 1);
-            return previous;
-        })
-    }
-
-
     return (
-        <SelectedSlidesContext.Provider value={{
-            slides: selectedSlides,
-            onAdd: handleAdd,
-            onRemove: handleRemove
-        }}>
-            <Layout style={{minHeight: '100vh'}}>
-                <Layout.Sider theme={"light"} style={{
-                    minWidth: "200px"
-                }}>
-                    <div>
-                        <Typography.Title style={{marginTop: "12px", paddingLeft: "28px"}}
-                                          level={3}>主题</Typography.Title>
-                        <Menu
-                            mode="inline"
-                            items={topics}
-                            onSelect={handleTopicSelected}
-                        />
-                    </div>
-                </Layout.Sider>
-                <Layout>
-                    <Layout.Content>
-                        {selectedTopic ? selectedTopic.map((topicId: number) => (
-                            <SlidesGallery key={topicId} id={topicId}/>
-                        )) : (<div>请选择主题</div>)}
-                    </Layout.Content>
-                    <Footer/>
-                </Layout>
-                <FloatButton style={{marginRight: "8px"}} icon={<ShoppingCartOutlined/>} onClick={() => setOpen(true)}/>
-                <Drawer title="购物车" placement="right" onClose={() => setOpen(false)} open={open}>
-                    <ShoppingCart items={selectedSlides}/>
-                </Drawer>
-            </Layout>
-        </SelectedSlidesContext.Provider>
-    );
-};
+        <div>
+            <Row align={"middle"}>
+                <Col flex={"1"}>
+                    <Typography.Title style={{marginTop: "12px", paddingLeft: "28px"}}
+                                      level={3}>主题</Typography.Title>
+                </Col>
+            </Row>
+            <Menu
+                mode="inline"
+                items={topics}
+                onSelect={handleTopicSelected}
+            />
+        </div>
+    )
+}
+
 
 const ShoppingCart = ({items}: { items: Slide[] }) => {
     return (
@@ -119,7 +143,7 @@ const ShoppingCart = ({items}: { items: Slide[] }) => {
             <div style={{flexGrow: "1"}}>
                 {items.length < 0 ?
                     <Empty/> :
-                    <SelectedSlidesContext.Consumer>
+                    <CartContext.Consumer>
                         {
                             ({slides, onAdd, onRemove}) =>
                                 <List
@@ -138,7 +162,7 @@ const ShoppingCart = ({items}: { items: Slide[] }) => {
                                     )}
                                 />
                         }
-                    </SelectedSlidesContext.Consumer>
+                    </CartContext.Consumer>
 
                 }
             </div>
@@ -179,21 +203,22 @@ export const SlidesGallery = ({id}: { id: number }) => {
         <div style={{background: "white", padding: "8px 16px", margin: "0 16px 16px 16px"}}>
             <div style={{display: "flex"}}>
                 <Typography.Title level={4} style={{flexGrow: "1"}}>{label}</Typography.Title>
-                <Button type={"primary"}
+
+                <Button type={"primary"} disabled={true}
                         href={`http://localhost:5000/topics/${id}/slides/download`}>下载</Button>
             </div>
-            <div style={{display: "flex", gap: "8px", flexFlow: "wrap"}}>
+            <div style={{display: "flex", gap: "8px", flexFlow: "wrap", justifyContent: "center"}}>
                 {slides.length > 0 ? slides.map((slideId: number) => (
                     <GalleryItem key={slideId} id={slideId}/>
                 )) : (
-                    <Empty/>
+                    <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE}/>
                 )}
             </div>
         </div>
     )
 }
 
-const GalleryItem = ({id}: { id: number }) => {
+export const GalleryItem = ({id}: { id: number }) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isSelected, setIsSelected] = useState<boolean>(false);
     const [src, setSrc] = useState("");
@@ -209,7 +234,7 @@ const GalleryItem = ({id}: { id: number }) => {
     }, [id])
 
     return (
-        <SelectedSlidesContext.Consumer>
+        <CartContext.Consumer>
             {({slides, onAdd, onRemove}) =>
                 <div style={{border: "1px solid", position: "relative"}}>
                     {isLoading
@@ -240,7 +265,7 @@ const GalleryItem = ({id}: { id: number }) => {
                         )
                     }
                 </div>}
-        </SelectedSlidesContext.Consumer>
+        </CartContext.Consumer>
     )
 }
 

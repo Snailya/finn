@@ -1,14 +1,17 @@
 ﻿using System.Text.Json.Serialization;
 using FINN.CORE.Models;
+using FINN.SLIDE.Data;
 
 namespace FINN.SLIDE;
 
 public sealed class Topic : BaseEntity
 {
+    private List<Topic> _topics = new();
+
     /// <summary>
     ///     The name of the topic.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     ///     The parent topic of this topic.
@@ -19,7 +22,15 @@ public sealed class Topic : BaseEntity
     /// <summary>
     ///     The children topic of this topic.
     /// </summary>
-    public List<Topic> Topics { get; set; } = new();
+    public List<Topic> Topics
+    {
+        get => _topics;
+        set
+        {
+            _topics = value;
+            _topics.ForEach(x => x.Parent = this);
+        }
+    }
 
     /// <summary>
     ///     The slides belongs to this topic.

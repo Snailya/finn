@@ -1,4 +1,6 @@
-﻿namespace FINN.SLIDE.Dtos;
+﻿using FINN.SLIDE.Data;
+
+namespace FINN.SLIDE.Dtos;
 
 public class SlideDto
 {
@@ -10,7 +12,7 @@ public class SlideDto
     /// <summary>
     ///     The base 64 string that represents the thumbnail of the presentation's slide.
     /// </summary>
-    public string Image { get; set; }
+    public string Image { get; set; } = string.Empty;
 
     /// <summary>
     ///     Map a dto from <see cref="Slide" />.

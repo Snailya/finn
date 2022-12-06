@@ -2,7 +2,7 @@ import './CostTable.css';
 
 import {Table, Typography} from "antd";
 import type {ColumnsType} from "antd/es/table";
-import {CostDto, TableRecord} from "dto";
+import {CostDto, TableViewModel} from "dto";
 import React from "react";
 import {TableProps} from "../../../components/TableProps";
 
@@ -12,18 +12,18 @@ const typeName: { [id: string]: string } = {
     platform: "平台",
 };
 
-const columns: ColumnsType<TableRecord<CostDto>> = [
+const columns: ColumnsType<TableViewModel<CostDto>> = [
     {
         title: "类型",
         dataIndex: "category",
-        render: (value: string, record: TableRecord<CostDto>) => (
+        render: (value: string, record: TableViewModel<CostDto>) => (
             <>{typeName[value]}</>
         ),
     },
     {
         title: "价格(万元)",
         dataIndex: "value",
-        render: (value: number, record: TableRecord<CostDto>) => (
+        render: (value: number, record: TableViewModel<CostDto>) => (
             <>{value.toFixed(0)}</>
         ),
     },

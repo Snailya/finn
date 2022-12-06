@@ -6,20 +6,20 @@ import type {ColumnsType} from "antd/es/table";
 import React, {useEffect, useState} from "react";
 import {apiFetch} from "../../../service";
 import {blue, green, red} from "@ant-design/colors";
-import {RequestLogDto, TableRecord} from "dto";
+import {RequestLogDto, TableViewModel} from "dto";
 import moment from "moment";
 
 const {Title} = Typography;
 
-const columns: ColumnsType<TableRecord<RequestLogDto>> = [
+const columns: ColumnsType<TableViewModel<RequestLogDto>> = [
     {
         title: "时间",
         dataIndex: "created",
         key: "created",
-        render: (value: string, record: TableRecord<RequestLogDto>) => (
+        render: (value: string, record: TableViewModel<RequestLogDto>) => (
             <>{moment(value).format("yyyy-MM-DD HH:mm:ss")}</>
         ),
-        sorter: (a: TableRecord<RequestLogDto>, b: TableRecord<RequestLogDto>) => {
+        sorter: (a: TableViewModel<RequestLogDto>, b: TableViewModel<RequestLogDto>) => {
             return moment(a.created).valueOf() - moment(b.created).valueOf();
         },
         defaultSortOrder: "descend",
@@ -28,7 +28,7 @@ const columns: ColumnsType<TableRecord<RequestLogDto>> = [
         title: "类型",
         dataIndex: "type",
         key: "type",
-        render: (value: string, record: TableRecord<RequestLogDto>) => (
+        render: (value: string, record: TableViewModel<RequestLogDto>) => (
             <Tag color={value === "layout" ? "geekblue" : "green"}>
                 {value.toUpperCase()}
             </Tag>
@@ -38,7 +38,7 @@ const columns: ColumnsType<TableRecord<RequestLogDto>> = [
         title: "状态",
         dataIndex: "status",
         key: "status",
-        render: (value: string, record: TableRecord<RequestLogDto>) => {
+        render: (value: string, record: TableViewModel<RequestLogDto>) => {
             switch (value) {
                 case "pending":
                     return <SyncOutlined spin style={{color: blue[5]}}/>;
@@ -64,7 +64,7 @@ const columns: ColumnsType<TableRecord<RequestLogDto>> = [
                 value: "error",
             },
         ],
-        onFilter: (value: any, record: TableRecord<RequestLogDto>) =>
+        onFilter: (value: any, record: TableViewModel<RequestLogDto>) =>
             record.status.indexOf(value) === 0,
     },
     {
@@ -85,7 +85,7 @@ const columns: ColumnsType<TableRecord<RequestLogDto>> = [
 ];
 
 export const Logs: React.FC = () => {
-    const [data, setData] = useState<TableRecord<RequestLogDto>[]>([]);
+    const [data, setData] = useState<TableViewModel<RequestLogDto>[]>([]);
 
     useEffect(() => {
         apiFetch("/logs")

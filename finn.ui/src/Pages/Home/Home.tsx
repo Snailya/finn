@@ -7,13 +7,13 @@ import {useCallback, useState} from "react";
 
 import {saveAs} from "../../service";
 import {CostTable} from "./compoents/CostTable";
-import {CostDto, TableRecord} from "dto";
+import {CostDto, TableViewModel} from "dto";
 import type {RcFile, UploadChangeParam, UploadFile} from 'antd/es/upload/interface';
 
 const {Dragger} = Upload;
 
 export const Home: React.FC = () => {
-    const [cost, setCost] = useState<TableRecord<CostDto>[]>();
+    const [cost, setCost] = useState<TableViewModel<CostDto>[]>();
     const [isDownloadIconVisible, setIsDownloadIconVisible] =
         useState<boolean>(false);
 

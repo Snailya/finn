@@ -9,7 +9,7 @@ import {Home} from "./pages/home/Home";
 import {Index as SlideIndex} from "./pages/slides/Index";
 import {SlidesShop} from "./pages/slides/SlidesShop";
 import {NotFound} from "./pages/notFound/NotFound";
-
+import {Mode} from "./pages/slides/Mode";
 
 export default function App() {
     return (
@@ -18,15 +18,15 @@ export default function App() {
         }}>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/">
-                        <Route index element={<Home/>}/>
-                        <Route path="admin" element={<Admin/>}/>
+                    <Route path="/*">
+                        <Route index path="process" element={<Home/>}/>
                         <Route path="slides">
                             <Route index element={<SlideIndex/>}/>
-                            <Route path="standard" element={<SlidesShop fast={false}/>}/>
-                            <Route path="fast" element={<SlidesShop fast={true}/>}/>
+                            <Route path="mode" element={<Mode/>}/>
+                            <Route path="shop" element={<SlidesShop/>}/>
                         </Route>
                     </Route>
+                    <Route path="/admin/*" element={<Admin/>}/>
                     <Route path="*" element={<NotFound/>}/>
                 </Routes>
             </BrowserRouter>

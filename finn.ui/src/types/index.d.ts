@@ -116,5 +116,23 @@ declare module "dto" {
         filename: string;
     }
 
-    export type TableRecord<T> = T & { key: string | number };
+    export interface SlideDto {
+        id: number;
+        image: string;
+    }
+
+    export interface TopicDto {
+        id: number;
+        parentId: number;
+        name: string;
+        isFast: boolean;
+        topics: number[];
+        slides: number[];
+    }
+
+    export type TreeViewModel<T> =
+        T
+        & { key: string | number, title: string, isLeaf: boolean, children: TreeViewModel<T>[] };
+    export type TreeSelectViewModel<T> = Omit<TreeViewModel<T>, "children"> & { value: string, pId: string | number }
+    export type TableViewModel<T> = T & { key: string | number };
 }
