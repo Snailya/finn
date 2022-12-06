@@ -1,7 +1,7 @@
 ﻿import {Col, Row} from "antd";
-import {Blocks} from "../components/Blocks";
-import {Formulas} from "../components/Formulas";
 import React from "react";
+import {Formulas} from "./Formulas";
+import {Blocks} from "./Blocks";
 
 export const Process = () => {
     return (
